@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>1. Kinematics — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
 </head>
 <body data-section="01-kinematics">
 <div class="wrap">
@@ -15,10 +17,644 @@
       <p class="sub">Kinematics describes how objects move without yet explaining why they move.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button data-target="constant-velocity">Constant Velocity</button>
+    <button data-target="constant-acceleration">Constant Acceleration</button>
+    <button data-target="free-fall">Free Fall</button>
+    <button class="active" data-target="projectile-motion">Projectile Motion</button>
+    <button data-target="relative-motion">Relative Motion</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= CONSTANT VELOCITY (stub) ================= -->
+    <div class="panel" id="panel-constant-velocity">
+      <h2>Constant Velocity</h2>
+      <p class="intro">Position, displacement, distance, speed, and velocity, described with an object moving at a steady pace.</p>
+      <div class="grid">
+        <div><h3>Concepts</h3><ul>
+          <li>Position</li><li>Displacement</li><li>Distance</li><li>Speed</li><li>Velocity</li>
+          <li>Position-time graphs</li><li>Velocity-time graphs</li>
+        </ul></div>
+        <div><h3>Problems &amp; applications</h3><ul>
+          <li>Catch-up problems</li><li>Overtaking vehicles</li><li>Walking on a moving walkway</li>
+          <li>Aircraft travelling with or against wind</li><li>Boats crossing a river</li>
+        </ul></div>
+        <div><h3>Experiments &amp; simulations</h3><ul>
+          <li>Motion graph lab — compare constant-speed motion to a position-time graph</li>
+          <li>Two-runner challenge — find when a faster runner catches a slower one</li>
+          <li>Relative-velocity explorer — change speed and direction of two moving objects</li>
+          <li>Video analysis — track a toy car or walking person frame by frame</li>
+        </ul></div>
+      </div>
+      <p class="status-note">Status: outline — full page coming soon.</p>
+    </div>
+
+    <!-- ================= CONSTANT ACCELERATION (stub) ================= -->
+    <div class="panel" id="panel-constant-acceleration">
+      <h2>Constant Acceleration</h2>
+      <p class="intro">Core equations: <var>v = u + at</var>, <var>s = ut + ½at²</var>, <var>v² = u² + 2as</var>.</p>
+      <div class="grid">
+        <div><h3>Concepts</h3><ul>
+          <li>Constant acceleration</li><li>Velocity-time graphs</li><li>Area under a velocity-time graph</li>
+          <li>Slope of a velocity-time graph</li><li>Braking distance</li><li>Reaction time</li>
+        </ul></div>
+        <div><h3>Problems &amp; applications</h3><ul>
+          <li>Car braking distance</li><li>Accelerating trains</li><li>Elevator motion</li><li>Sprinting</li>
+          <li>Motion down a shallow ramp</li>
+        </ul></div>
+        <div><h3>Experiments &amp; simulations</h3><ul>
+          <li>Motion-graph explorer — change initial velocity and acceleration, observe graphs</li>
+          <li>Ramp experiment — roll a cart down a ramp and estimate acceleration</li>
+          <li>Braking-distance calculator — compare stopping distances at different speeds</li>
+          <li>Elevator apparent-weight model — acceleration during lift start and stop</li>
+        </ul></div>
+      </div>
+      <p class="status-note">Status: outline — full page coming soon.</p>
+    </div>
+
+    <!-- ================= FREE FALL (stub) ================= -->
+    <div class="panel" id="panel-free-fall">
+      <h2>Free Fall</h2>
+      <p class="intro">What happens to speed, and to differently-shaped objects, when gravity is the only force that matters.</p>
+      <div class="grid">
+        <div><h3>Concepts</h3><ul>
+          <li>Gravitational acceleration near Earth</li><li>Free fall</li><li>Upward throws</li>
+          <li>Air resistance</li><li>Terminal velocity</li><li>Why mass doesn't affect ideal free-fall acceleration</li>
+        </ul></div>
+        <div><h3>Problems &amp; applications</h3><ul>
+          <li>Dropping an object from a known height</li><li>Throwing an object vertically upward</li>
+          <li>Comparing a vacuum to air resistance</li><li>Estimating reaction time using a falling ruler</li>
+        </ul></div>
+        <div><h3>Experiments &amp; simulations</h3><ul>
+          <li>Ruler-drop reaction-time test</li><li>Drop comparison — compact vs. high-drag objects</li>
+          <li>Free-fall graph simulation — position, velocity, acceleration vs. time</li>
+          <li>Terminal-velocity model — ideal free fall vs. drag-based motion</li>
+        </ul></div>
+      </div>
+      <p class="status-note">Status: outline — full page coming soon.</p>
+    </div>
+
+    <!-- ================= PROJECTILE MOTION (full) ================= -->
+    <div class="panel active" id="panel-projectile-motion">
+      <h2>Projectile Motion</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> if you throw a ball at 45° and
+        then throw the same ball, just as hard, at 30°, which one lands
+        farther away? Which one lands first? Most people guess wrong on at
+        least one of those — build the explorer below and check yourself
+        before reading on.
+      </p>
+
+      <p class="explainer">
+        The core idea behind everything on this page: gravity only pulls
+        <strong>down</strong>. It never pushes sideways. So a launched
+        object's horizontal motion and vertical motion don't interfere with
+        each other at all — you can work out each one separately, using
+        exactly the tools from <a href="../00-toolkit/index.html">the
+        toolkit</a> (components) and constant-velocity / constant-acceleration
+        kinematics, and then just recombine them.
+      </p>
+
+      <div class="var-list">
+        <div><var>x(t)</var>, <var>y(t)</var> — horizontal and vertical position at time <var>t</var></div>
+        <div><var>v₀</var> — launch speed</div>
+        <div><var>θ</var> (theta) — launch angle above horizontal</div>
+        <div><var>y₀</var> — launch height above the ground</div>
+        <div><var>g</var> — gravitational acceleration (9.8 m/s² on Earth)</div>
+        <div><var>R</var> — range (horizontal distance travelled when it lands)</div>
+        <div><var>H</var> — maximum height reached</div>
+        <div><var>T</var> — time of flight (total time in the air)</div>
+      </div>
+
+      <p class="explainer">
+        <var>x(t) = v₀cos(θ) · t</var> &nbsp;&nbsp;&nbsp; <var>y(t) = y₀ + v₀sin(θ) · t − ½gt²</var>
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: where those two equations come from</summary>
+        <p class="explainer">
+          Decompose the launch velocity into horizontal and vertical parts:
+          <var>v</var><sub>x</sub> = <var>v₀</var>cos(<var>θ</var>) and
+          <var>v</var><sub>y</sub> = <var>v₀</var>sin(<var>θ</var>). Horizontally
+          there is no acceleration at all (nothing is pushing the object
+          sideways), so that's just constant-velocity motion:
+          <var>x(t) = x₀ + v</var><sub>x</sub><var>t</var>. Vertically, the only
+          acceleration is gravity, <var>a</var> = −<var>g</var>, so that's
+          constant-acceleration motion: <var>y(t) = y₀ + v</var><sub>y</sub><var>t</var> − ½<var>gt</var>².
+          Substituting <var>v</var><sub>x</sub> and <var>v</var><sub>y</sub> gives exactly the two
+          boxed equations above. Every other projectile formula (range, height,
+          time of flight) is just algebra performed on these two.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Projectile Motion Explorer</h3>
+      <p class="explainer">
+        Adjust launch speed, angle, launch height, and gravity, and watch the
+        range, max height, and time of flight respond. The preset buttons load
+        realistic numbers for a few everyday throws — try "Clear the wall" to
+        turn this into a mini free-kick problem.
+      </p>
+
+      <div class="preset-row" id="presetRow">
+        <button data-preset="basketball">🏀 Basketball free throw</button>
+        <button data-preset="soccer">⚽ Soccer free kick</button>
+        <button data-preset="fountain">⛲ Water fountain</button>
+        <button data-preset="wall">🧱 Clear the wall</button>
+        <button data-preset="catapult">🏰 Catapult</button>
+      </div>
+
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 260" id="explorerSvg">
+            <line x1="0" y1="220" x2="500" y2="220" stroke="var(--text-primary)" stroke-width="2"></line>
+            <g id="explorerGroundHatch"></g>
+            <line x1="40" y1="20" x2="40" y2="220" class="svg-grid"></line>
+            <g id="explorerWall" style="display:none">
+              <rect id="explorerWallRect" x="0" y="0" width="10" height="0" fill="rgba(137,135,129,0.35)" stroke="var(--muted)"></rect>
+            </g>
+            <path id="explorerPathIdeal" d="" fill="none" stroke="#2a78d6" stroke-width="2.5"></path>
+            <path id="explorerPathDrag" d="" fill="none" stroke="#e34948" stroke-width="2" stroke-dasharray="5 4" style="display:none"></path>
+            <circle id="explorerBall" cx="40" cy="220" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text id="explorerVerdict" x="460" y="30" text-anchor="end" class="svg-label" font-weight="700"></text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row">
+              <div class="row-head"><span>Launch speed, v₀</span><b id="v0Val">15 m/s</b></div>
+              <input type="range" id="v0Slider" min="5" max="22" step="0.5" value="15">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Launch angle, θ</span><b id="thVal">45°</b></div>
+              <input type="range" id="thSlider" min="5" max="85" step="1" value="45">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Launch height, y₀</span><b id="y0Val">0.0 m</b></div>
+              <input type="range" id="y0Slider" min="0" max="5" step="0.1" value="0">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Gravity, g</span><b id="gVal">9.8 m/s²</b></div>
+              <input type="range" id="gSlider" min="4" max="25" step="0.1" value="9.8">
+            </div>
+            <label class="checkbox"><input type="checkbox" id="explorerWallToggle"> Show wall obstacle (9 m away, 2 m tall)</label>
+            <label class="checkbox"><input type="checkbox" id="dragToggle"> Include air resistance (drag)</label>
+            <div class="row" id="dragRow" style="display:none">
+              <div class="row-head"><span>Drag strength, b</span><b id="dragVal">0.02</b></div>
+              <input type="range" id="dragSlider" min="0" max="0.08" step="0.005" value="0.02">
+            </div>
+            <button class="action" id="explorerPlay">▶ Launch</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Range, R</td><td class="v" id="rangeVal">—</td></tr>
+              <tr><td class="k">Max height, H</td><td class="v" id="heightVal">—</td></tr>
+              <tr><td class="k">Time of flight, T</td><td class="v" id="flightVal">—</td></tr>
+              <tr id="dragRangeRow" style="display:none"><td class="k">Range with drag</td><td class="v" id="dragRangeVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving range, max height, and time of flight</summary>
+        <p class="explainer">
+          <strong>Time of flight</strong> — the object lands when <var>y(t) = 0</var>.
+          That's a quadratic in <var>t</var>: −½<var>gt</var>² + <var>v₀</var>sin(<var>θ</var>)<var>t</var> + <var>y₀</var> = 0.
+          The quadratic formula, keeping the positive root, gives:
+        </p>
+        <p class="explainer">
+          <var>T</var> = [ <var>v₀</var>sin(<var>θ</var>) + √( (<var>v₀</var>sin(<var>θ</var>))² + 2<var>gy₀</var> ) ] / <var>g</var>
+        </p>
+        <p class="explainer">
+          When the launch height <var>y₀</var> = 0, that simplifies to the
+          familiar <var>T</var> = 2<var>v₀</var>sin(<var>θ</var>)/<var>g</var>.
+        </p>
+        <p class="explainer">
+          <strong>Max height</strong> — the object stops rising exactly when its
+          vertical velocity hits zero: <var>v</var><sub>y</sub>(<var>t</var>) = <var>v₀</var>sin(<var>θ</var>) − <var>gt</var> = 0,
+          so that happens at <var>t</var><sub>h</sub> = <var>v₀</var>sin(<var>θ</var>)/<var>g</var>.
+          Plugging that back into <var>y(t)</var> gives:
+        </p>
+        <p class="explainer">
+          <var>H</var> = <var>y₀</var> + (<var>v₀</var>sin(<var>θ</var>))² / (2<var>g</var>)
+        </p>
+        <p class="explainer">
+          <strong>Range</strong> is just <var>R = x(T) = v₀</var>cos(<var>θ</var>)·<var>T</var>.
+          When <var>y₀</var> = 0, substituting the simple form of <var>T</var> and
+          using the identity 2sin(<var>θ</var>)cos(<var>θ</var>) = sin(2<var>θ</var>) gives the
+          well-known result <var>R</var> = <var>v₀</var>²sin(2<var>θ</var>)/<var>g</var> — which is
+          maximized at exactly <var>θ</var> = 45°, and gives the <em>same</em>
+          range for <var>θ</var> and 90° − <var>θ</var> (a 30° throw and a 60° throw,
+          at the same speed, land in the same spot — just at very different
+          times and heights). Try it on the explorer above.
+        </p>
+      </details>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: what air resistance actually changes</summary>
+        <p class="explainer">
+          The dashed red curve uses a simple drag model where the air pushes
+          back on the object with a force proportional to <var>v</var>² (speed
+          squared), always pointing opposite to the direction of motion. Written
+          as acceleration components, with <var>v</var> = √(<var>v</var><sub>x</sub>² + <var>v</var><sub>y</sub>²) and
+          drag-strength constant <var>b</var> (folding the object's drag
+          coefficient, cross-sectional area, air density, and mass into one
+          number):
+        </p>
+        <p class="explainer">
+          <var>a</var><sub>x</sub> = −<var>b·v·v</var><sub>x</sub> &nbsp;&nbsp; <var>a</var><sub>y</sub> = −<var>g</var> − <var>b·v·v</var><sub>y</sub>
+        </p>
+        <p class="explainer">
+          There's no clean formula for <var>x(t)</var> and <var>y(t)</var> anymore
+          — the widget instead steps forward in small time increments <var>Δt</var>
+          (about 20 milliseconds), recomputing the acceleration and updating the
+          velocity and position each step. This is called <strong>numerical
+          integration</strong> (specifically, the simplest version, Euler's
+          method), and it's the same basic idea used for almost any physics
+          simulation that doesn't have a tidy closed-form answer.
+        </p>
+        <p class="explainer">
+          One genuinely surprising consequence: with drag, the range-maximizing
+          angle is no longer 45° — it drops, often into the 30&ndash;40° range,
+          because a flatter shot spends less total time fighting air resistance.
+          Turn drag on and slide <var>θ</var> around 45° to see the ideal (blue)
+          and drag (red) curves disagree about where the optimum is.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Target Challenge</h3>
+      <p class="explainer">
+        Speed is fixed. Your only job is to find the angle that lands exactly
+        on the target. There are usually two different angles that work for
+        any given speed and distance — see if you can find both.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 250" id="targetSvg">
+            <line x1="0" y1="220" x2="460" y2="220" stroke="var(--text-primary)" stroke-width="2"></line>
+            <path id="targetPreview" d="" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"></path>
+            <path id="targetPath" d="" fill="none" stroke="#2a78d6" stroke-width="2.5" style="display:none"></path>
+            <circle id="targetBall" cx="20" cy="220" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <g id="targetMark">
+              <line x1="0" y1="205" x2="0" y2="220" stroke="#1baf7a" stroke-width="4"></line>
+              <circle cx="0" cy="200" r="5" fill="#1baf7a"></circle>
+            </g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row">
+              <div class="row-head"><span>Launch speed, v₀ (fixed for this round)</span><b id="tV0Val">18 m/s</b></div>
+              <input type="range" id="tV0Slider" min="12" max="24" step="0.5" value="18">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Launch angle, θ</span><b id="tThVal">45°</b></div>
+              <input type="range" id="tThSlider" min="5" max="85" step="1" value="45">
+            </div>
+            <button class="action" id="targetLaunch">▶ Launch</button>
+            <button class="action" id="targetNew">🎯 New target</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Target distance</td><td class="v" id="targetDist">—</td></tr>
+              <tr><td class="k">Predicted landing spot</td><td class="v" id="targetPredicted">—</td></tr>
+              <tr><td class="k">Result</td><td class="v" id="targetResult">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why two angles always work</summary>
+        <p class="explainer">
+          With <var>y₀</var> = 0, range is <var>R = v₀</var>²sin(2<var>θ</var>)/<var>g</var>.
+          Because sin(2<var>θ</var>) = sin(180° − 2<var>θ</var>) = sin(2(90° − <var>θ</var>)),
+          swapping <var>θ</var> for 90° − <var>θ</var> leaves <var>R</var> completely
+          unchanged. A 20° throw and a 70° throw at the same speed land in the
+          same place — the low, flat one gets there quickly; the high, lobbed
+          one takes much longer and spends far more time in the air. There is
+          exactly one exception: <var>θ</var> = 45° is its own pair (90° − 45° = 45°),
+          which is also why it's the single angle that maximizes range.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it at home: the water-stream experiment</h4>
+        <ol>
+          <li>Turn on a garden hose or a water fountain at a fixed pressure so the arc is steady.</li>
+          <li>Stand to the side and take a photo of the water arc against a plain background, with something of known length (a yardstick, a person of known height) in the same frame for scale.</li>
+          <li>Import the photo into any image editor or plotting tool and mark several (x, y) points along the visible arc.</li>
+          <li>Fit those points to <var>y = y₀ + tan(θ)·x − [g / (2v₀²cos²θ)]·x²</var> (the same equation as above, rewritten with time eliminated) and compare the fitted <var>θ</var> and <var>v₀</var> to what you'd estimate by eye.</li>
+          <li>Does the real arc match a parabola well, or does it look visibly "steeper on the way down" — a sign that air resistance mattered more than the ideal model assumes?</li>
+        </ol>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it at home: sports-video analysis</h4>
+        <ol>
+          <li>Find (or record) slow-motion footage of a thrown, kicked, or shot ball — a basketball free throw is a good, simple choice.</li>
+          <li>Step through the video frame by frame and mark the ball's pixel position in each frame, along with the known frame rate (e.g. 30 or 60 frames per second).</li>
+          <li>Convert pixel positions to real distances using a known reference length visible in the shot (the height of the hoop, the width of the court's key, etc.).</li>
+          <li>Plot vertical position against horizontal position — it should trace a parabola — and separately plot vertical position against <em>time</em>, which should look like the constant-acceleration curve from the "Constant Acceleration" tab.</li>
+          <li>Estimate the launch angle and speed from the first couple of frames, then check whether the Projectile-Motion Explorer above (with those numbers) predicts the same range you measured.</li>
+        </ol>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Interception Lab: leading a moving target</h3>
+      <p class="explainer">
+        Projectile motion gets genuinely interesting once the target isn't
+        sitting still. A quarterback has to throw <em>ahead</em> of a running
+        receiver; a dog has to run to where a thrown ball is <em>going to
+        be</em>, not where it is right now; two cars approaching the same
+        intersection have to (implicitly) solve the same kind of problem to
+        avoid meeting at the same point at the same time. All of these are the
+        same question: given two things in motion, is there a time
+        <var>t</var> at which they occupy the same place?
+      </p>
+
+      <div class="mode-toggle" id="interceptModeToggle">
+        <button class="active" data-mode="cars"><b>Two vehicles</b>Constant velocity, no gravity — e.g. two cars nearing an intersection</button>
+        <button data-mode="throw"><b>Thrown projectile vs. a moving target</b>Gravity acts on the projectile; the target rolls at constant speed</button>
+      </div>
+
+      <!-- Mode: cars -->
+      <div id="interceptCarsMode">
+        <div class="widget">
+          <div class="widget-visual">
+            <svg viewBox="0 0 460 460" id="carsSvg">
+              <g id="carsGrid"></g>
+              <line class="svg-axis" x1="10" y1="230" x2="450" y2="230"></line>
+              <line class="svg-axis" x1="230" y1="10" x2="230" y2="450"></line>
+              <path id="carsPathA" d="" stroke="#2a78d6" stroke-width="2" stroke-dasharray="4 3" fill="none"></path>
+              <path id="carsPathB" d="" stroke="#eb6834" stroke-width="2" stroke-dasharray="4 3" fill="none"></path>
+              <circle id="carsClosestMark" cx="0" cy="0" r="7" fill="none" stroke="#e34948" stroke-width="2" style="display:none"></circle>
+              <rect id="carA" x="-8" y="-5" width="16" height="10" fill="#2a78d6"></rect>
+              <rect id="carB" x="-8" y="-5" width="16" height="10" fill="#eb6834"></rect>
+            </svg>
+          </div>
+          <div class="widget-side">
+            <div class="controls">
+              <p class="control-group-label">Car A (blue) — moves along +x</p>
+              <div class="row"><div class="row-head"><span>Start position (x, y)</span><b id="aPosVal">(−30, 0) m</b></div>
+                <input type="range" id="aY0Slider" min="-15" max="15" step="1" value="0"></div>
+              <div class="row"><div class="row-head"><span>Speed</span><b id="aSpeedVal">10 m/s</b></div>
+                <input type="range" id="aSpeedSlider" min="2" max="18" step="1" value="10"></div>
+              <p class="control-group-label">Car B (orange)</p>
+              <div class="row"><div class="row-head"><span>Start position (x, y)</span><b id="bPosVal">(0, −30) m</b></div>
+                <input type="range" id="bX0Slider" min="-15" max="15" step="1" value="0"></div>
+              <div class="row"><div class="row-head"><span>Heading (from +x axis)</span><b id="bHeadVal">90°</b></div>
+                <input type="range" id="bHeadSlider" min="0" max="180" step="1" value="90"></div>
+              <div class="row"><div class="row-head"><span>Speed</span><b id="bSpeedVal">10 m/s</b></div>
+                <input type="range" id="bSpeedSlider" min="2" max="18" step="1" value="10"></div>
+              <button class="action" id="carsPlay">▶ Run</button>
+            </div>
+            <div class="readout">
+              <table>
+                <tr><td class="k">Closest approach</td><td class="v" id="carsClosest">—</td></tr>
+                <tr><td class="k">Time of closest approach</td><td class="v" id="carsClosestT">—</td></tr>
+                <tr><td class="k">Verdict</td><td class="v" id="carsVerdict">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <details class="math-details">
+          <summary>For math enthusiasts: solving for the closest approach</summary>
+          <p class="explainer">
+            Write each car's position as a straight line in time:
+            <var>p</var><sub>A</sub>(<var>t</var>) = <var>p</var><sub>A0</sub> + <var>v</var><sub>A</sub><var>t</var>,
+            and likewise for car B. Their separation is
+            <var>r</var>(<var>t</var>) = <var>p</var><sub>B</sub>(<var>t</var>) − <var>p</var><sub>A</sub>(<var>t</var>)
+            = Δ<var>p</var><sub>0</sub> + Δ<var>v</var>·<var>t</var>, where Δ<var>p</var><sub>0</sub> and Δ<var>v</var>
+            are the initial separation and relative velocity (both vectors).
+            The squared distance |<var>r</var>(<var>t</var>)|² is a simple upward
+            parabola in <var>t</var>; calculus (or completing the square) says its
+            minimum is at:
+          </p>
+          <p class="explainer">
+            <var>t</var>* = −(Δ<var>p</var><sub>0</sub> · Δ<var>v</var>) / |Δ<var>v</var>|²
+          </p>
+          <p class="explainer">
+            (a dot product on top, divided by the squared length of the relative
+            velocity). Plugging <var>t</var>* back into <var>r</var>(<var>t</var>)
+            gives the closest-approach distance. If that distance is smaller than
+            the sum of both cars' "radii," they collide before <var>t</var>*; if
+            <var>t</var>* comes out negative, their closest approach already
+            happened in the past and they're moving apart now.
+          </p>
+        </details>
+      </div>
+
+      <!-- Mode: throw -->
+      <div id="interceptThrowMode" style="display:none">
+        <div class="widget">
+          <div class="widget-visual">
+            <svg viewBox="0 0 500 260" id="throwSvg">
+              <line x1="0" y1="220" x2="500" y2="220" stroke="var(--text-primary)" stroke-width="2"></line>
+              <path id="throwPreview" d="" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"></path>
+              <path id="throwPath" d="" fill="none" stroke="#2a78d6" stroke-width="2.5" style="display:none"></path>
+              <circle id="throwBall" cx="20" cy="220" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+              <rect id="throwTarget" x="0" y="205" width="16" height="15" fill="#1baf7a"></rect>
+              <text id="throwVerdict" x="480" y="30" text-anchor="end" class="svg-label" font-weight="700"></text>
+            </svg>
+          </div>
+          <div class="widget-side">
+            <div class="controls">
+              <p class="control-group-label">Your throw</p>
+              <div class="row"><div class="row-head"><span>Launch speed, v₀</span><b id="thV0Val">16 m/s</b></div>
+                <input type="range" id="thV0Slider" min="8" max="25" step="0.5" value="16"></div>
+              <div class="row"><div class="row-head"><span>Launch angle, θ</span><b id="thThVal">40°</b></div>
+                <input type="range" id="thThSlider" min="10" max="80" step="1" value="40"></div>
+              <p class="control-group-label">Moving target</p>
+              <div class="row"><div class="row-head"><span>Starting distance</span><b id="thX0Val">20 m</b></div>
+                <input type="range" id="thX0Slider" min="10" max="40" step="1" value="20"></div>
+              <div class="row"><div class="row-head"><span>Target speed (+ away from you, − toward you)</span><b id="thVtVal">3 m/s</b></div>
+                <input type="range" id="thVtSlider" min="-6" max="8" step="0.5" value="3"></div>
+              <button class="action" id="throwLaunch">▶ Launch</button>
+            </div>
+            <div class="readout">
+              <table>
+                <tr><td class="k">Your time of flight</td><td class="v" id="thFlight">—</td></tr>
+                <tr><td class="k">Where you land</td><td class="v" id="thLand">—</td></tr>
+                <tr><td class="k">Where the target is by then</td><td class="v" id="thTargetPos">—</td></tr>
+                <tr><td class="k">Miss distance</td><td class="v" id="thMiss">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <details class="math-details">
+          <summary>For math enthusiasts: why this one doesn't have a one-line formula</summary>
+          <p class="explainer">
+            The target's position is linear in time, <var>x</var><sub>target</sub>(<var>t</var>) = <var>x</var><sub>0</sub> + <var>v</var><sub>t</sub><var>t</var>,
+            but your projectile's landing position depends on <var>θ</var> only
+            through <var>T</var>(<var>θ</var>) = 2<var>v₀</var>sin(<var>θ</var>)/<var>g</var> and
+            <var>R</var>(<var>θ</var>) = <var>v₀</var>²sin(2<var>θ</var>)/<var>g</var>, and both of those are
+            trigonometric, not linear. Setting <var>R</var>(<var>θ</var>) equal to
+            <var>x</var><sub>target</sub>(<var>T</var>(<var>θ</var>)) mixes sin(<var>θ</var>), sin(2<var>θ</var>),
+            and <var>θ</var> itself in one equation, which in general has no
+            algebraic solution — you either solve it numerically (have a
+            computer try many angles until one works, which is exactly what you
+            just did by hand with the slider) or, in the real world, iterate a
+            radar-guided solution continuously as the target moves. This is a
+            small-scale preview of Widget 4 below, where the same problem gets a
+            third dimension.
+          </p>
+        </details>
+      </div>
+
+      <h3 class="subhead">Widget 4 — Extending to 3D: intercepting a maneuvering target</h3>
+      <p class="explainer">
+        A real interception problem — a surface-to-air missile meeting an
+        incoming aircraft, or even just a well-thrown pass to a receiver
+        cutting across the field rather than running straight — isn't confined
+        to one vertical plane. The interceptor has to match the target's
+        downrange position <strong>and</strong> its sideways ("crossrange")
+        position <strong>and</strong> its altitude, all at the same instant.
+        That means aiming with two angles at once: an <strong>elevation</strong>
+        angle (up/down, same as <var>θ</var> above) and an <strong>azimuth</strong>
+        angle (left/right).
+      </p>
+
+      <div class="var-list">
+        <div><var>θ</var> — interceptor's elevation angle (up from horizontal)</div>
+        <div><var>φ</var> (phi) — interceptor's azimuth angle (sideways lead)</div>
+        <div><var>x</var> — downrange axis (toward the target)</div>
+        <div><var>z</var> — crossrange axis (sideways)</div>
+        <div><var>y</var> — altitude</div>
+        <div><var>T</var><sub>c</sub> — the intercept time you're aiming for</div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: the 3D equations</summary>
+        <p class="explainer">
+          The interceptor's launch speed splits three ways instead of two.
+          First, elevation splits it into a vertical part and a horizontal
+          part; then azimuth splits <em>that</em> horizontal part into
+          downrange and crossrange:
+        </p>
+        <p class="explainer">
+          <var>v</var><sub>x</sub> = <var>v₀</var>cos(<var>θ</var>)cos(<var>φ</var>) &nbsp;&nbsp;
+          <var>v</var><sub>z</sub> = <var>v₀</var>cos(<var>θ</var>)sin(<var>φ</var>) &nbsp;&nbsp;
+          <var>v</var><sub>y</sub> = <var>v₀</var>sin(<var>θ</var>)
+        </p>
+        <p class="explainer">
+          Gravity still only acts on <var>y</var>, so:
+          <var>x</var>(<var>t</var>) = <var>v</var><sub>x</sub><var>t</var>,
+          <var>z</var>(<var>t</var>) = <var>v</var><sub>z</sub><var>t</var>,
+          <var>y</var>(<var>t</var>) = <var>v</var><sub>y</sub><var>t</var> − ½<var>gt</var>².
+          The target, moving at constant velocity and (for simplicity) constant
+          altitude, has its own <var>x</var><sub>t</sub>(<var>t</var>), <var>z</var><sub>t</sub>(<var>t</var>),
+          and fixed <var>y</var><sub>t</sub>. A perfect intercept at your chosen
+          time <var>T</var><sub>c</sub> means all three coordinates match
+          simultaneously — three equations. With <var>v₀</var>, <var>θ</var>, and
+          <var>φ</var> as your three unknowns (for a chosen <var>T</var><sub>c</sub>),
+          this is, in general, exactly solvable — but doing it by algebra is
+          unpleasant, which is exactly why the widget below lets you solve it by
+          feel instead, the same way a fire-control computer solves it
+          iteratively rather than symbolically.
+        </p>
+      </details>
+
+      <p class="explainer">
+        Tune the target's motion, then tune your interceptor's <var>v₀</var>,
+        <var>θ</var>, <var>φ</var>, and your chosen intercept time <var>T</var><sub>c</sub>
+        until the live miss-distance below reads close to zero in
+        <strong>both</strong> views at once — that's the hard part; a fix in the
+        top-down view alone (matching downrange + crossrange) says nothing
+        about whether you'll be at the right altitude.
+      </p>
+
+      <div class="dual-pane">
+        <div>
+          <p class="pane-label">Top-down view (downrange × crossrange)</p>
+          <div class="widget-visual">
+            <svg viewBox="0 0 300 300" id="topSvg">
+              <line class="svg-axis" x1="20" y1="150" x2="280" y2="150"></line>
+              <line class="svg-axis" x1="20" y1="20" x2="20" y2="280"></line>
+              <path id="topTargetPath" stroke="#eb6834" stroke-width="2" stroke-dasharray="4 3" fill="none" d=""></path>
+              <path id="topInterceptPath" stroke="#2a78d6" stroke-width="2" fill="none" d=""></path>
+              <circle id="topTargetDot" r="6" fill="#eb6834" stroke="white" stroke-width="1.5" cx="20" cy="150"></circle>
+              <circle id="topInterceptDot" r="6" fill="#2a78d6" stroke="white" stroke-width="1.5" cx="20" cy="150"></circle>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <p class="pane-label">Side view (downrange × altitude)</p>
+          <div class="widget-visual">
+            <svg viewBox="0 0 300 300" id="sideSvg">
+              <line class="svg-axis" x1="20" y1="280" x2="280" y2="280"></line>
+              <line class="svg-axis" x1="20" y1="20" x2="20" y2="280"></line>
+              <path id="sideTargetPath" stroke="#eb6834" stroke-width="2" stroke-dasharray="4 3" fill="none" d=""></path>
+              <path id="sideInterceptPath" stroke="#2a78d6" stroke-width="2" fill="none" d=""></path>
+              <circle id="sideTargetDot" r="6" fill="#eb6834" stroke="white" stroke-width="1.5" cx="20" cy="280"></circle>
+              <circle id="sideInterceptDot" r="6" fill="#2a78d6" stroke="white" stroke-width="1.5" cx="20" cy="280"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-side" style="grid-column: 1 / -1; display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="controls">
+            <p class="control-group-label">Target</p>
+            <div class="row"><div class="row-head"><span>Starting downrange distance</span><b id="m_x0tVal">35 m</b></div>
+              <input type="range" id="m_x0tSlider" min="15" max="55" step="1" value="35"></div>
+            <div class="row"><div class="row-head"><span>Starting crossrange offset</span><b id="m_z0tVal">0 m</b></div>
+              <input type="range" id="m_z0tSlider" min="-25" max="25" step="1" value="0"></div>
+            <div class="row"><div class="row-head"><span>Altitude (constant)</span><b id="m_y0tVal">15 m</b></div>
+              <input type="range" id="m_y0tSlider" min="3" max="28" step="1" value="15"></div>
+            <div class="row"><div class="row-head"><span>Speed</span><b id="m_vtVal">10 m/s</b></div>
+              <input type="range" id="m_vtSlider" min="0" max="20" step="0.5" value="10"></div>
+            <div class="row"><div class="row-head"><span>Heading (toward you = 180°)</span><b id="m_headVal">180°</b></div>
+              <input type="range" id="m_headSlider" min="90" max="270" step="1" value="180"></div>
+          </div>
+          <div class="controls">
+            <p class="control-group-label">Your interceptor</p>
+            <div class="row"><div class="row-head"><span>Launch speed, v₀</span><b id="m_v0Val">30 m/s</b></div>
+              <input type="range" id="m_v0Slider" min="15" max="60" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>Elevation, θ</span><b id="m_thVal">30°</b></div>
+              <input type="range" id="m_thSlider" min="5" max="70" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>Azimuth, φ</span><b id="m_phVal">0°</b></div>
+              <input type="range" id="m_phSlider" min="-45" max="45" step="1" value="0"></div>
+            <div class="row"><div class="row-head"><span>Intercept time, T꜀</span><b id="m_tcVal">2.0 s</b></div>
+              <input type="range" id="m_tcSlider" min="0.3" max="8" step="0.1" value="2.0"></div>
+            <button class="action" id="m_launch">▶ Fly it</button>
+          </div>
+        </div>
+      </div>
+      <div class="readout">
+        <table>
+          <tr><td class="k">Target position at T꜀</td><td class="v" id="m_targetPos">—</td></tr>
+          <tr><td class="k">Interceptor position at T꜀</td><td class="v" id="m_interceptPos">—</td></tr>
+          <tr><td class="k">3D miss distance</td><td class="v" id="m_missDist">—</td></tr>
+          <tr><td class="k">Verdict</td><td class="v" id="m_verdict">—</td></tr>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ================= RELATIVE MOTION (stub) ================= -->
+    <div class="panel" id="panel-relative-motion">
+      <h2>Relative Motion</h2>
+      <p class="intro">Velocity is always measured relative to something — the last tab's interception lab already leans on this.</p>
+      <div class="grid">
+        <div><h3>Concepts</h3><ul>
+          <li>Relative velocity between two moving objects</li><li>Frame-dependent displacement</li>
+          <li>Vector subtraction for relative motion</li>
+        </ul></div>
+        <div><h3>Problems &amp; applications</h3><ul>
+          <li>Crossing a moving river</li><li>Wind-affected flight paths</li><li>Relative speed of passing vehicles</li>
+        </ul></div>
+        <div><h3>Experiments &amp; simulations</h3><ul>
+          <li>Boat-river crossing simulator</li><li>Two-object relative-velocity explorer</li>
+        </ul></div>
+      </div>
+      <p class="status-note">Status: outline — full page coming soon.</p>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/kinematics.js"></script>
 </body>
 </html>

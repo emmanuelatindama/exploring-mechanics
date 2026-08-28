@@ -24,6 +24,15 @@
   display: block;
   touch-action: none;
 }
+/* Square (1:1) SVGs stretch to fill a wide grid column, which makes them
+   tall enough to push the rest of the tab below the fold. Cap their
+   rendered size instead of letting them grow with the column. */
+.widget-visual.compact svg {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.readout table + table { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 
 .widget-side {
   display: flex;
@@ -112,3 +121,33 @@
 .svg-label { font-size: 12px; fill: var(--text-secondary); }
 .svg-axis { stroke: var(--gridline); stroke-width: 1; }
 .svg-grid { stroke: var(--gridline); stroke-width: 0.6; }
+
+.explainer var, .readout var, summary var {
+  font-style: normal;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  color: var(--text-primary);
+}
+
+details.math-details {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-1);
+  padding: 4px 14px;
+  margin: 0 0 18px;
+  max-width: 100ch;
+}
+details.math-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 8px 0;
+  list-style: none;
+}
+details.math-details summary::-webkit-details-marker { display: none; }
+details.math-details summary::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+details.math-details[open] summary::before { transform: rotate(90deg); }
+details.math-details .explainer:last-child { margin-bottom: 10px; }

@@ -40,29 +40,34 @@
         <strong>cube</strong> of length. Drag the slider and watch why a
         scaled-up elephant can't just be a scaled-up mouse — its legs would need
         to grow far thicker than its body just to keep up with its own weight.
+        The two shapes below scale by the same factor <var>k</var> at the same
+        time, on purpose: the ratios don't care whether the object is a cube or
+        a sphere.
       </p>
       <div class="widget">
         <div class="widget-visual">
-          <svg viewBox="0 0 460 260" id="scaleSvg">
-            <defs>
-              <marker id="arrow-gridnone" viewBox="0 0 1 1"></marker>
-            </defs>
-            <line class="svg-axis" x1="20" y1="230" x2="230" y2="230"></line>
-            <rect id="cubeSmall" x="30" y="190" width="40" height="40" fill="rgba(42,120,214,0.25)" stroke="var(--accent)" stroke-width="2"></rect>
-            <text x="50" y="185" text-anchor="middle" class="svg-label">side = 1</text>
-            <rect id="cubeBig" x="110" y="190" width="40" height="40" fill="rgba(235,104,52,0.22)" stroke="var(--accent-2)" stroke-width="2"></rect>
-            <text id="cubeBigLabel" x="130" y="185" text-anchor="middle" class="svg-label">side = k</text>
+          <svg viewBox="0 0 460 300" id="scaleSvg">
+            <line class="svg-axis" x1="20" y1="120" x2="230" y2="120"></line>
+            <rect id="cubeSmall" x="30" y="80" width="40" height="40" fill="rgba(42,120,214,0.25)" stroke="var(--accent)" stroke-width="2"></rect>
+            <text x="50" y="75" text-anchor="middle" class="svg-label">side = 1</text>
+            <rect id="cubeBig" x="110" y="80" width="40" height="40" fill="rgba(235,104,52,0.22)" stroke="var(--accent-2)" stroke-width="2"></rect>
+            <text id="cubeBigLabel" x="130" y="75" text-anchor="middle" class="svg-label">side = k</text>
 
-            <line class="svg-axis" x1="250" y1="230" x2="450" y2="230"></line>
-            <rect id="barL" x="262" y="223" width="36" height="7" fill="var(--accent)"></rect>
-            <rect id="barA" x="322" y="223" width="36" height="7" fill="var(--accent-2)"></rect>
-            <rect id="barV" x="382" y="223" width="36" height="7" fill="#1baf7a"></rect>
-            <text x="280" y="248" text-anchor="middle" class="svg-label">Length</text>
-            <text x="340" y="248" text-anchor="middle" class="svg-label">Area</text>
-            <text x="400" y="248" text-anchor="middle" class="svg-label">Volume</text>
-            <text id="barLVal" x="280" y="215" text-anchor="middle" class="svg-label">×1.0</text>
-            <text id="barAVal" x="340" y="215" text-anchor="middle" class="svg-label">×1.0</text>
-            <text id="barVVal" x="400" y="215" text-anchor="middle" class="svg-label">×1.0</text>
+            <line class="svg-axis" x1="20" y1="270" x2="450" y2="270"></line>
+            <circle id="circleSmall" cx="50" cy="250" r="20" fill="rgba(42,120,214,0.25)" stroke="var(--accent)" stroke-width="2"></circle>
+            <text x="50" y="222" text-anchor="middle" class="svg-label">r = 1</text>
+            <circle id="circleBig" cx="130" cy="250" r="20" fill="rgba(235,104,52,0.22)" stroke="var(--accent-2)" stroke-width="2"></circle>
+            <text id="circleBigLabel" x="130" y="222" text-anchor="middle" class="svg-label">r = k</text>
+
+            <rect id="barL" x="310" y="263" width="36" height="7" fill="var(--accent)"></rect>
+            <rect id="barA" x="370" y="263" width="36" height="7" fill="var(--accent-2)"></rect>
+            <rect id="barV" x="430" y="263" width="36" height="7" fill="#1baf7a"></rect>
+            <text x="328" y="288" text-anchor="middle" class="svg-label">Length</text>
+            <text x="388" y="288" text-anchor="middle" class="svg-label">Area</text>
+            <text x="448" y="288" text-anchor="middle" class="svg-label">Volume</text>
+            <text id="barLVal" x="328" y="255" text-anchor="middle" class="svg-label">×1.0</text>
+            <text id="barAVal" x="388" y="255" text-anchor="middle" class="svg-label">×1.0</text>
+            <text id="barVVal" x="448" y="255" text-anchor="middle" class="svg-label">×1.0</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -84,6 +89,28 @@
       <p class="explainer" id="scaleSentence">
         At k = 1.0, both objects are identical: everything scales together.
       </p>
+      <details class="math-details">
+        <summary>For math enthusiasts</summary>
+        <p class="explainer">
+          For a shape with a characteristic length <var>L</var> (a cube's side,
+          a sphere's radius, an animal's height — anything with consistent
+          proportions), surface area scales like <var>L</var>², because area is
+          always a product of two lengths, and volume scales like <var>L</var>³,
+          because volume is a product of three lengths. Scaling that shape by a
+          factor <var>k</var> (so <var>L</var> → <var>kL</var>) therefore sends:
+        </p>
+        <p class="explainer">
+          Area → <var>k</var>²·(original area), &nbsp; Volume → <var>k</var>³·(original volume).
+        </p>
+        <p class="explainer">
+          A sphere's surface area is 4π<var>r</var>² and its volume is
+          (4/3)π<var>r</var>³ — different constants out front than a cube's 6<var>L</var>²
+          and <var>L</var>³, but the same <var>k</var>² and <var>k</var>³ scaling with size.
+          That's the whole point of dimensional analysis: the exponents on
+          length are a property of geometry (area = length × length, volume =
+          length × length × length), not of the particular shape.
+        </p>
+      </details>
     </div>
 
     <!-- ================= 2. VECTORS & COMPONENTS ================= -->
@@ -95,7 +122,7 @@
         to see how two vectors add tip-to-tail into a resultant <strong>R</strong>.
       </p>
       <div class="widget">
-        <div class="widget-visual">
+        <div class="widget-visual compact">
           <svg viewBox="0 0 400 400" id="vecSvg">
             <defs>
               <marker id="arrow-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -153,7 +180,7 @@
         straight-line motion look simple.
       </p>
       <div class="widget">
-        <div class="widget-visual">
+        <div class="widget-visual compact">
           <svg viewBox="0 0 400 400" id="coordSvg">
             <defs>
               <marker id="arrow-p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -193,20 +220,31 @@
     <div class="panel" id="panel-frames">
       <h2>Reference Frames</h2>
       <p class="explainer">
-        A walker moves along a moving walkway. The <strong>same motion</strong>
-        looks different depending on whose frame you describe it from: the
-        ground frame sees both the walkway and the walker's own steps; the
-        walkway frame only sees the steps.
+        There is <strong>one</strong> walker, taking steps at a steady pace on
+        a moving airport-style walkway. Two <strong>observers</strong> watch
+        that same walker and, if you asked each of them "how fast are they
+        going?", they would give you two different — and equally correct —
+        numbers, because "how fast" always means <em>fast relative to
+        something</em>. Below, the top strip is what a person standing on
+        solid ground next to the walkway sees; the bottom strip is what a
+        person riding the walkway itself (moving along with the belt) sees.
+        Same walker, same instant, two viewpoints.
+      </p>
+      <p class="explainer">
+        <var>u</var> is how fast the walkway (the belt) itself moves, measured
+        by the ground observer. <var>w</var> is how fast the walker is
+        stepping, measured against the walkway surface under their
+        feet — i.e. how fast they'd be moving if the belt were switched off.
       </p>
       <div class="widget">
         <div class="widget-visual">
           <svg viewBox="0 0 460 230" id="framesSvg">
-            <text x="8" y="18" class="svg-label">Ground frame</text>
+            <text x="8" y="18" class="svg-label">Observer 1: standing on the ground beside the walkway</text>
             <rect x="8" y="26" width="444" height="34" fill="none" stroke="var(--gridline)"></rect>
             <rect id="beltGround" x="8" y="26" width="444" height="34" fill="url(#beltPattern)"></rect>
             <circle id="walkerGround" cx="8" cy="43" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
 
-            <text x="8" y="118" class="svg-label">Walkway frame (belt looks stationary here)</text>
+            <text x="8" y="118" class="svg-label">Observer 2: riding the walkway, moving with the belt</text>
             <rect x="8" y="126" width="444" height="34" fill="none" stroke="var(--gridline)"></rect>
             <rect x="8" y="126" width="444" height="34" fill="url(#beltPatternStill)"></rect>
             <circle id="walkerFrame" cx="8" cy="143" r="10" fill="#eb6834" stroke="white" stroke-width="2"></circle>
@@ -220,27 +258,48 @@
               </pattern>
             </defs>
 
-            <text x="230" y="205" text-anchor="middle" class="svg-label" id="frameNote">u = walkway speed, w = walking speed relative to the walkway</text>
+            <text x="230" y="205" text-anchor="middle" class="svg-label" id="frameNote">To observer 2, the belt's tick-marks don't move — only the walker's own steps do.</text>
           </svg>
         </div>
         <div class="widget-side">
           <div class="controls">
             <div class="row">
-              <div class="row-head"><span>Walkway speed, u</span><b id="uVal">1.0 m/s</b></div>
+              <div class="row-head"><span>Walkway (belt) speed, u</span><b id="uVal">1.0 m/s</b></div>
               <input type="range" id="uSlider" min="-1.5" max="2" step="0.1" value="1">
             </div>
             <div class="row">
-              <div class="row-head"><span>Walking speed (relative to walkway), w</span><b id="wVal">1.0 m/s</b></div>
+              <div class="row-head"><span>Walker's own stepping speed, w</span><b id="wVal">1.0 m/s</b></div>
               <input type="range" id="wSlider" min="-1.5" max="2" step="0.1" value="1">
             </div>
             <button class="action" id="playPause">Pause</button>
           </div>
           <div class="readout">
             <table>
-              <tr><td class="k">Ground-frame velocity</td><td class="v" id="groundVel">u + w = 2.0 m/s</td></tr>
-              <tr><td class="k">Walkway-frame velocity</td><td class="v" id="frameVel">w = 1.0 m/s</td></tr>
+              <tr><td class="k">Speed seen by observer 1 (ground)</td><td class="v" id="groundVel">u + w = 2.0 m/s</td></tr>
+              <tr><td class="k">Speed seen by observer 2 (on the belt)</td><td class="v" id="frameVel">w = 1.0 m/s</td></tr>
             </table>
           </div>
+          <details class="math-details">
+            <summary>For math enthusiasts</summary>
+            <p class="explainer">
+              This is Galilean velocity addition. If <var>v</var><sub>walker,ground</sub>
+              is the walker's velocity as measured by the ground observer,
+              <var>v</var><sub>belt,ground</sub> = <var>u</var> is the belt's
+              velocity relative to the ground, and <var>v</var><sub>walker,belt</sub> = <var>w</var>
+              is the walker's velocity relative to the belt, then:
+            </p>
+            <p class="explainer">
+              <var>v</var><sub>walker,ground</sub> = <var>v</var><sub>belt,ground</sub> + <var>v</var><sub>walker,belt</sub> = <var>u</var> + <var>w</var>
+            </p>
+            <p class="explainer">
+              Velocities relative to different things add like vectors along
+              the shared direction of travel. It's also why this stops
+              working at speeds close to the speed of light — special
+              relativity replaces this simple sum with a formula that never
+              lets two added speeds exceed <var>c</var>, but at walking pace
+              the difference is unmeasurably small.
+            </p>
+          </details>
         </div>
       </div>
     </div>
@@ -249,14 +308,26 @@
     <div class="panel" id="panel-fbd">
       <h2>Free-Body Diagrams</h2>
       <p class="explainer">
-        Toggle forces on and off and drag the sliders. The dashed dark arrow is
-        the <strong>net force</strong> — the vector sum of every active force.
-        Un-check the normal force to see the classic student mistake: forgetting
-        it produces a net force straight down through a box that should just be
+        Push or pull on a box at an angle, and that one push doesn't act in
+        just one direction — it <strong>splits</strong>. Part of it acts
+        horizontally (actually sliding the box along) and part acts
+        vertically (pressing the box down into the ground, or lifting it up
+        off of it). A free-body diagram is a picture of exactly how much of
+        each force is "felt" in each direction, all at once, so you can add
+        them up. Drag the applied force's angle slider below and watch the
+        blue arrow's horizontal and vertical reach change — and watch the
+        green (normal) and red (friction) arrows react to it.
+      </p>
+      <p class="explainer">
+        Toggle forces on and off. The dashed dark arrow is the <strong>net
+        force</strong> — the sum of every active force's horizontal parts and
+        every active force's vertical parts, added separately. Un-check the
+        normal force to see the classic student mistake: forgetting it
+        produces a net force straight down through a box that should just be
         sitting still.
       </p>
       <div class="widget">
-        <div class="widget-visual">
+        <div class="widget-visual compact">
           <svg viewBox="0 0 400 340" id="fbdSvg">
             <defs>
               <marker id="arrow-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#eb6834"></path></marker>
@@ -306,11 +377,45 @@
           </div>
           <div class="readout">
             <table>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Weight → (horiz., vert.)</td><td class="v" id="wComp">(0.0, 0.0) N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Normal → (horiz., vert.)</td><td class="v" id="nComp">(0.0, 0.0) N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Applied → (horiz., vert.)</td><td class="v" id="appComp">(0.0, 0.0) N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#e34948"></span>Friction → (horiz., vert.)</td><td class="v" id="frComp">(0.0, 0.0) N</td></tr>
+            </table>
+            <table>
               <tr><td class="k">Net force (Fx, Fy)</td><td class="v" id="netVal">(0, 0) N</td></tr>
               <tr><td class="k">|Net|</td><td class="v" id="netMag">0 N</td></tr>
             </table>
           </div>
           <p class="explainer" id="fbdVerdict" style="margin:0">Net force ≈ 0 → the box stays in equilibrium.</p>
+          <details class="math-details">
+            <summary>For math enthusiasts</summary>
+            <p class="explainer">
+              An applied force of magnitude <var>F</var> at angle <var>θ</var>
+              above horizontal splits into components
+              <var>F</var><sub>x</sub> = <var>F</var>cos<var>θ</var> (horizontal)
+              and <var>F</var><sub>y</sub> = <var>F</var>sin<var>θ</var> (vertical),
+              because <var>F</var> is the hypotenuse of a right triangle whose
+              legs are exactly those two components.
+            </p>
+            <p class="explainer">
+              With weight <var>W</var> acting straight down and the box resting
+              on a horizontal surface, the surface pushes back just hard enough
+              to prevent the box from sinking into it:
+              <var>N</var> = max(0, <var>W</var> − <var>F</var><sub>y</sub>).
+              That's why lifting the applied force's angle up reduces the normal
+              force — part of the box's weight is being "carried" by the pull
+              instead of by the ground.
+            </p>
+            <p class="explainer">
+              Every force here is added component-by-component to get the net
+              force: <var>F</var><sub>net,x</sub> = ΣF<sub>x</sub> and
+              <var>F</var><sub>net,y</sub> = ΣF<sub>y</sub>. This is the whole
+              idea behind free-body diagrams — turn every force into an
+              (<var>x</var>, <var>y</var>) pair first, then add columns
+              instead of arrows.
+            </p>
+          </details>
         </div>
       </div>
     </div>

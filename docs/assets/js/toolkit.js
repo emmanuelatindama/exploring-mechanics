@@ -81,13 +81,15 @@
     const kVal = document.getElementById("kVal");
     const cubeBig = document.getElementById("cubeBig");
     const cubeBigLabel = document.getElementById("cubeBigLabel");
+    const circleBig = document.getElementById("circleBig");
+    const circleBigLabel = document.getElementById("circleBigLabel");
     const barL = document.getElementById("barL"), barA = document.getElementById("barA"), barV = document.getElementById("barV");
     const barLVal = document.getElementById("barLVal"), barAVal = document.getElementById("barAVal"), barVVal = document.getElementById("barVVal");
     const rL = document.getElementById("rL"), rA = document.getElementById("rA"), rV = document.getElementById("rV");
     const sentence = document.getElementById("scaleSentence");
     if (!slider) return;
 
-    const BASE = 40, BOTTOM = 230, LEFT = 110, PXPER = 150 / 27;
+    const BASE = 40, SQUARE_BOTTOM = 120, LEFT = 110, CIRCLE_R0 = 20, CIRCLE_CY = 250, CIRCLE_CX = 130, CHART_BOTTOM = 270, PXPER = 190 / 27;
 
     function render() {
       const k = parseFloat(slider.value);
@@ -96,19 +98,25 @@
       const side = BASE * k;
       cubeBig.setAttribute("width", side);
       cubeBig.setAttribute("height", side);
-      cubeBig.setAttribute("y", BOTTOM - side);
+      cubeBig.setAttribute("y", SQUARE_BOTTOM - side);
       cubeBigLabel.setAttribute("x", LEFT + side / 2);
-      cubeBigLabel.setAttribute("y", Math.max(15, BOTTOM - side - 5));
+      cubeBigLabel.setAttribute("y", Math.max(15, SQUARE_BOTTOM - side - 5));
       cubeBigLabel.textContent = "side = " + k.toFixed(2);
+
+      const radius = CIRCLE_R0 * k;
+      circleBig.setAttribute("r", radius);
+      circleBig.setAttribute("cy", CIRCLE_CY + CIRCLE_R0 - radius);
+      circleBigLabel.setAttribute("y", Math.max(15, CIRCLE_CY + CIRCLE_R0 - 2 * radius - 5));
+      circleBigLabel.textContent = "r = " + k.toFixed(2);
 
       const k2 = k * k, k3 = k * k * k;
       const hL = k * PXPER, hA = k2 * PXPER, hV = k3 * PXPER;
-      barL.setAttribute("y", 230 - hL); barL.setAttribute("height", hL);
-      barA.setAttribute("y", 230 - hA); barA.setAttribute("height", hA);
-      barV.setAttribute("y", 230 - hV); barV.setAttribute("height", hV);
-      barLVal.setAttribute("y", Math.max(15, 230 - hL - 8));
-      barAVal.setAttribute("y", Math.max(15, 230 - hA - 8));
-      barVVal.setAttribute("y", Math.max(15, 230 - hV - 8));
+      barL.setAttribute("y", CHART_BOTTOM - hL); barL.setAttribute("height", hL);
+      barA.setAttribute("y", CHART_BOTTOM - hA); barA.setAttribute("height", hA);
+      barV.setAttribute("y", CHART_BOTTOM - hV); barV.setAttribute("height", hV);
+      barLVal.setAttribute("y", Math.max(15, CHART_BOTTOM - hL - 8));
+      barAVal.setAttribute("y", Math.max(15, CHART_BOTTOM - hA - 8));
+      barVVal.setAttribute("y", Math.max(15, CHART_BOTTOM - hV - 8));
       barLVal.textContent = "×" + k.toFixed(2);
       barAVal.textContent = "×" + k2.toFixed(2);
       barVVal.textContent = "×" + k3.toFixed(2);
@@ -335,6 +343,7 @@
     const vecFriction = document.getElementById("vecFriction"), labelFriction = document.getElementById("labelFriction");
     const vecNet = document.getElementById("vecNet"), labelNet = document.getElementById("labelNet");
     const netVal = document.getElementById("netVal"), netMag = document.getElementById("netMag");
+    const wComp = document.getElementById("wComp"), nComp = document.getElementById("nComp"), appComp = document.getElementById("appComp"), frComp = document.getElementById("frComp");
     const verdict = document.getElementById("fbdVerdict");
     const hatching = document.getElementById("hatching");
 
@@ -381,6 +390,11 @@
       setVec(vecNormal, labelNormal, normalOn, 0, N, `N = ${N.toFixed(0)} N`);
       setVec(vecApplied, labelApplied, appliedOn, Ax, Ay, `F = ${Fapp} N`);
       setVec(vecFriction, labelFriction, frictionOn, Ffx, 0, `f = ${Ffr} N`);
+
+      wComp.textContent = `(0.0, ${Wy.toFixed(1)}) N`;
+      nComp.textContent = `(0.0, ${N.toFixed(1)}) N`;
+      appComp.textContent = `(${Ax.toFixed(1)}, ${Ay.toFixed(1)}) N`;
+      frComp.textContent = `(${Ffx.toFixed(1)}, 0.0) N`;
 
       const NetX = Ax + Ffx;
       const NetY = Wy + Ay + N;
