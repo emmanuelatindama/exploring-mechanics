@@ -1,0 +1,6 @@
+# Python dependencies for notebooks/ (derivations, numerical methods, data analysis)
+numpy
+scipy
+matplotlib
+sympy
+jupyter
