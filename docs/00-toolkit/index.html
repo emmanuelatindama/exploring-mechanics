@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>0. Mathematical and Modeling Toolkit — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
 </head>
 <body data-section="00-toolkit">
 <div class="wrap">
@@ -12,13 +13,310 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 0. Toolkit</p>
       <h1>0. Mathematical and Modeling Toolkit</h1>
-      <p class="sub">This section establishes the language used throughout the repository.</p>
+      <p class="sub">
+        This section establishes the language used throughout the repository.
+        Drag things, drop things, drag sliders — every idea below is meant to
+        be played with, not just read.
+      </p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="units">Units &amp; Dimensional Analysis</button>
+    <button data-target="vectors">Vectors &amp; Components</button>
+    <button data-target="coordinates">Coordinate Systems</button>
+    <button data-target="frames">Reference Frames</button>
+    <button data-target="fbd">Free-Body Diagrams</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= 1. UNITS & DIMENSIONAL ANALYSIS ================= -->
+    <div class="panel active" id="panel-units">
+      <h2>Units and Dimensional Analysis</h2>
+      <p class="explainer">
+        Length scales linearly, surface area scales with the <strong>square</strong>
+        of length, and volume (so mass, for a fixed density) scales with the
+        <strong>cube</strong> of length. Drag the slider and watch why a
+        scaled-up elephant can't just be a scaled-up mouse — its legs would need
+        to grow far thicker than its body just to keep up with its own weight.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 260" id="scaleSvg">
+            <defs>
+              <marker id="arrow-gridnone" viewBox="0 0 1 1"></marker>
+            </defs>
+            <line class="svg-axis" x1="20" y1="230" x2="230" y2="230"></line>
+            <rect id="cubeSmall" x="30" y="190" width="40" height="40" fill="rgba(42,120,214,0.25)" stroke="var(--accent)" stroke-width="2"></rect>
+            <text x="50" y="185" text-anchor="middle" class="svg-label">side = 1</text>
+            <rect id="cubeBig" x="110" y="190" width="40" height="40" fill="rgba(235,104,52,0.22)" stroke="var(--accent-2)" stroke-width="2"></rect>
+            <text id="cubeBigLabel" x="130" y="185" text-anchor="middle" class="svg-label">side = k</text>
+
+            <line class="svg-axis" x1="250" y1="230" x2="450" y2="230"></line>
+            <rect id="barL" x="262" y="223" width="36" height="7" fill="var(--accent)"></rect>
+            <rect id="barA" x="322" y="223" width="36" height="7" fill="var(--accent-2)"></rect>
+            <rect id="barV" x="382" y="223" width="36" height="7" fill="#1baf7a"></rect>
+            <text x="280" y="248" text-anchor="middle" class="svg-label">Length</text>
+            <text x="340" y="248" text-anchor="middle" class="svg-label">Area</text>
+            <text x="400" y="248" text-anchor="middle" class="svg-label">Volume</text>
+            <text id="barLVal" x="280" y="215" text-anchor="middle" class="svg-label">×1.0</text>
+            <text id="barAVal" x="340" y="215" text-anchor="middle" class="svg-label">×1.0</text>
+            <text id="barVVal" x="400" y="215" text-anchor="middle" class="svg-label">×1.0</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row">
+              <div class="row-head"><span>Scale factor k</span><b id="kVal">1.0×</b></div>
+              <input type="range" id="scaleSlider" min="0.5" max="3" step="0.05" value="1">
+            </div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Length ratio</td><td class="v" id="rL">k = 1.00</td></tr>
+              <tr><td class="k">Area ratio</td><td class="v" id="rA">k² = 1.00</td></tr>
+              <tr><td class="k">Volume / mass ratio</td><td class="v" id="rV">k³ = 1.00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="explainer" id="scaleSentence">
+        At k = 1.0, both objects are identical: everything scales together.
+      </p>
+    </div>
+
+    <!-- ================= 2. VECTORS & COMPONENTS ================= -->
+    <div class="panel" id="panel-vectors">
+      <h2>Vectors and Components</h2>
+      <p class="explainer">
+        Drag the tip of vector <strong>A</strong> (blue). The dashed lines show
+        its horizontal and vertical components. Turn on vector <strong>B</strong>
+        to see how two vectors add tip-to-tail into a resultant <strong>R</strong>.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 400" id="vecSvg">
+            <defs>
+              <marker id="arrow-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"></path>
+              </marker>
+              <marker id="arrow-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#eb6834"></path>
+              </marker>
+              <marker id="arrow-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"></path>
+              </marker>
+            </defs>
+            <g id="vecGrid"></g>
+            <line class="svg-axis" x1="10" y1="200" x2="390" y2="200"></line>
+            <line class="svg-axis" x1="200" y1="10" x2="200" y2="390"></line>
+
+            <line id="projAx" x1="200" y1="200" x2="200" y2="200" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"></line>
+            <line id="projAy" x1="200" y1="200" x2="200" y2="200" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"></line>
+
+            <g id="groupB" style="display:none">
+              <line id="lineTailAtoR" x1="0" y1="0" x2="0" y2="0" stroke="#eb6834" stroke-width="1.5" stroke-dasharray="3 3"></line>
+              <line id="vecR" x1="200" y1="200" x2="200" y2="200" stroke="#1baf7a" stroke-width="3" marker-end="url(#arrow-r)"></line>
+              <line id="vecB" x1="200" y1="200" x2="240" y2="140" stroke="#eb6834" stroke-width="3" marker-end="url(#arrow-b)"></line>
+              <circle id="handleB" cx="240" cy="140" r="9" fill="#eb6834" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            </g>
+
+            <line id="vecA" x1="200" y1="200" x2="280" y2="120" stroke="#2a78d6" stroke-width="3" marker-end="url(#arrow-a)"></line>
+            <circle id="handleA" cx="280" cy="120" r="9" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <label class="checkbox"><input type="checkbox" id="toggleB"> Show vector B and resultant R = A + B</label>
+            <button class="action" id="resetVec">Reset vectors</button>
+          </div>
+          <div class="readout">
+            <table id="vecReadout">
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>A</td><td class="v" id="aVal">(2.0, 3.0)</td></tr>
+              <tr><td class="k">|A|, angle</td><td class="v" id="aMag">3.6 @ 56°</td></tr>
+              <tr id="rowB" style="display:none"><td class="k"><span class="swatch" style="background:#eb6834"></span>B</td><td class="v" id="bVal">—</td></tr>
+              <tr id="rowR" style="display:none"><td class="k"><span class="swatch" style="background:#1baf7a"></span>R = A+B</td><td class="v" id="rVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 3. COORDINATE SYSTEMS ================= -->
+    <div class="panel" id="panel-coordinates">
+      <h2>Coordinate Systems</h2>
+      <p class="explainer">
+        The same point has Cartesian coordinates (x, y) and polar coordinates
+        (r, θ). Drag the point and switch grids to see why polar coordinates
+        make circular motion look simple, while Cartesian coordinates make
+        straight-line motion look simple.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 400" id="coordSvg">
+            <defs>
+              <marker id="arrow-p" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"></path>
+              </marker>
+            </defs>
+            <g id="cartGrid"></g>
+            <g id="polarGrid" style="display:none"></g>
+            <line class="svg-axis" x1="10" y1="200" x2="390" y2="200"></line>
+            <line class="svg-axis" x1="200" y1="10" x2="200" y2="390"></line>
+
+            <line id="cProjX" x1="200" y1="200" x2="200" y2="200" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"></line>
+            <line id="cProjY" x1="200" y1="200" x2="200" y2="200" stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"></line>
+            <path id="thetaArc" d="" fill="none" stroke="#eb6834" stroke-width="2"></path>
+            <text id="thetaLabel" x="0" y="0" class="svg-label" fill="#eb6834">θ</text>
+
+            <line id="vecP" x1="200" y1="200" x2="280" y2="140" stroke="#2a78d6" stroke-width="3" marker-end="url(#arrow-p)"></line>
+            <circle id="handleP" cx="280" cy="140" r="9" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <label class="checkbox"><input type="checkbox" id="togglePolar"> Show polar grid instead of Cartesian</label>
+            <button class="action" id="resetCoord">Reset point</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Cartesian (x, y)</td><td class="v" id="xyVal">(2.0, 3.0)</td></tr>
+              <tr><td class="k">Polar (r, θ)</td><td class="v" id="rtVal">3.6, 56°</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 4. REFERENCE FRAMES ================= -->
+    <div class="panel" id="panel-frames">
+      <h2>Reference Frames</h2>
+      <p class="explainer">
+        A walker moves along a moving walkway. The <strong>same motion</strong>
+        looks different depending on whose frame you describe it from: the
+        ground frame sees both the walkway and the walker's own steps; the
+        walkway frame only sees the steps.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 230" id="framesSvg">
+            <text x="8" y="18" class="svg-label">Ground frame</text>
+            <rect x="8" y="26" width="444" height="34" fill="none" stroke="var(--gridline)"></rect>
+            <rect id="beltGround" x="8" y="26" width="444" height="34" fill="url(#beltPattern)"></rect>
+            <circle id="walkerGround" cx="8" cy="43" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+
+            <text x="8" y="118" class="svg-label">Walkway frame (belt looks stationary here)</text>
+            <rect x="8" y="126" width="444" height="34" fill="none" stroke="var(--gridline)"></rect>
+            <rect x="8" y="126" width="444" height="34" fill="url(#beltPatternStill)"></rect>
+            <circle id="walkerFrame" cx="8" cy="143" r="10" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+
+            <defs>
+              <pattern id="beltPattern" width="40" height="34" patternUnits="userSpaceOnUse">
+                <line x1="6" y1="0" x2="6" y2="34" stroke="var(--muted)" stroke-width="3"></line>
+              </pattern>
+              <pattern id="beltPatternStill" width="40" height="34" patternUnits="userSpaceOnUse">
+                <line x1="6" y1="0" x2="6" y2="34" stroke="var(--muted)" stroke-width="3"></line>
+              </pattern>
+            </defs>
+
+            <text x="230" y="205" text-anchor="middle" class="svg-label" id="frameNote">u = walkway speed, w = walking speed relative to the walkway</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row">
+              <div class="row-head"><span>Walkway speed, u</span><b id="uVal">1.0 m/s</b></div>
+              <input type="range" id="uSlider" min="-1.5" max="2" step="0.1" value="1">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Walking speed (relative to walkway), w</span><b id="wVal">1.0 m/s</b></div>
+              <input type="range" id="wSlider" min="-1.5" max="2" step="0.1" value="1">
+            </div>
+            <button class="action" id="playPause">Pause</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Ground-frame velocity</td><td class="v" id="groundVel">u + w = 2.0 m/s</td></tr>
+              <tr><td class="k">Walkway-frame velocity</td><td class="v" id="frameVel">w = 1.0 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= 5. FREE-BODY DIAGRAMS ================= -->
+    <div class="panel" id="panel-fbd">
+      <h2>Free-Body Diagrams</h2>
+      <p class="explainer">
+        Toggle forces on and off and drag the sliders. The dashed dark arrow is
+        the <strong>net force</strong> — the vector sum of every active force.
+        Un-check the normal force to see the classic student mistake: forgetting
+        it produces a net force straight down through a box that should just be
+        sitting still.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 340" id="fbdSvg">
+            <defs>
+              <marker id="arrow-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#eb6834"></path></marker>
+              <marker id="arrow-n" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"></path></marker>
+              <marker id="arrow-f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"></path></marker>
+              <marker id="arrow-fr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#e34948"></path></marker>
+              <marker id="arrow-net" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--text-primary)"></path></marker>
+            </defs>
+            <line x1="20" y1="300" x2="380" y2="300" stroke="var(--text-primary)" stroke-width="2"></line>
+            <g id="hatching"></g>
+            <rect x="160" y="240" width="80" height="60" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+
+            <line id="vecWeight" x1="200" y1="270" x2="200" y2="270" stroke="#eb6834" stroke-width="3" marker-end="url(#arrow-w)"></line>
+            <text id="labelWeight" class="svg-label" fill="#eb6834"></text>
+
+            <line id="vecNormal" x1="200" y1="270" x2="200" y2="270" stroke="#1baf7a" stroke-width="3" marker-end="url(#arrow-n)"></line>
+            <text id="labelNormal" class="svg-label" fill="#1baf7a"></text>
+
+            <line id="vecApplied" x1="200" y1="270" x2="200" y2="270" stroke="#2a78d6" stroke-width="3" marker-end="url(#arrow-f)"></line>
+            <text id="labelApplied" class="svg-label" fill="#2a78d6"></text>
+
+            <line id="vecFriction" x1="200" y1="270" x2="200" y2="270" stroke="#e34948" stroke-width="3" marker-end="url(#arrow-fr)"></line>
+            <text id="labelFriction" class="svg-label" fill="#e34948"></text>
+
+            <line id="vecNet" x1="200" y1="270" x2="200" y2="270" stroke="var(--text-primary)" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#arrow-net)"></line>
+            <text id="labelNet" class="svg-label" fill="var(--text-primary)"></text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <label class="checkbox"><input type="checkbox" id="cbWeight" checked> Weight (W = 50 N)</label>
+            <label class="checkbox"><input type="checkbox" id="cbNormal" checked> Normal force</label>
+            <label class="checkbox"><input type="checkbox" id="cbApplied" checked> Applied force</label>
+            <div class="row">
+              <div class="row-head"><span>Applied magnitude</span><b id="fAppVal">40 N</b></div>
+              <input type="range" id="fAppSlider" min="0" max="80" step="1" value="40">
+            </div>
+            <div class="row">
+              <div class="row-head"><span>Applied angle above horizontal</span><b id="thAppVal">30°</b></div>
+              <input type="range" id="thAppSlider" min="0" max="90" step="1" value="30">
+            </div>
+            <label class="checkbox"><input type="checkbox" id="cbFriction" checked> Friction</label>
+            <div class="row">
+              <div class="row-head"><span>Friction magnitude</span><b id="fFrVal">20 N</b></div>
+              <input type="range" id="fFrSlider" min="0" max="50" step="1" value="20">
+            </div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Net force (Fx, Fy)</td><td class="v" id="netVal">(0, 0) N</td></tr>
+              <tr><td class="k">|Net|</td><td class="v" id="netMag">0 N</td></tr>
+            </table>
+          </div>
+          <p class="explainer" id="fbdVerdict" style="margin:0">Net force ≈ 0 → the box stays in equilibrium.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
 </body>
 </html>
