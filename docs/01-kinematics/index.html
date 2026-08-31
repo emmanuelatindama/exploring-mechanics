@@ -19,85 +19,818 @@
   </header>
 
   <nav class="tabbar" id="tabbar">
-    <button data-target="constant-velocity">Constant Velocity</button>
+    <button class="active" data-target="constant-velocity">Constant Velocity</button>
     <button data-target="constant-acceleration">Constant Acceleration</button>
     <button data-target="free-fall">Free Fall</button>
-    <button class="active" data-target="projectile-motion">Projectile Motion</button>
+    <button data-target="projectile-motion">Projectile Motion</button>
     <button data-target="relative-motion">Relative Motion</button>
   </nav>
 
   <div class="panels" id="panels">
 
     <!-- ================= CONSTANT VELOCITY (stub) ================= -->
-    <div class="panel" id="panel-constant-velocity">
+    <div class="panel active" id="panel-constant-velocity">
       <h2>Constant Velocity</h2>
-      <p class="intro">Position, displacement, distance, speed, and velocity, described with an object moving at a steady pace.</p>
-      <div class="grid">
-        <div><h3>Concepts</h3><ul>
-          <li>Position</li><li>Displacement</li><li>Distance</li><li>Speed</li><li>Velocity</li>
-          <li>Position-time graphs</li><li>Velocity-time graphs</li>
-        </ul></div>
-        <div><h3>Problems &amp; applications</h3><ul>
-          <li>Catch-up problems</li><li>Overtaking vehicles</li><li>Walking on a moving walkway</li>
-          <li>Aircraft travelling with or against wind</li><li>Boats crossing a river</li>
-        </ul></div>
-        <div><h3>Experiments &amp; simulations</h3><ul>
-          <li>Motion graph lab — compare constant-speed motion to a position-time graph</li>
-          <li>Two-runner challenge — find when a faster runner catches a slower one</li>
-          <li>Relative-velocity explorer — change speed and direction of two moving objects</li>
-          <li>Video analysis — track a toy car or walking person frame by frame</li>
-        </ul></div>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you walk 3 steps forward,
+        then 1 step back. How far have you <em>walked</em>? Where do you
+        <em>end up</em>, measured from where you started? Those are two
+        different questions with two different answers — that gap is the
+        entire distinction this tab is built around.
+      </p>
+
+      <div class="var-list">
+        <div><var>x</var> — position (where something is, measured from a chosen origin)</div>
+        <div><var>Δx</var> — displacement (net change in position, end minus start — a vector, can be negative)</div>
+        <div>distance — total length of path travelled (always ≥ 0, never subtracts)</div>
+        <div><var>t</var> — time; <var>Δt</var> — elapsed time</div>
+        <div><var>v</var> — velocity, <var>v = Δx / Δt</var> (a vector — sign/direction matters)</div>
+        <div>speed — magnitude of velocity, |<var>v</var>| (always ≥ 0)</div>
       </div>
-      <p class="status-note">Status: outline — full page coming soon.</p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: distance vs. displacement, speed vs. velocity</summary>
+        <p class="explainer">
+          Walk 3 m forward then 1 m back: distance travelled = 3 + 1 = 4 m
+          (you add up every bit of path, regardless of direction). Displacement
+          = +3 + (−1) = +2 m (steps backward subtract, because displacement is
+          a vector pointing from your start to your end). Average speed = total
+          distance / total time. Average velocity = displacement / time. They
+          agree only when you never change direction — the moment you turn
+          around, distance keeps climbing while displacement can shrink, stall,
+          or reverse sign.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Motion Graph Lab</h3>
+      <p class="explainer">
+        Set a starting position and a (signed) velocity — negative means
+        moving left — and press play. Watch the dot on the track and the two
+        graphs move in lock-step: the position-time graph is a straight line
+        because the position changes by the same amount every second; the
+        velocity-time graph is flat because the velocity never changes at all.
+      </p>
+
+      <div class="widget">
+        <div class="widget-visual">
+          <p class="pane-label">Track</p>
+          <svg viewBox="0 0 500 70" id="cvTrackSvg">
+            <line x1="20" y1="35" x2="480" y2="35" class="svg-axis"></line>
+            <g id="cvTrackTicks"></g>
+            <circle id="cvDot" cx="250" cy="35" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <p class="pane-label">Position vs. time — <var>x(t) = x₀ + vt</var></p>
+          <svg viewBox="0 0 500 160" id="cvXtSvg">
+            <g id="cvXtGrid"></g>
+            <line x1="40" y1="80" x2="480" y2="80" class="svg-axis"></line>
+            <line x1="40" y1="20" x2="40" y2="140" class="svg-axis"></line>
+            <line id="cvXtLine" x1="40" y1="80" x2="40" y2="80" stroke="#2a78d6" stroke-width="2.5"></line>
+            <circle id="cvXtMarker" cx="40" cy="80" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+          <p class="pane-label">Velocity vs. time — flat line at <var>v</var></p>
+          <svg viewBox="0 0 500 120" id="cvVtSvg">
+            <g id="cvVtGrid"></g>
+            <line x1="40" y1="60" x2="480" y2="60" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="110" class="svg-axis"></line>
+            <line id="cvVtLine" x1="40" y1="60" x2="40" y2="60" stroke="#1baf7a" stroke-width="2.5"></line>
+            <circle id="cvVtMarker" cx="40" cy="60" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <path id="cvVtArea" fill="rgba(27,175,122,0.18)" stroke="none" d=""></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Starting position, x₀</span><b id="cvX0Val">−10 m</b></div>
+              <input type="range" id="cvX0Slider" min="-18" max="18" step="1" value="-10"></div>
+            <div class="row"><div class="row-head"><span>Velocity, v (negative = leftward)</span><b id="cvVVal">3 m/s</b></div>
+              <input type="range" id="cvVSlider" min="-8" max="8" step="0.5" value="3"></div>
+            <button class="action" id="cvPlayBtn">▶ Play</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time, t</td><td class="v" id="cvTVal">0.0 s</td></tr>
+              <tr><td class="k">Position, x(t)</td><td class="v" id="cvXVal">−10.0 m</td></tr>
+              <tr><td class="k">Displacement so far</td><td class="v" id="cvDispVal">0.0 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why slope and area mean what they mean</summary>
+        <p class="explainer">
+          Average velocity between any two points on the position-time graph is
+          "rise over run": (<var>x</var><sub>2</sub> − <var>x</var><sub>1</sub>) / (<var>t</var><sub>2</sub> − <var>t</var><sub>1</sub>) —
+          exactly the slope of the line connecting them. For constant velocity
+          that slope is identical everywhere, which is <em>why</em> the graph
+          is a single straight line, and why that one number, the slope, fully
+          determines the motion.
+        </p>
+        <p class="explainer">
+          On the velocity-time graph, the shaded rectangle from 0 to <var>t</var>
+          has width <var>t</var> and height <var>v</var>, so its area is
+          <var>v</var>·<var>t</var> — which is exactly the displacement,
+          <var>Δx = vt</var>. This isn't a coincidence: "area under a
+          velocity-time graph equals displacement" stays true even when
+          velocity <em>isn't</em> constant (you'll see that rectangle turn into
+          more complicated shapes once acceleration enters the picture in the
+          next tab).
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Two-Runner Catch-Up Challenge</h3>
+      <p class="explainer">
+        Runner A has a head start; Runner B starts behind but can run faster.
+        Tune B's speed to find out whether — and exactly when and where — B
+        catches A. This is the same question as one car overtaking another on
+        a highway, or a police car catching up to a speeder: same head start,
+        same "who's faster" logic.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 90" id="raceTrackSvg">
+            <line x1="20" y1="55" x2="480" y2="55" class="svg-axis"></line>
+            <g id="raceTicks"></g>
+            <circle id="raceCatchMark" cx="0" cy="55" r="9" fill="none" stroke="#e34948" stroke-width="2" style="display:none"></circle>
+            <circle id="raceDotA" cx="250" cy="40" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <text x="250" y="25" text-anchor="middle" class="svg-label">A</text>
+            <circle id="raceDotB" cx="150" cy="70" r="8" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <text x="150" y="85" text-anchor="middle" class="svg-label">B</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <p class="control-group-label">Runner A (head start, front)</p>
+            <div class="row"><div class="row-head"><span>Speed</span><b id="raceVAVal">3.0 m/s</b></div>
+              <input type="range" id="raceVASlider" min="1" max="8" step="0.5" value="3"></div>
+            <p class="control-group-label">Runner B (starts behind)</p>
+            <div class="row"><div class="row-head"><span>Head start distance (how far behind A)</span><b id="raceGapVal">20 m</b></div>
+              <input type="range" id="raceGapSlider" min="5" max="35" step="1" value="20"></div>
+            <div class="row"><div class="row-head"><span>Speed</span><b id="raceVBVal">5.0 m/s</b></div>
+              <input type="range" id="raceVBSlider" min="1" max="10" step="0.5" value="5"></div>
+            <button class="action" id="raceRunBtn">▶ Run</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Catch-up time</td><td class="v" id="raceMeetT">—</td></tr>
+              <tr><td class="k">Catch-up position</td><td class="v" id="raceMeetX">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="raceVerdict">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: solving the catch-up algebraically</summary>
+        <p class="explainer">
+          Let A start at <var>x</var><sub>A0</sub> = 0 with speed <var>v</var><sub>A</sub>,
+          and B start at <var>x</var><sub>B0</sub> = −<var>g</var> (a gap
+          <var>g</var> behind A) with speed <var>v</var><sub>B</sub>. Their
+          positions are <var>x</var><sub>A</sub>(<var>t</var>) = <var>v</var><sub>A</sub><var>t</var> and
+          <var>x</var><sub>B</sub>(<var>t</var>) = −<var>g</var> + <var>v</var><sub>B</sub><var>t</var>.
+          They meet when these are equal:
+        </p>
+        <p class="explainer">
+          <var>t</var>* = <var>g</var> / (<var>v</var><sub>B</sub> − <var>v</var><sub>A</sub>)
+        </p>
+        <p class="explainer">
+          This only gives a sensible future meeting time when <var>v</var><sub>B</sub> &gt; <var>v</var><sub>A</sub>
+          (B has to be faster than A to close a gap behind them at all) — if
+          <var>v</var><sub>B</sub> ≤ <var>v</var><sub>A</sub>, B never catches up, the gap only
+          grows or stays exactly the same forever. Notice the head start
+          <var>g</var> sits on top: double the head start and you exactly
+          double the time needed to close it, for a fixed speed difference.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Relative Velocity Explorer</h3>
+      <p class="explainer">
+        Velocity only makes sense relative to something. A boat "aimed"
+        straight across a river isn't actually moving straight across the
+        ground, because the water it's moving through is itself moving. The
+        same addition — your velocity relative to a medium, plus that medium's
+        velocity relative to the ground — also explains why a headwind slows a
+        plane's <em>ground</em> speed without slowing it through the air at all.
+      </p>
+
+      <div class="mode-toggle" id="cvRelToggle">
+        <button class="active" data-mode="river"><b>Boat crossing a river</b>2D: current pushes sideways while you cross</button>
+        <button data-mode="wind"><b>Aircraft with/against wind</b>1D: headwind or tailwind changes ground speed</button>
+      </div>
+
+      <div id="cvRiverMode">
+        <div class="widget">
+          <div class="widget-visual">
+            <svg viewBox="0 0 460 300" id="riverSvg">
+              <defs>
+                <marker id="cv-arrow-boat" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"></path></marker>
+                <marker id="cv-arrow-current" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#eb6834"></path></marker>
+                <marker id="cv-arrow-result" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"></path></marker>
+              </defs>
+              <rect x="20" y="0" width="420" height="20" fill="rgba(137,135,129,0.15)"></rect>
+              <rect id="riverFarBankRect" x="20" y="0" width="420" height="0" fill="rgba(137,135,129,0.15)"></rect>
+              <line x1="20" y1="0" x2="440" y2="0" stroke="var(--muted)" stroke-width="2"></line>
+              <line id="riverFarBankLine" x1="20" y1="20" x2="440" y2="20" stroke="var(--muted)" stroke-width="2"></line>
+              <line id="riverNearBankLine" x1="20" y1="280" x2="440" y2="280" stroke="var(--muted)" stroke-width="2"></line>
+              <line x1="20" y1="300" x2="440" y2="300" stroke="var(--muted)" stroke-width="2"></line>
+              <path id="riverTargetLine" stroke="var(--gridline)" stroke-width="1.5" stroke-dasharray="4 3" fill="none" d=""></path>
+              <path id="riverPathLine" stroke="#1baf7a" stroke-width="2" stroke-dasharray="4 3" fill="none" d=""></path>
+              <line id="riverVecBoat" x1="60" y1="280" x2="60" y2="280" stroke="#2a78d6" stroke-width="3" marker-end="url(#cv-arrow-boat)"></line>
+              <line id="riverVecCurrent" x1="60" y1="280" x2="60" y2="280" stroke="#eb6834" stroke-width="3" marker-end="url(#cv-arrow-current)"></line>
+              <line id="riverVecResult" x1="60" y1="280" x2="60" y2="280" stroke="#1baf7a" stroke-width="3" marker-end="url(#cv-arrow-result)"></line>
+              <circle id="riverBoatDot" cx="60" cy="280" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            </svg>
+          </div>
+          <div class="widget-side">
+            <div class="controls">
+              <div class="row"><div class="row-head"><span>River width</span><b id="riverWidthVal">30 m</b></div>
+                <input type="range" id="riverWidthSlider" min="15" max="45" step="1" value="30"></div>
+              <div class="row"><div class="row-head"><span>Current speed</span><b id="riverCurrentVal">1.5 m/s</b></div>
+                <input type="range" id="riverCurrentSlider" min="0" max="4" step="0.1" value="1.5"></div>
+              <div class="row"><div class="row-head"><span>Boat speed (relative to water)</span><b id="riverBoatSpeedVal">3.0 m/s</b></div>
+                <input type="range" id="riverBoatSpeedSlider" min="0.5" max="6" step="0.1" value="3"></div>
+              <div class="row"><div class="row-head"><span>Boat heading (0° = straight across, − = angled upstream)</span><b id="riverHeadingVal">0°</b></div>
+                <input type="range" id="riverHeadingSlider" min="-80" max="80" step="1" value="0"></div>
+              <button class="action" id="riverRunBtn">▶ Cross</button>
+            </div>
+            <div class="readout">
+              <table>
+                <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Boat, relative to water</td><td class="v" id="riverBoatVec">—</td></tr>
+                <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Current, relative to ground</td><td class="v" id="riverCurrentVec">—</td></tr>
+                <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Boat, relative to ground</td><td class="v" id="riverResultVec">—</td></tr>
+                <tr><td class="k">Crossing time</td><td class="v" id="riverCrossTime">—</td></tr>
+                <tr><td class="k">Downstream drift</td><td class="v" id="riverDrift">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <details class="math-details">
+          <summary>For math enthusiasts: why "aim across" doesn't mean "go across"</summary>
+          <p class="explainer">
+            The boat's velocity relative to the <em>ground</em> is the vector
+            sum of its velocity relative to the <em>water</em> and the water's
+            velocity relative to the ground (the current) — the same vector
+            addition from <a href="../00-toolkit/index.html">the toolkit</a>.
+            With the across-river direction as <var>y</var> and the downstream
+            direction as <var>x</var>, and heading angle <var>θ</var> measured
+            from straight-across:
+          </p>
+          <p class="explainer">
+            <var>v</var><sub>ground,x</sub> = <var>v</var><sub>boat</sub>sin(<var>θ</var>) + <var>v</var><sub>current</sub> &nbsp;&nbsp;
+            <var>v</var><sub>ground,y</sub> = <var>v</var><sub>boat</sub>cos(<var>θ</var>)
+          </p>
+          <p class="explainer">
+            Crossing time only depends on the across-river component:
+            <var>T</var> = width / <var>v</var><sub>ground,y</sub>. Downstream
+            drift is then <var>v</var><sub>ground,x</sub>·<var>T</var>. Aiming
+            straight across (<var>θ</var> = 0) does <strong>not</strong> zero
+            the drift — it zeroes the boat's <em>own contribution</em> to
+            sideways motion, but the current keeps pushing regardless. To land
+            exactly opposite your start, you have to aim upstream by just
+            enough that <var>v</var><sub>boat</sub>sin(<var>θ</var>) = −<var>v</var><sub>current</sub> — which is
+            only possible at all if the boat is at least as fast as the
+            current.
+          </p>
+        </details>
+      </div>
+
+      <div id="cvWindMode" style="display:none">
+        <div class="widget">
+          <div class="widget-visual">
+            <svg viewBox="0 0 500 90" id="windTrackSvg">
+              <line x1="20" y1="55" x2="480" y2="55" class="svg-axis"></line>
+              <g id="windTicks"></g>
+              <path id="windArrowShaft" stroke="var(--muted)" stroke-width="2" fill="none" d=""></path>
+              <circle id="windPlaneDot" cx="20" cy="35" r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            </svg>
+          </div>
+          <div class="widget-side">
+            <div class="controls">
+              <div class="row"><div class="row-head"><span>Airspeed (relative to the air)</span><b id="windAirVal">180 m/s</b></div>
+                <input type="range" id="windAirSlider" min="60" max="260" step="5" value="180"></div>
+              <div class="row"><div class="row-head"><span>Wind (+ tailwind, − headwind)</span><b id="windSpeedVal">30 m/s</b></div>
+                <input type="range" id="windSpeedSlider" min="-80" max="80" step="5" value="30"></div>
+              <div class="row"><div class="row-head"><span>Flight distance</span><b id="windDistVal">900 km</b></div>
+                <input type="range" id="windDistSlider" min="200" max="3000" step="50" value="900"></div>
+              <button class="action" id="windRunBtn">▶ Fly</button>
+            </div>
+            <div class="readout">
+              <table>
+                <tr><td class="k">Ground speed</td><td class="v" id="windGroundSpeed">—</td></tr>
+                <tr><td class="k">Flight time (with wind)</td><td class="v" id="windTime">—</td></tr>
+                <tr><td class="k">Flight time (no wind)</td><td class="v" id="windTimeNoWind">—</td></tr>
+                <tr><td class="k">Time saved / lost</td><td class="v" id="windDelta">—</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <details class="math-details">
+          <summary>For math enthusiasts: the same addition, collapsed to one dimension</summary>
+          <p class="explainer">
+            This is the river-crossing formula with the current pointing
+            exactly along your direction of travel instead of sideways, so the
+            vector sum collapses to plain addition:
+            <var>v</var><sub>ground</sub> = <var>v</var><sub>air</sub> + <var>v</var><sub>wind</sub>
+            (a tailwind is positive, a headwind is negative). Flight time is
+            distance divided by ground speed, <var>T</var> = <var>d</var> / <var>v</var><sub>ground</sub> —
+            notice that because time depends on the <em>reciprocal</em> of
+            speed, a headwind on the way out costs you more time than a
+            same-strength tailwind saves you on the way back, even though the
+            speed change is symmetric.
+          </p>
+        </details>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it at home: video analysis</h4>
+        <ol>
+          <li>Record a toy car rolling across a flat floor at a steady push, or film someone walking at a steady pace across a room — steady pace is the whole point, so avoid speeding up or slowing down mid-clip.</li>
+          <li>Step through the video frame by frame (most phone video is 30 frames per second, so each frame is 1/30 s) and mark the object's position in each frame using a fixed reference (floor tiles, a tape measure taped down beforehand).</li>
+          <li>Plot position against time by hand or in a spreadsheet. If the pace was genuinely steady, the points should sit close to a straight line.</li>
+          <li>Fit a straight line and read its slope — that's your measured velocity. Compare it to a stopwatch-and-tape-measure estimate (total distance ÷ total time) — they should agree, since average velocity over the whole trip is exactly what that stopwatch method measures.</li>
+        </ol>
+      </div>
+
+      <p class="explainer">
+        One more application worth knowing is already built: walking on a
+        moving walkway is exactly the reference-frame problem from
+        <a href="../00-toolkit/index.html">the toolkit's Reference Frames
+        tab</a> — go there to play with it directly.
+      </p>
     </div>
 
     <!-- ================= CONSTANT ACCELERATION (stub) ================= -->
     <div class="panel" id="panel-constant-acceleration">
       <h2>Constant Acceleration</h2>
-      <p class="intro">Core equations: <var>v = u + at</var>, <var>s = ut + ½at²</var>, <var>v² = u² + 2as</var>.</p>
-      <div class="grid">
-        <div><h3>Concepts</h3><ul>
-          <li>Constant acceleration</li><li>Velocity-time graphs</li><li>Area under a velocity-time graph</li>
-          <li>Slope of a velocity-time graph</li><li>Braking distance</li><li>Reaction time</li>
-        </ul></div>
-        <div><h3>Problems &amp; applications</h3><ul>
-          <li>Car braking distance</li><li>Accelerating trains</li><li>Elevator motion</li><li>Sprinting</li>
-          <li>Motion down a shallow ramp</li>
-        </ul></div>
-        <div><h3>Experiments &amp; simulations</h3><ul>
-          <li>Motion-graph explorer — change initial velocity and acceleration, observe graphs</li>
-          <li>Ramp experiment — roll a cart down a ramp and estimate acceleration</li>
-          <li>Braking-distance calculator — compare stopping distances at different speeds</li>
-          <li>Elevator apparent-weight model — acceleration during lift start and stop</li>
-        </ul></div>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a car goes twice as fast as
+        another identical car with the same brakes. When both slam the
+        brakes, does the faster car need twice the distance to stop, or more
+        than twice? Most drivers badly underestimate this one — Widget 2
+        below will show you the real number.
+      </p>
+
+      <div class="var-list">
+        <div><var>u</var> — initial velocity (at <var>t</var> = 0)</div>
+        <div><var>v</var> — velocity at time <var>t</var></div>
+        <div><var>a</var> — acceleration (constant): how much velocity changes per second</div>
+        <div><var>t</var> — elapsed time</div>
+        <div><var>s</var> — displacement over that time</div>
       </div>
-      <p class="status-note">Status: outline — full page coming soon.</p>
+
+      <p class="explainer">
+        <var>v = u + at</var> &nbsp;&nbsp;&nbsp; <var>s = ut + ½at²</var> &nbsp;&nbsp;&nbsp; <var>v² = u² + 2as</var>
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: where all three equations come from</summary>
+        <p class="explainer">
+          <var>v = u + at</var> is just the definition of acceleration
+          rearranged: <var>a</var> = (<var>v</var> − <var>u</var>)/<var>t</var>. On a
+          velocity-time graph this is the whole story: <var>a</var> is the
+          <strong>slope</strong> of the line, because velocity increases by the
+          same amount, <var>a</var>, every single second.
+        </p>
+        <p class="explainer">
+          <var>s = ut + ½at²</var> comes from "displacement = area under the
+          velocity-time graph." That area is a trapezoid: a rectangle of
+          height <var>u</var> and width <var>t</var> (area <var>ut</var>), plus a
+          triangle on top with base <var>t</var> and height (<var>v</var> − <var>u</var>) = <var>at</var>
+          (area ½<var>t</var>·<var>at</var> = ½<var>at</var>²). Add them:
+          <var>s = ut + ½at²</var>.
+        </p>
+        <p class="explainer">
+          <var>v² = u² + 2as</var> eliminates <var>t</var> entirely — useful
+          whenever a problem never tells you how much time passed (braking
+          distance is the classic example). It falls out of substituting
+          <var>t</var> = (<var>v</var> − <var>u</var>)/<var>a</var> from the first equation into the
+          second one and simplifying.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Motion Graph Explorer</h3>
+      <p class="explainer">
+        Set an initial velocity and an acceleration and press play. Notice the
+        position-time graph is now a <strong>curve</strong>, not a straight
+        line — its slope (the instantaneous velocity) keeps changing, which is
+        exactly what "accelerating" means. The velocity-time graph is still a
+        straight line, just a tilted one; the shaded trapezoid under it is the
+        displacement.
+      </p>
+      <div class="preset-row" id="caPresetRow">
+        <button data-preset="car">🚗 Accelerating car</button>
+        <button data-preset="train">🚆 Train leaving a station</button>
+        <button data-preset="elevator">🛗 Elevator starting up</button>
+        <button data-preset="sprinter">🏃 Sprinter off the blocks</button>
+        <button data-preset="brake">🛑 Braking to a stop</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <p class="pane-label">Track</p>
+          <svg viewBox="0 0 500 70" id="caTrackSvg">
+            <line x1="20" y1="35" x2="480" y2="35" class="svg-axis"></line>
+            <g id="caTrackTicks"></g>
+            <circle id="caDot" cx="40" cy="35" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <p class="pane-label">Position vs. time — <var>s(t) = ut + ½at²</var></p>
+          <svg viewBox="0 0 500 160" id="caXtSvg">
+            <g id="caXtGrid"></g>
+            <line x1="40" y1="140" x2="480" y2="140" class="svg-axis"></line>
+            <line x1="40" y1="20" x2="40" y2="140" class="svg-axis"></line>
+            <path id="caXtPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="caXtMarker" cx="40" cy="140" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+          <p class="pane-label">Velocity vs. time — slope = <var>a</var>, shaded area = <var>s</var></p>
+          <svg viewBox="0 0 500 120" id="caVtSvg">
+            <g id="caVtGrid"></g>
+            <line x1="40" y1="60" x2="480" y2="60" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="110" class="svg-axis"></line>
+            <path id="caVtArea" fill="rgba(27,175,122,0.18)" stroke="none" d=""></path>
+            <line id="caVtLine" x1="40" y1="60" x2="40" y2="60" stroke="#1baf7a" stroke-width="2.5"></line>
+            <circle id="caVtMarker" cx="40" cy="60" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial velocity, u</span><b id="caUVal">0.0 m/s</b></div>
+              <input type="range" id="caUSlider" min="-10" max="10" step="0.5" value="0"></div>
+            <div class="row"><div class="row-head"><span>Acceleration, a</span><b id="caAVal">2.0 m/s²</b></div>
+              <input type="range" id="caASlider" min="-6" max="6" step="0.2" value="2"></div>
+            <button class="action" id="caPlayBtn">▶ Play</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time, t</td><td class="v" id="caTVal">0.0 s</td></tr>
+              <tr><td class="k">Velocity, v(t)</td><td class="v" id="caVVal">0.0 m/s</td></tr>
+              <tr><td class="k">Displacement, s(t)</td><td class="v" id="caSVal">0.0 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Braking Distance &amp; Reaction Time</h3>
+      <p class="explainer">
+        Total stopping distance has two completely different parts: how far
+        you travel <em>before</em> you even start braking (reaction distance —
+        still at full speed, constant velocity), and how far you travel
+        <em>while</em> braking (braking distance — constant deceleration down
+        to zero). Try the reaction-time tester below to plug in your own
+        actual reaction time instead of guessing it.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 90" id="brakeSvg">
+            <line x1="20" y1="55" x2="480" y2="55" class="svg-axis"></line>
+            <g id="brakeTicks"></g>
+            <path id="brakeReactionSeg" stroke="#eb6834" stroke-width="4" d=""></path>
+            <path id="brakeBrakingSeg" stroke="#e34948" stroke-width="4" d=""></path>
+            <line id="brakeHazard" x1="0" y1="30" x2="0" y2="55" stroke="#1baf7a" stroke-width="4" style="display:none"></line>
+            <circle id="brakeCarDot" cx="20" cy="35" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial speed, v₀</span><b id="brakeV0Val">20 m/s</b></div>
+              <input type="range" id="brakeV0Slider" min="5" max="35" step="1" value="20"></div>
+            <div class="row"><div class="row-head"><span>Reaction time</span><b id="brakeTRVal">1.5 s</b></div>
+              <input type="range" id="brakeTRSlider" min="0.1" max="3" step="0.1" value="1.5"></div>
+            <button class="action" id="brakeTestBtn">⏱ Test your reaction time</button>
+            <p class="explainer" id="brakeTestStatus" style="margin:0; min-height:1.2em;"></p>
+            <p class="control-group-label">Road condition (braking deceleration)</p>
+            <div class="preset-row">
+              <button data-brake="8">Dry road</button>
+              <button data-brake="4.5">Wet road</button>
+              <button data-brake="1.5">Icy road</button>
+            </div>
+            <div class="row"><div class="row-head"><span>Braking deceleration</span><b id="brakeAVal">8.0 m/s²</b></div>
+              <input type="range" id="brakeASlider" min="1" max="10" step="0.5" value="8"></div>
+            <label class="checkbox"><input type="checkbox" id="brakeHazardToggle"> Place a hazard, see if you stop in time</label>
+            <div class="row" id="brakeHazardRow" style="display:none">
+              <div class="row-head"><span>Hazard distance</span><b id="brakeHazardVal">60 m</b></div>
+              <input type="range" id="brakeHazardSlider" min="10" max="150" step="5" value="60"></div>
+            <button class="action" id="brakeRunBtn">▶ Brake!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Reaction distance</td><td class="v" id="brakeReactVal">—</td></tr>
+              <tr><td class="k">Braking distance</td><td class="v" id="brakeBrakeVal">—</td></tr>
+              <tr><td class="k">Total stopping distance</td><td class="v" id="brakeTotalVal">—</td></tr>
+              <tr id="brakeVerdictRow" style="display:none"><td class="k">Verdict</td><td class="v" id="brakeVerdict">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why doubling your speed more than doubles your stopping distance</summary>
+        <p class="explainer">
+          Reaction distance is constant-velocity motion: <var>d</var><sub>react</sub> = <var>v₀</var>·<var>t</var><sub>R</sub> —
+          that part scales <var>linearly</var> with speed. But braking distance
+          comes from <var>v² = u² + 2as</var> with final velocity 0:
+        </p>
+        <p class="explainer">
+          <var>d</var><sub>brake</sub> = <var>v₀</var>² / (2<var>a</var>)
+        </p>
+        <p class="explainer">
+          That's <var>v₀</var> <strong>squared</strong>. Double your speed and
+          reaction distance only doubles, but braking distance quadruples.
+          Triple your speed and braking distance is nine times longer. This is
+          the single biggest reason speed limits matter more on the highway
+          than they seem to at a glance — the danger doesn't scale with speed,
+          it scales with speed squared.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Ramp Experiment</h3>
+      <p class="explainer">
+        Release a cart from rest at the top of a frictionless ramp. Predict
+        how long it takes to reach the bottom, then time it yourself with the
+        start/stop buttons and see how close your measurement gets to the true
+        physics.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 220" id="rampSvg">
+            <path id="rampSurface" fill="none" stroke="var(--text-primary)" stroke-width="3" d=""></path>
+            <line x1="20" y1="200" x2="380" y2="200" stroke="var(--muted)" stroke-width="2"></line>
+            <circle id="rampCart" cx="40" cy="40" r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp angle, θ</span><b id="rampAngleVal">15°</b></div>
+              <input type="range" id="rampAngleSlider" min="5" max="30" step="1" value="15"></div>
+            <div class="row"><div class="row-head"><span>Ramp length</span><b id="rampLenVal">2.0 m</b></div>
+              <input type="range" id="rampLenSlider" min="1" max="4" step="0.1" value="2"></div>
+            <button class="action" id="rampReleaseBtn">▶ Release cart</button>
+            <button class="action" id="rampTimerBtn">⏱ Start / stop your timer</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">True acceleration, a = g·sin(θ)</td><td class="v" id="rampAVal">—</td></tr>
+              <tr><td class="k">True time to bottom</td><td class="v" id="rampTrueTVal">—</td></tr>
+              <tr><td class="k">Your measured time</td><td class="v" id="rampMeasuredTVal">—</td></tr>
+              <tr><td class="k">Acceleration from your measurement</td><td class="v" id="rampMeasuredAVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: where g·sin(θ) comes from</summary>
+        <p class="explainer">
+          Gravity pulls straight down with acceleration <var>g</var>, but the
+          cart is constrained to move along the ramp's surface. Decomposing
+          <var>g</var> into components parallel and perpendicular to the ramp
+          (exactly the component decomposition from
+          <a href="../00-toolkit/index.html">the toolkit</a>) gives a
+          component <var>g</var>sin(<var>θ</var>) pointing down the slope and a
+          component <var>g</var>cos(<var>θ</var>) pressing into the ramp (which the
+          ramp's surface cancels out — the cart doesn't sink into it). Only the
+          along-ramp piece accelerates the cart, so <var>a = g</var>sin(<var>θ</var>).
+          A shallower ramp (small <var>θ</var>) means a gentler, easier-to-measure
+          acceleration — which is exactly why the real experiment below asks
+          for a <em>shallow</em> ramp rather than a steep one.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: ramp and stopwatch</h4>
+        <ol>
+          <li>Prop up a board or track at a shallow, measured angle (5–15° is
+            easiest to time accurately) and mark a fixed distance down it.</li>
+          <li>Release a cart, marble, or ball from rest at the top and time how
+            long it takes to reach your mark, using a stopwatch or your phone.</li>
+          <li>Run it several times and average the times — reaction time on
+            the stopwatch button adds random error you can average away.</li>
+          <li>Compute acceleration from your average time using
+            <var>a</var> = 2<var>s</var>/<var>t</var>² (from <var>s = ut + ½at²</var> with
+            <var>u</var> = 0), and compare it to the predicted <var>g</var>sin(<var>θ</var>)
+            using your ramp's actual angle.</li>
+          <li>They usually won't match perfectly — the gap is real friction
+            and rolling resistance, which this idealized model leaves out on
+            purpose (that's next section's problem to solve).</li>
+        </ol>
+      </div>
     </div>
 
     <!-- ================= FREE FALL (stub) ================= -->
     <div class="panel" id="panel-free-fall">
       <h2>Free Fall</h2>
-      <p class="intro">What happens to speed, and to differently-shaped objects, when gravity is the only force that matters.</p>
-      <div class="grid">
-        <div><h3>Concepts</h3><ul>
-          <li>Gravitational acceleration near Earth</li><li>Free fall</li><li>Upward throws</li>
-          <li>Air resistance</li><li>Terminal velocity</li><li>Why mass doesn't affect ideal free-fall acceleration</li>
-        </ul></div>
-        <div><h3>Problems &amp; applications</h3><ul>
-          <li>Dropping an object from a known height</li><li>Throwing an object vertically upward</li>
-          <li>Comparing a vacuum to air resistance</li><li>Estimating reaction time using a falling ruler</li>
-        </ul></div>
-        <div><h3>Experiments &amp; simulations</h3><ul>
-          <li>Ruler-drop reaction-time test</li><li>Drop comparison — compact vs. high-drag objects</li>
-          <li>Free-fall graph simulation — position, velocity, acceleration vs. time</li>
-          <li>Terminal-velocity model — ideal free fall vs. drag-based motion</li>
-        </ul></div>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> drop a bowling ball and a
+        tennis ball from the same height at the same instant, ignoring air.
+        Which lands first? Now picture a feather and a hammer dropped the same
+        way, this time <em>with</em> air around them, on Earth — and then on
+        the Moon, where there's no air at all. (That second version isn't
+        hypothetical: Apollo 15's commander did exactly this on live TV in
+        1971. Widget 2 below lets you re-run it.)
+      </p>
+
+      <div class="var-list">
+        <div><var>g</var> — gravitational acceleration near Earth's surface, ≈ 9.8 m/s², always pointing down</div>
+        <div><var>y</var> — height above the ground; <var>y₀</var> — starting height</div>
+        <div><var>v</var> — vertical velocity (positive = upward); <var>v₀</var> — starting vertical velocity</div>
+        <div><var>t</var> — time since release</div>
       </div>
-      <p class="status-note">Status: outline — full page coming soon.</p>
+
+      <p class="explainer">
+        Free fall is just constant acceleration with <var>a</var> = −<var>g</var>
+        always — the same <var>v = u + at</var> and <var>s = ut + ½at²</var>
+        from the last tab, specialized to one direction. What makes it worth
+        its own tab: <var>g</var> doesn't depend on the object's mass at all,
+        which is the single most counterintuitive fact in this whole section.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why mass drops out of free fall entirely</summary>
+        <p class="explainer">
+          You'll see the force explanation properly in the Newton's Laws
+          section (heavier objects need proportionally more force to
+          accelerate them, and gravity conveniently supplies proportionally
+          more force to heavier objects — the two proportionalities cancel).
+          For now, purely as a fact about motion: two objects released from
+          the same height at the same instant, in a vacuum, hit the ground at
+          the same instant, regardless of how much either one weighs. Air
+          resistance is a completely separate effect — it depends on shape and
+          speed, not weight directly — and it's the only reason a feather
+          seems to disobey this rule in everyday experience.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Free-Fall Graph Simulator</h3>
+      <p class="explainer">
+        Drop something from a height, or throw it straight up or down first.
+        All three graphs share the same clock: watch how the position curve's
+        steepness (its slope) always matches the velocity graph's current
+        height, while the acceleration graph just... doesn't move. That flat
+        line <em>is</em> "constant acceleration."
+      </p>
+      <div class="preset-row" id="ffPresetRow">
+        <button data-preset="drop">🪨 Simple drop</button>
+        <button data-preset="up">⬆️ Thrown upward</button>
+        <button data-preset="down">⬇️ Thrown downward</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <p class="pane-label">Vertical track</p>
+          <svg viewBox="0 0 140 300" id="ffTrackSvg">
+            <line x1="20" y1="280" x2="120" y2="280" stroke="var(--text-primary)" stroke-width="2"></line>
+            <g id="ffTrackTicks"></g>
+            <circle id="ffDot" cx="70" cy="200" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <p class="pane-label">Height vs. time — <var>y(t) = y₀ + v₀t − ½gt²</var></p>
+          <svg viewBox="0 0 500 160" id="ffYtSvg">
+            <g id="ffYtGrid"></g>
+            <line x1="40" y1="140" x2="480" y2="140" class="svg-axis"></line>
+            <line x1="40" y1="20" x2="40" y2="140" class="svg-axis"></line>
+            <path id="ffYtPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="ffYtMarker" cx="40" cy="140" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+          <p class="pane-label">Velocity vs. time — slope = −<var>g</var></p>
+          <svg viewBox="0 0 500 120" id="ffVtSvg">
+            <g id="ffVtGrid"></g>
+            <line x1="40" y1="60" x2="480" y2="60" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="110" class="svg-axis"></line>
+            <line id="ffVtLine" x1="40" y1="60" x2="40" y2="60" stroke="#1baf7a" stroke-width="2.5"></line>
+            <circle id="ffVtMarker" cx="40" cy="60" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+          <p class="pane-label">Acceleration vs. time — always flat</p>
+          <svg viewBox="0 0 500 70" id="ffAtSvg">
+            <line x1="40" y1="10" x2="480" y2="10" class="svg-grid"></line>
+            <line x1="40" y1="60" x2="480" y2="60" class="svg-axis"></line>
+            <line x1="40" y1="5" x2="40" y2="65" class="svg-axis"></line>
+            <line id="ffAtLine" x1="40" y1="30" x2="480" y2="30" stroke="#e34948" stroke-width="2.5"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Starting height, y₀</span><b id="ffY0Val">20 m</b></div>
+              <input type="range" id="ffY0Slider" min="0" max="50" step="1" value="20"></div>
+            <div class="row"><div class="row-head"><span>Starting velocity, v₀ (+ up, − down)</span><b id="ffV0Val">0 m/s</b></div>
+              <input type="range" id="ffV0Slider" min="-15" max="15" step="0.5" value="0"></div>
+            <div class="row"><div class="row-head"><span>Gravity, g</span><b id="ffGVal">9.8 m/s²</b></div>
+              <input type="range" id="ffGSlider" min="2" max="25" step="0.1" value="9.8"></div>
+            <button class="action" id="ffPlayBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time, t</td><td class="v" id="ffTVal">0.0 s</td></tr>
+              <tr><td class="k">Height, y(t)</td><td class="v" id="ffYVal">20.0 m</td></tr>
+              <tr><td class="k">Velocity, v(t)</td><td class="v" id="ffVVal">0.0 m/s</td></tr>
+              <tr><td class="k">Time to land</td><td class="v" id="ffLandVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Drop Comparison &amp; Terminal Velocity</h3>
+      <p class="explainer">
+        Two objects fall from the same height. One is compact and dense (low
+        air resistance); the other is light and spread out (high air
+        resistance) — think a marble versus a sheet of paper. Flip on
+        "vacuum" and watch every difference between them disappear, exactly
+        like it did on the Moon.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 200 300" id="dropSvg">
+            <line x1="10" y1="280" x2="190" y2="280" stroke="var(--text-primary)" stroke-width="2"></line>
+            <g id="dropTicks"></g>
+            <circle id="dropBallCompact" cx="70" cy="30" r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="dropBallDrag" cx="130" cy="30" r="9" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Drop height</span><b id="dropHeightVal">60 m</b></div>
+              <input type="range" id="dropHeightSlider" min="20" max="120" step="5" value="60"></div>
+            <div class="row"><div class="row-head"><span>High-drag object's drag coefficient</span><b id="dropBVal">0.08</b></div>
+              <input type="range" id="dropBSlider" min="0.01" max="0.2" step="0.005" value="0.08"></div>
+            <label class="checkbox"><input type="checkbox" id="dropVacuum"> Vacuum (remove air resistance entirely)</label>
+            <button class="action" id="dropRunBtn">▶ Drop both</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Compact object: landing time</td><td class="v" id="dropCompactT">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>High-drag object: landing time</td><td class="v" id="dropDragT">—</td></tr>
+              <tr><td class="k">High-drag terminal velocity</td><td class="v" id="dropTerminalV">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: where terminal velocity comes from</summary>
+        <p class="explainer">
+          Using the same quadratic-drag model as the projectile tab, but
+          purely vertical: acceleration while falling is <var>a</var> = <var>g</var> − <var>b·s</var>²,
+          where <var>s</var> is the falling speed and <var>b</var> bundles up the
+          object's drag coefficient, cross-sectional area, air density, and
+          mass into one number. As <var>s</var> grows, the drag term grows too
+          (it's squared!) until it exactly cancels <var>g</var> — at that point
+          acceleration is zero and speed stops changing. Setting <var>a</var> = 0:
+        </p>
+        <p class="explainer">
+          <var>s</var><sub>terminal</sub> = √(<var>g</var> / <var>b</var>)
+        </p>
+        <p class="explainer">
+          A larger <var>b</var> (more drag relative to weight — a wider,
+          lighter object) gives a <em>lower</em> terminal velocity, which is
+          exactly why a sheet of paper drifts down slowly while a marble made
+          of the same material would thud to the floor almost as fast as it
+          would in vacuum.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Ruler-Drop Reaction Time Test</h3>
+      <p class="explainer">
+        This is the actual classroom technique for measuring reaction time
+        without a stopwatch: someone releases a ruler without warning, you
+        catch it as fast as you can, and however far it fell tells you your
+        reaction time — because for a falling object, distance and time are
+        locked together by <var>d</var> = ½<var>gt</var>².
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 140 280" id="rulerSvg">
+            <line x1="20" y1="220" x2="120" y2="220" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 3"></line>
+            <text x="125" y="224" class="svg-label">✋</text>
+            <rect id="rulerRect" x="55" y="10" width="30" height="180" fill="rgba(42,120,214,0.2)" stroke="#2a78d6" stroke-width="2"></rect>
+            <g id="rulerTicks"></g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <button class="action" id="rulerTestBtn">🎯 Drop the ruler</button>
+            <p class="explainer" id="rulerStatus" style="margin:0; min-height:1.2em;"></p>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Distance fallen before you caught it</td><td class="v" id="rulerDistVal">—</td></tr>
+              <tr><td class="k">Your estimated reaction time</td><td class="v" id="rulerTimeVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: ruler drop and paper vs. coin</h4>
+        <ol>
+          <li>Have a friend hold a ruler vertically with the 0 cm mark at the
+            bottom, your fingers open right at that mark, not touching it.</li>
+          <li>Without any countdown, they let go; you catch it as fast as you
+            can and read whatever mark lines up with your fingers.</li>
+          <li>Convert that distance to reaction time with <var>t</var> = √(2<var>d</var>/<var>g</var>)
+            — typical human reaction times land around 0.15–0.3 s (15–30 cm).</li>
+          <li>Separately: drop a flat sheet of paper and a coin side by side.
+            The coin wins easily. Now crumple the paper into a tight ball and
+            race them again — same mass, same material, dramatically closer
+            finish, because you changed its air resistance, not its weight.</li>
+        </ol>
+      </div>
     </div>
 
     <!-- ================= PROJECTILE MOTION (full) ================= -->
-    <div class="panel active" id="panel-projectile-motion">
+    <div class="panel" id="panel-projectile-motion">
       <h2>Projectile Motion</h2>
 
       <p class="explainer">
@@ -637,20 +1370,134 @@
     <!-- ================= RELATIVE MOTION (stub) ================= -->
     <div class="panel" id="panel-relative-motion">
       <h2>Relative Motion</h2>
-      <p class="intro">Velocity is always measured relative to something — the last tab's interception lab already leans on this.</p>
-      <div class="grid">
-        <div><h3>Concepts</h3><ul>
-          <li>Relative velocity between two moving objects</li><li>Frame-dependent displacement</li>
-          <li>Vector subtraction for relative motion</li>
-        </ul></div>
-        <div><h3>Problems &amp; applications</h3><ul>
-          <li>Crossing a moving river</li><li>Wind-affected flight paths</li><li>Relative speed of passing vehicles</li>
-        </ul></div>
-        <div><h3>Experiments &amp; simulations</h3><ul>
-          <li>Boat-river crossing simulator</li><li>Two-object relative-velocity explorer</li>
-        </ul></div>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> two trains pass each other
+        on parallel tracks, each doing 60 km/h in opposite directions. From a
+        platform, each train looks like it's doing 60 km/h. From inside one
+        train, looking at the other — is it also 60 km/h, or does it look
+        faster?
+      </p>
+
+      <div class="var-list">
+        <div><var>v</var><sub>A</sub>, <var>v</var><sub>B</sub> — velocities of A and B, both measured relative to the ground</div>
+        <div><var>v</var><sub>B/A</sub> — velocity of B <em>relative to A</em>: what someone riding along with A would see B doing</div>
+        <div><var>r</var> — a position vector; Δ<var>r</var> — a displacement</div>
       </div>
-      <p class="status-note">Status: outline — full page coming soon.</p>
+
+      <p class="explainer">
+        <var>v</var><sub>B/A</sub> = <var>v</var><sub>B</sub> − <var>v</var><sub>A</sub> — plain vector subtraction, the
+        same operation from <a href="../00-toolkit/index.html">the
+        toolkit</a>. Drag both velocity vectors below and watch the relative
+        one update live.
+      </p>
+
+      <h3 class="subhead">Widget — Two-Object Relative-Velocity Explorer</h3>
+      <p class="explainer">
+        Vectors <strong>A</strong> and <strong>B</strong> are two objects'
+        velocities, both measured from the ground. The dashed segment from
+        A's tip to B's tip <em>is</em> B's velocity relative to A — slide it
+        back to the origin (the solid green arrow) and you get the same
+        vector. Below, watch the same two objects' motion play out on a
+        track twice: once from the ground, once from inside object A.
+      </p>
+      <div class="preset-row" id="relPresetRow">
+        <button data-preset="passing">🚆 Passing trains</button>
+        <button data-preset="overtake">🚗 Overtaking car</button>
+        <button data-preset="cross">↗️ Crossing paths</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 400 400" id="relVecSvg">
+            <defs>
+              <marker id="rel-arrow-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"></path></marker>
+              <marker id="rel-arrow-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#eb6834"></path></marker>
+              <marker id="rel-arrow-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1baf7a"></path></marker>
+            </defs>
+            <g id="relGrid"></g>
+            <line class="svg-axis" x1="10" y1="200" x2="390" y2="200"></line>
+            <line class="svg-axis" x1="200" y1="10" x2="200" y2="390"></line>
+            <line id="relTailBtoR" x1="0" y1="0" x2="0" y2="0" stroke="#1baf7a" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <line id="relVecR" x1="200" y1="200" x2="200" y2="200" stroke="#1baf7a" stroke-width="3" marker-end="url(#rel-arrow-r)"></line>
+            <line id="relVecA" x1="200" y1="200" x2="280" y2="160" stroke="#2a78d6" stroke-width="3" marker-end="url(#rel-arrow-a)"></line>
+            <circle id="relHandleA" cx="280" cy="160" r="9" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <line id="relVecB" x1="200" y1="200" x2="120" y2="100" stroke="#eb6834" stroke-width="3" marker-end="url(#rel-arrow-b)"></line>
+            <circle id="relHandleB" cx="120" cy="100" r="9" fill="#eb6834" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <button class="action" id="relResetBtn">Reset vectors</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>v<sub>A</sub></td><td class="v" id="relAVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>v<sub>B</sub></td><td class="v" id="relBVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>v<sub>B/A</sub> = v<sub>B</sub> − v<sub>A</sub></td><td class="v" id="relRVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-visual">
+          <p class="pane-label">Ground frame — both A and B move (horizontal component only, for this track view)</p>
+          <svg viewBox="0 0 500 60" id="relGroundSvg">
+            <line x1="20" y1="30" x2="480" y2="30" class="svg-axis"></line>
+            <g id="relGroundTicks"></g>
+            <circle id="relGroundA" cx="250" cy="20" r="7" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="relGroundB" cx="250" cy="40" r="7" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <p class="pane-label">A's frame — A stays put, B moves at v<sub>B/A</sub></p>
+          <svg viewBox="0 0 500 60" id="relAFrameSvg">
+            <line x1="20" y1="30" x2="480" y2="30" class="svg-axis"></line>
+            <g id="relAFrameTicks"></g>
+            <circle id="relAFrameA" cx="250" cy="30" r="7" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="relAFrameB" cx="250" cy="30" r="7" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <button class="action" id="relPlayBtn">▶ Play both frames</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time</td><td class="v" id="relTVal">0.0 s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why displacement depends on your frame but doesn't have to</summary>
+        <p class="explainer">
+          If <var>r</var><sub>A</sub>(<var>t</var>) and <var>r</var><sub>B</sub>(<var>t</var>) are positions measured
+          from the ground, B's position <em>as seen from A</em> is
+          <var>r</var><sub>B</sub>(<var>t</var>) − <var>r</var><sub>A</sub>(<var>t</var>). Differentiate both sides
+          with respect to time and you get exactly
+          <var>v</var><sub>B/A</sub> = <var>v</var><sub>B</sub> − <var>v</var><sub>A</sub> — velocities subtract the same
+          way positions do, at every instant, regardless of where the origin
+          is. That's why the vector diagram above doesn't care where you drop
+          the vectors on the grid: only the difference between the two
+          arrowheads matters, never their absolute position.
+        </p>
+        <p class="explainer">
+          For the passing-trains prediction: if <var>v</var><sub>A</sub> = +60 km/h and
+          <var>v</var><sub>B</sub> = −60 km/h (opposite directions), then
+          <var>v</var><sub>B/A</sub> = −60 − 60 = −120 km/h. From the platform each train
+          is doing 60; from inside either train, the other one blows past at
+          120 — closing speeds add, they don't cancel.
+        </p>
+      </details>
+
+      <p class="explainer">
+        Two applications are already fully built elsewhere rather than
+        duplicated here: boats crossing a river and aircraft flying with or
+        against the wind are exactly the river-crossing and headwind/tailwind
+        modes in the <a href="#" data-jump-tab="constant-velocity">Constant
+        Velocity tab's Relative Velocity Explorer</a> — go there for those two
+        directly.
+      </p>
     </div>
 
   </div>

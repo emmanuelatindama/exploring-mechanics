@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>6. Circular Motion and Gravitation — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/circular.css">
 </head>
 <body data-section="06-circular-motion">
 <div class="wrap">
@@ -12,12 +15,628 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 6. Circular Motion</p>
       <h1>6. Circular Motion and Gravitation</h1>
+      <p class="sub">Moving in a circle always requires a net force pointed at the center — everything in this section is a variation on that one fact.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="uniform-circular-motion">Uniform Circular Motion</button>
+    <button data-target="banked-curves">Banked Curves</button>
+    <button data-target="vertical-circles">Vertical Circles</button>
+    <button data-target="gravitation">Gravitation</button>
+    <button data-target="orbits">Orbits</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= UNIFORM CIRCULAR MOTION (full) ================= -->
+    <div class="panel active" id="panel-uniform-circular-motion">
+      <h2>Uniform Circular Motion</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you whirl a ball on a
+        string in a horizontal circle at constant speed. Its speed never
+        changes — so is there any net force acting on it at all?
+      </p>
+
+      <p class="explainer"><var>a<sub>c</sub></var> = <var>v²/r</var> &nbsp;&nbsp;·&nbsp;&nbsp; <var>F<sub>c</sub></var> = <var>mv²/r</var> &nbsp;(always pointed toward the center)</p>
+
+      <div class="var-list">
+        <div><var>v</var> — speed (constant in <em>magnitude</em>, but its <em>direction</em> is always changing)</div>
+        <div><var>r</var> — radius of the circular path</div>
+        <div><var>a<sub>c</sub></var> — centripetal acceleration; <var>F<sub>c</sub></var> — centripetal force</div>
+        <div><var>ω</var> — angular speed, <var>ω</var> = <var>v/r</var></div>
+      </div>
+
+      <p class="explainer">
+        Yes — there is a net force, and it's the entire point of this
+        section. Velocity is a vector; even at perfectly constant
+        <em>speed</em>, a circling object's velocity <em>direction</em> is
+        constantly changing, which is itself an acceleration. That
+        acceleration points directly at the circle's center (never forward
+        or backward along the path), so the net force causing it — tension,
+        friction, gravity, whatever's actually supplying it — always points
+        at the center too.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why the acceleration points inward, not forward</summary>
+        <p class="explainer">
+          Velocity is tangent to the circle at every instant. A short time
+          later, the velocity vector has the same length but a slightly
+          different direction — subtracting the two velocity vectors to get
+          <var>Δv</var> gives a vector that, in the limit of a very short
+          time interval, points exactly toward the center, perpendicular to
+          the velocity itself. That's the geometric origin of "centripetal"
+          ("center-seeking") acceleration, and working through the geometry
+          carefully gives the exact formula <var>a<sub>c</sub></var> = <var>v²/r</var>.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Ball on a String</h3>
+      <p class="explainer">
+        Watch the velocity arrow (always tangent, always changing
+        direction) and the tension arrow (always pointing straight at the
+        center). Then cut the string and see exactly what "centripetal
+        force" was preventing.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 300" id="ucmSvg">
+            <circle id="ucmOrbit" cx="150" cy="150" r="100" fill="none" stroke="var(--gridline)" stroke-width="1.5"></circle>
+            <line id="ucmString" x1="150" y1="150" x2="250" y2="150" stroke="var(--muted)" stroke-width="2"></line>
+            <circle id="ucmBall" cx="250" cy="150" r="12" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <line id="ucmVArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#ucmHeadGreen)"></line>
+            <line id="ucmFArrow" stroke="#e34948" stroke-width="3" marker-end="url(#ucmHeadRed)"></line>
+            <defs>
+              <marker id="ucmHeadGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path></marker>
+              <marker id="ucmHeadRed" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Radius, r</span><b id="ucmRVal">1.0 m</b></div>
+              <input type="range" id="ucmRSlider" min="0.3" max="2" step="0.1" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Speed, v</span><b id="ucmVVal">3 m/s</b></div>
+              <input type="range" id="ucmVSlider" min="0.5" max="8" step="0.5" value="3"></div>
+            <div class="row"><div class="row-head"><span>Ball mass, m</span><b id="ucmMVal">0.2 kg</b></div>
+              <input type="range" id="ucmMSlider" min="0.05" max="1" step="0.05" value="0.2"></div>
+            <button class="action" id="ucmCutBtn">✂️ Cut the string</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Centripetal acceleration, <var>v²/r</var></td><td class="v" id="ucmAVal">9.00 m/s²</td></tr>
+              <tr><td class="k">String tension, <var>mv²/r</var></td><td class="v" id="ucmFVal">1.80 N</td></tr>
+              <tr><td class="k">Angular speed, <var>ω</var></td><td class="v" id="ucmWVal">3.00 rad/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: what actually happens the instant the string breaks</summary>
+        <p class="explainer">
+          The instant tension disappears, the net force on the ball drops
+          to zero — by Newton's First Law it then travels in a straight
+          line at constant velocity, tangent to the circle at the exact
+          point of release. It does <em>not</em> fly straight outward
+          (radially), which is the most common misconception this
+          demonstration corrects.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Centripetal vs. "Centrifugal": Two Points of View</h3>
+      <p class="explainer">
+        Switch viewpoints on the exact same spinning platform. From
+        outside, looking down (an inertial frame), everything is explained
+        by one real, center-pointing force. From inside the spinning
+        platform itself, that same physics only makes sense if you invent
+        an outward "centrifugal" force — which is why it's called a
+        <strong>fictitious</strong> force: it's an artifact of watching from
+        a rotating frame, not a force any object is actually exerting.
+      </p>
+      <div class="mode-toggle" id="ccModeToggle">
+        <button class="active" data-mode="inertial"><b>Ground view (inertial)</b>one real, center-pointing force</button>
+        <button data-mode="rotating"><b>On the platform (rotating)</b>an apparent outward force appears</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 260" id="ccSvg">
+            <circle cx="130" cy="130" r="100" fill="none" stroke="var(--gridline)" stroke-width="1.5"></circle>
+            <circle id="ccBall" cx="230" cy="130" r="12" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <line id="ccArrow" stroke="#e34948" stroke-width="3" marker-end="url(#ccHead)"></line>
+            <text id="ccLabel" class="svg-label" text-anchor="middle"></text>
+            <defs><marker id="ccHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="readout">
+            <table>
+              <tr><td class="k">Force shown</td><td class="v" id="ccForceNameVal">Centripetal (real)</td></tr>
+              <tr><td class="k">Direction</td><td class="v" id="ccDirVal">Toward the center</td></tr>
+              <tr><td class="k">Who provides it?</td><td class="v" id="ccSourceVal">Friction against the platform, or a rail/harness</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: introductory non-inertial frames, in one sentence</summary>
+        <p class="explainer">
+          Newton's laws in their simple <var>F</var> = <var>ma</var> form
+          only work directly in inertial (non-accelerating) frames; a
+          rotating frame is accelerating (it's constantly changing
+          direction), so to keep using <var>F</var> = <var>ma</var>-style
+          bookkeeping inside it, you have to add fictitious terms — the
+          centrifugal force here — that don't correspond to any actual
+          push or pull. This connects directly back to the intro to
+          rotating platforms in the
+          <a href="../00-toolkit/index.html#reference-frames">Toolkit → Reference Frames</a> tab.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= BANKED CURVES (stub) ================= -->
+    <div class="panel" id="panel-banked-curves">
+      <h2>Banked Curves</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a race track curve is
+        banked (tilted inward) at just the right angle for a specific
+        speed. At exactly that speed, how much friction does a car need
+        from its tires to make the turn?
+      </p>
+
+      <p class="explainer">Ideal banking angle (no friction needed): <var>tanθ</var> = <var>v²/(rg)</var></p>
+
+      <div class="var-list">
+        <div><var>θ</var> — the bank angle, measured from horizontal</div>
+        <div><var>v</var> — the car's speed; <var>r</var> — the curve's radius</div>
+        <div><var>N</var> — the normal force from the road, tilted inward with the bank</div>
+      </div>
+
+      <p class="explainer">
+        On a banked curve, the road's normal force itself tilts inward. Pick
+        the bank angle so that the <em>horizontal component</em> of that
+        tilted normal force alone supplies exactly the needed centripetal
+        force — and the answer to the prediction is <strong>zero</strong>
+        friction required at that one specific "design speed."
+      </p>
+
+      <h3 class="subhead">Widget 1 — Ideal Banking Angle Calculator</h3>
+      <p class="explainer">
+        Set a curve's radius and design speed and watch the required bank
+        angle update — steeper for faster curves, shallower for gentler
+        ones.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 160" id="bankSvg">
+            <line x1="20" y1="140" x2="240" y2="140" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"></line>
+            <path id="bankRoadFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <rect id="bankCar" x="0" y="0" width="26" height="16" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <line id="bankNArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#bankHeadGreen)"></line>
+            <line id="bankGArrow" stroke="var(--text-primary)" stroke-width="2.5" marker-end="url(#bankHeadDark)"></line>
+            <defs>
+              <marker id="bankHeadGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path></marker>
+              <marker id="bankHeadDark" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--text-primary)"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Design speed, v</span><b id="bankVVal">25 m/s</b></div>
+              <input type="range" id="bankVSlider" min="5" max="45" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Curve radius, r</span><b id="bankRVal">80 m</b></div>
+              <input type="range" id="bankRSlider" min="20" max="200" step="5" value="80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required bank angle, θ</td><td class="v" id="bankThetaVal">38.6°</td></tr>
+              <tr><td class="k">Friction needed at this exact speed</td><td class="v" id="bankFrictionVal">None</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Safe Speed Range on a Real (Frictional) Bank</h3>
+      <p class="explainer">
+        Real curves are driven at a range of speeds, not just the exact
+        design speed — friction fills the gap, up to its limit. Too slow
+        and you'd slide down the bank; too fast and you'd slide up and off
+        it.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 100" id="bankRangeSvg">
+            <line x1="30" y1="70" x2="230" y2="70" class="svg-axis"></line>
+            <line id="bankRangeBar" x1="80" y1="70" x2="180" y2="70" stroke="#2a78d6" stroke-width="6"></line>
+            <circle id="bankRangeDesign" cx="130" cy="70" r="5" fill="#1baf7a"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Bank angle, θ</span><b id="bankR2ThetaVal">30°</b></div>
+              <input type="range" id="bankR2ThetaSlider" min="5" max="60" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>Curve radius, r</span><b id="bankR2RVal">80 m</b></div>
+              <input type="range" id="bankR2RSlider" min="20" max="200" step="5" value="80"></div>
+            <div class="row"><div class="row-head"><span>Tire friction, μ</span><b id="bankR2MuVal">0.60</b></div>
+              <input type="range" id="bankR2MuSlider" min="0.1" max="1.0" step="0.05" value="0.60"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Minimum safe speed</td><td class="v" id="bankVMinVal">—</td></tr>
+              <tr><td class="k">Design (frictionless) speed</td><td class="v" id="bankVDesignVal">—</td></tr>
+              <tr><td class="k">Maximum safe speed</td><td class="v" id="bankVMaxVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving the safe speed range</summary>
+        <p class="explainer">
+          Decomposing both the normal force and (up-slope or down-slope)
+          friction into horizontal and vertical components and solving
+          Newton's Second Law in each direction gives
+          <var>v²</var> = <var>rg</var>(tanθ ± <var>μ</var>) / (1 ∓ <var>μ</var>tanθ) —
+          the "+"/"−" (top sign) case is the fastest safe speed, where
+          friction acts down-slope to keep the car from sliding up and off;
+          the "−"/"+" case is the slowest, where friction acts up-slope to
+          keep the car from sliding down. Setting <var>μ</var> = 0 in either
+          formula collapses both back to the single ideal-angle result from
+          Widget 1.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= VERTICAL CIRCLES (stub) ================= -->
+    <div class="panel" id="panel-vertical-circles">
+      <h2>Vertical Circles</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a roller-coaster car goes
+        around a vertical loop at constant track speed near the top. Is the
+        normal force pushing on the rider from the track the same all the
+        way around the loop, or does it change?
+      </p>
+
+      <p class="explainer">
+        <var>N</var> = <var>mv²/r</var> + <var>mg</var> cosφ, where φ is the
+        angle measured from the <em>bottom</em> of the loop
+      </p>
+
+      <div class="var-list">
+        <div><var>N</var> — normal force from the track (the rider's apparent weight)</div>
+        <div><var>φ</var> — position around the loop: 0° at the bottom, 180° at the top</div>
+        <div><var>v</var> — speed at that point in the loop (changes with height, via energy conservation)</div>
+      </div>
+
+      <p class="explainer">
+        <var>N</var> changes continuously around the loop — largest at the
+        bottom (where gravity and the centripetal requirement both point
+        the same way, "up"), smallest at the top (where gravity now helps
+        supply the centripetal force instead of fighting it). This tab
+        develops the height-and-loop-radius relationship that
+        <a href="../03-energy/index.html#roller-coaster-physics">Energy → Roller Coaster Physics</a>
+        already used, by tracking apparent weight around the <em>whole</em>
+        circuit instead of just the top point.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Loop-the-Loop: Apparent Weight All the Way Around</h3>
+      <p class="explainer">
+        Set a bottom speed and watch the normal-force readout swing as the
+        marker travels around the loop. If it ever needs to go negative,
+        the car has lost contact with the track before reaching that point.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="loopSvg">
+            <line x1="10" y1="200" x2="290" y2="200" stroke="var(--text-primary)" stroke-width="2"></line>
+            <circle id="loopCircle" cx="150" cy="140" r="60" fill="none" stroke="var(--border)" stroke-width="3"></circle>
+            <circle id="loopCar" cx="150" cy="200" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <line id="loopNArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#loopHeadGreen)"></line>
+            <defs><marker id="loopHeadGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed at the bottom, v<sub>bottom</sub></span><b id="loopVVal">18 m/s</b></div>
+              <input type="range" id="loopVSlider" min="8" max="35" step="1" value="18"></div>
+            <div class="row"><div class="row-head"><span>Loop radius, r</span><b id="loopRVal">10 m</b></div>
+              <input type="range" id="loopRSlider" min="3" max="20" step="1" value="10"></div>
+            <div class="row"><div class="row-head"><span>Rider mass, m</span><b id="loopMVal">70 kg</b></div>
+              <input type="range" id="loopMSlider" min="40" max="120" step="5" value="70"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Speed at the top, <var>v<sub>top</sub></var></td><td class="v" id="loopVTopVal">—</td></tr>
+              <tr><td class="k">Minimum bottom speed needed for this radius</td><td class="v" id="loopVMinVal">—</td></tr>
+              <tr><td class="k">Normal force right now, <var>N</var></td><td class="v" id="loopNVal">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="loopVerdictVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the full derivation, bottom to top</summary>
+        <p class="explainer">
+          At angle φ from the bottom, height above the bottom is
+          <var>h</var>(φ) = <var>r</var>(1−cosφ), so by energy conservation
+          <var>v</var>(φ)² = <var>v<sub>bottom</sub></var>² − 2<var>gr</var>(1−cosφ).
+          Newton's Second Law along the radial direction then gives
+          <var>N</var> = <var>mv</var>(φ)²/<var>r</var> + <var>mg</var>cosφ.
+          Requiring <var>N</var> ≥ 0 everywhere around the loop turns out to
+          be most restrictive exactly at the top (φ = 180°), which is why
+          checking only the top point (as the Roller Coaster Physics tab
+          did) is enough to guarantee the whole loop is safe.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — The Bucket-of-Water Intuition</h3>
+      <p class="explainer">
+        Swing a bucket of water in a fast vertical circle and the water
+        stays in, even upside down at the top. It's the exact same
+        <var>N</var> ≥ 0 condition — the "bucket" here is just gravity and
+        the water's own inertia playing the role of the track.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 140" id="bucketSvg">
+            <circle cx="100" cy="30" r="4" fill="var(--text-primary)"></circle>
+            <line id="bucketString" x1="100" y1="30" x2="100" y2="90" stroke="var(--muted)" stroke-width="2"></line>
+            <path id="bucketShape" fill="var(--chip)" stroke="var(--text-primary)" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed at the top, v</span><b id="bucketVVal">3 m/s</b></div>
+              <input type="range" id="bucketVSlider" min="0.5" max="8" step="0.5" value="3"></div>
+            <div class="row"><div class="row-head"><span>Swing radius, r</span><b id="bucketRVal">0.6 m</b></div>
+              <input type="range" id="bucketRSlider" min="0.2" max="1.5" step="0.1" value="0.6"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Minimum speed to keep water in, √(<var>gr</var>)</td><td class="v" id="bucketVMinVal">2.42 m/s</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="bucketVerdictVal">Water stays in</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= GRAVITATION (stub) ================= -->
+    <div class="panel" id="panel-gravitation">
+      <h2>Gravitation</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> the International Space
+        Station orbits only about 400 km above Earth's surface — roughly a
+        10% increase in distance from Earth's center. Is gravity up there
+        dramatically weaker than at the surface, or does something else
+        entirely explain why astronauts float?
+      </p>
+
+      <p class="explainer"><var>F</var> = <var>Gm₁m₂/r²</var></p>
+
+      <div class="var-list">
+        <div><var>F</var> — gravitational force between two masses</div>
+        <div><var>G</var> — the gravitational constant, 6.674×10⁻¹¹ N·m²/kg²</div>
+        <div><var>m₁</var>, <var>m₂</var> — the two masses; <var>r</var> — distance between their centers</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Inverse-Square Law Explorer</h3>
+      <p class="explainer">
+        Drag the distance slider and watch how sharply the force drops —
+        doubling the distance cuts the force to a quarter, not a half.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="gravGraphSvg">
+            <line x1="40" y1="150" x2="440" y2="150" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="150" class="svg-axis"></line>
+            <path id="gravCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="gravMarker" cx="40" cy="150" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass 1</span><b id="gravM1Val">5.97×10²⁴ kg (Earth)</b></div>
+              <input type="range" id="gravM1Slider" min="22" max="26" step="0.02" value="24.78"></div>
+            <div class="row"><div class="row-head"><span>Mass 2</span><b id="gravM2Val">1000 kg</b></div>
+              <input type="range" id="gravM2Slider" min="1" max="6" step="0.1" value="3"></div>
+            <div class="row"><div class="row-head"><span>Distance, r (× Earth radii)</span><b id="gravRVal">1.06 R⊕</b></div>
+              <input type="range" id="gravRSlider" min="1" max="5" step="0.01" value="1.06"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Gravitational force</td><td class="v" id="gravFVal">—</td></tr>
+              <tr><td class="k">If distance doubled instead</td><td class="v" id="gravFHalfVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the sliders use exponents of 10</summary>
+        <p class="explainer">
+          Real astronomical masses span such an enormous range (a
+          kilogram-scale probe next to a 5.97×10²⁴ kg planet) that a normal
+          linear slider would be useless — nearly the entire slider would
+          represent "basically zero" on a planetary scale. Sliding the
+          <em>exponent</em> instead (10 raised to whatever the slider says)
+          is a standard trick for exploring quantities across many orders
+          of magnitude at once.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Answering the Prediction: Continuous Free Fall</h3>
+      <p class="explainer">
+        Gravity at the ISS's altitude is barely weaker than at the surface —
+        compute it yourself below. Astronauts float for a completely
+        different reason: they (and their station) are in continuous free
+        fall, moving forward fast enough that the ground curves away from
+        them exactly as fast as they fall toward it. That's an orbit, and
+        it's developed fully in the next tab, <a href="#orbits" id="gravOrbitsLink">Orbits</a>.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 160" id="issSvg">
+            <circle cx="130" cy="130" r="70" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></circle>
+            <circle id="issOrbit" cx="130" cy="130" r="90" fill="none" stroke="var(--gridline)" stroke-width="1.5"></circle>
+            <circle id="issSat" cx="220" cy="130" r="6" fill="#2a78d6" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Altitude above surface</span><b id="issHVal">400 km</b></div>
+              <input type="range" id="issHSlider" min="0" max="2000" step="50" value="400"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Surface gravity, <var>g</var>₀</td><td class="v" id="issG0Val">9.80 m/s²</td></tr>
+              <tr><td class="k">Gravity at this altitude</td><td class="v" id="issGVal">9.52 m/s²</td></tr>
+              <tr><td class="k">Percent of surface gravity</td><td class="v" id="issPctVal">97.1%</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Notice: this is why "zero gravity" is the wrong name for orbit</h4>
+        <ol>
+          <li>Look up any "how astronauts train for weightlessness" video —
+            it's done inside a plane in free fall (briefly), not a
+            gravity-free chamber. Free fall, not absent gravity, is the
+            actual mechanism, at any altitude.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= ORBITS (stub) ================= -->
+    <div class="panel" id="panel-orbits">
+      <h2>Orbits</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a satellite is launched
+        sideways, exactly fast enough to circle its planet. Launch a second,
+        identical satellite from the same height but a little slower — does
+        it just fall to a lower circular orbit, or does something else
+        happen?
+      </p>
+
+      <p class="explainer">
+        Circular speed: <var>v<sub>circ</sub></var> = √(<var>GM/r</var>) &nbsp;&nbsp;·&nbsp;&nbsp; Escape speed: <var>v<sub>esc</sub></var> = √(2<var>GM/r</var>) = <var>v<sub>circ</sub></var>√2
+      </p>
+
+      <div class="var-list">
+        <div><var>G</var> — gravitational constant; <var>M</var> — mass of the central body</div>
+        <div><var>r</var> — orbital distance from the center; <var>v</var> — orbital speed</div>
+        <div>An orbit is really just a very long fall that keeps missing the ground</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Orbit Simulator</h3>
+      <p class="explainer">
+        Launch at exactly circular speed and you get a circle. Anything
+        slower or faster (up to escape speed) gives an <strong>ellipse</strong> —
+        not a smaller or bigger circle — with the launch point as one
+        extreme of the ellipse. That answers the prediction: the slower
+        satellite doesn't settle into a new circular orbit at all.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 400" id="orbitSvg">
+            <circle cx="200" cy="200" r="14" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <path id="orbitTrace" fill="none" stroke="#2a78d6" stroke-width="1.5" opacity="0.7"></path>
+            <circle id="orbitSat" cx="330" cy="200" r="7" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Launch speed, v (as a fraction of circular speed)</span><b id="orbitVVal">1.00×</b></div>
+              <input type="range" id="orbitVSlider" min="0.3" max="1.6" step="0.02" value="1.0"></div>
+            <button class="action" id="orbitGoBtn">🚀 Launch</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Circular speed here</td><td class="v" id="orbitVCircVal">—</td></tr>
+              <tr><td class="k">Escape speed here</td><td class="v" id="orbitVEscVal">—</td></tr>
+              <tr><td class="k">Orbit type</td><td class="v" id="orbitTypeVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the four orbit shapes are all conic sections</summary>
+        <p class="explainer">
+          Every possible gravitational orbit is a conic section, sorted
+          purely by total mechanical energy: bound orbits (energy &lt; 0)
+          are ellipses, with the circle as the special case of zero
+          eccentricity; the borderline (energy = 0, exactly escape speed)
+          is a parabola; unbound orbits (energy &gt; 0, faster than escape
+          speed) are hyperbolas that never return. This is the same
+          "conservation of energy decides the outcome" idea from Section 3,
+          just applied to gravity specifically instead of springs or ramps.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Escape Velocity Explorer</h3>
+      <p class="explainer">
+        Escape velocity is always exactly √2 times the circular orbital
+        velocity at the same distance — compare real worlds below.
+      </p>
+      <div class="preset-row" id="escPresetRow">
+        <button data-gm="3.986e14" data-r="6.371e6" class="active">🌍 Earth</button>
+        <button data-gm="4.905e12" data-r="1.737e6">🌕 Moon</button>
+        <button data-gm="4.283e13" data-r="3.390e6">🔴 Mars</button>
+        <button data-gm="1.267e17" data-r="6.991e7">🪐 Jupiter</button>
+      </div>
+      <div class="widget">
+        <div class="widget-side" style="max-width:520px">
+          <div class="readout">
+            <table>
+              <tr><td class="k">Low-orbit circular speed</td><td class="v" id="escVCircVal">7.91 km/s</td></tr>
+              <tr><td class="k">Escape speed from the surface</td><td class="v" id="escVEscVal">11.19 km/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Kepler's Third Law</h3>
+      <p class="explainer">
+        Slide the orbital radius and watch <var>T²/r³</var> stay exactly
+        constant — that ratio is Kepler's Third Law, and it depends only on
+        the central mass, never on the orbiting object's own mass or speed.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:520px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Orbital radius, r (AU, around the Sun)</span><b id="keplerRVal">1.00 AU</b></div>
+              <input type="range" id="keplerRSlider" min="0.3" max="30" step="0.1" value="1.0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Orbital period, T</td><td class="v" id="keplerTVal">1.00 years</td></tr>
+              <tr><td class="k"><var>T²/r³</var> (should stay constant)</td><td class="v" id="keplerRatioVal">1.00</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving Kepler's Third Law from circular orbits</summary>
+        <p class="explainer">
+          For a circular orbit, the centripetal requirement
+          <var>mv²/r</var> = <var>GMm/r²</var> combined with
+          <var>v</var> = 2π<var>r/T</var> gives, after simplifying,
+          <var>T²</var> = (4π²/<var>GM</var>)<var>r³</var> — a constant
+          (4π²/<var>GM</var>) times <var>r³</var>, exactly Kepler's Third
+          Law. Using years and astronomical units around the Sun
+          specifically, that constant works out to almost exactly 1, which
+          is why <var>T²/r³</var> ≈ 1 above regardless of <var>r</var>.
+        </p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/circular.js"></script>
 </body>
 </html>

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>4. Momentum, Impulse, and Collisions — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/momentum.css">
 </head>
 <body data-section="04-momentum">
 <div class="wrap">
@@ -12,12 +15,681 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 4. Momentum</p>
       <h1>4. Momentum, Impulse, and Collisions</h1>
+      <p class="sub">Momentum is what force and time together leave behind — and unlike energy, it never has a "wasted" form to lose track of.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="momentum">Momentum</button>
+    <button data-target="impulse">Impulse</button>
+    <button data-target="collisions">Collisions</button>
+    <button data-target="center-of-mass">Center of Mass</button>
+    <button data-target="ballistic-pendulum">Ballistic Pendulum</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= MOMENTUM (full) ================= -->
+    <div class="panel active" id="panel-momentum">
+      <h2>Momentum</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a loaded truck and a
+        motorcycle collide with a wall at the exact same speed. Which one
+        pushes on the wall harder, and for longer?
+      </p>
+
+      <p class="explainer"><var>p</var> = <var>mv</var> &nbsp;&nbsp;·&nbsp;&nbsp; In any isolated system, total momentum is conserved</p>
+
+      <div class="var-list">
+        <div><var>p</var> — momentum (kg·m/s), a vector — it has the same direction as <var>v</var></div>
+        <div><var>m</var> — mass; <var>v</var> — velocity</div>
+        <div>Isolated system — no external net force acts on the objects you're tracking</div>
+      </div>
+
+      <p class="explainer">
+        Momentum answers a slightly different question than kinetic energy
+        does. <var>KE</var> = ½<var>mv²</var> cares about speed
+        <em>squared</em> and has no direction; <var>p</var> = <var>mv</var>
+        is linear in velocity and is a genuine vector — a truck moving left
+        and one moving right at the same speed have opposite momenta (one
+        positive, one negative) but identical kinetic energy.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why momentum is conserved at all</summary>
+        <p class="explainer">
+          It follows directly from Newton's Third Law. In any collision
+          between objects A and B, the force A exerts on B and the force B
+          exerts on A are equal and opposite at every instant, so their
+          impulses (force × time, developed fully in the next tab) are
+          equal and opposite too — whatever momentum A loses, B gains,
+          exactly. Add up momentum over the <em>whole</em> isolated system
+          and those internal transfers cancel completely, leaving the total
+          unchanged no matter how complicated the collision is.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Two-Cart Collision Lab</h3>
+      <p class="explainer">
+        Set independent masses and velocities (negative means moving left)
+        for two carts that collide and stick together. Total momentum
+        before always equals total momentum after — even when the carts'
+        individual speeds change dramatically.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 100" id="mCartSvg">
+            <line x1="10" y1="80" x2="450" y2="80" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"></line>
+            <rect id="mCartA" x="60" y="50" width="40" height="28" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <rect id="mCartB" x="300" y="50" width="40" height="28" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Cart A mass, m<sub>A</sub></span><b id="mMAVal">6 kg</b></div>
+              <input type="range" id="mMASlider" min="1" max="20" step="1" value="6"></div>
+            <div class="row"><div class="row-head"><span>Cart A velocity, v<sub>A</sub></span><b id="mVAVal">4 m/s</b></div>
+              <input type="range" id="mVASlider" min="-10" max="10" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Cart B mass, m<sub>B</sub></span><b id="mMBVal">4 kg</b></div>
+              <input type="range" id="mMBSlider" min="1" max="20" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Cart B velocity, v<sub>B</sub></span><b id="mVBVal">-2 m/s</b></div>
+              <input type="range" id="mVBSlider" min="-10" max="10" step="1" value="-2"></div>
+            <button class="action" id="mGoBtn">💥 Collide (stick together)</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Momentum before, <var>m<sub>A</sub>v<sub>A</sub></var> + <var>m<sub>B</sub>v<sub>B</sub></var></td><td class="v" id="mPBeforeVal">16.0 kg·m/s</td></tr>
+              <tr><td class="k">Combined velocity after, <var>v<sub>f</sub></var></td><td class="v" id="mVFVal">1.60 m/s</td></tr>
+              <tr><td class="k">Momentum after, (<var>m<sub>A</sub>+m<sub>B</sub></var>)<var>v<sub>f</sub></var></td><td class="v" id="mPAfterVal">16.0 kg·m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="explainer">
+        The two-carts-pushing-apart-from-rest version of this idea (equal
+        and opposite forces, unequal resulting accelerations) was already
+        built as the Push-Off Simulator in
+        <a href="../02-newtons-laws/index.html#inertia">Newton's Laws → Inertia</a> —
+        it's the same conservation law, viewed from the force side instead
+        of the momentum side. What kinetic energy does <em>during</em> a
+        collision like this one is the subject of the next tab.
+      </p>
+
+      <h3 class="subhead">Widget 2 — Recoil: Firing a Cannon</h3>
+      <p class="explainer">
+        A cannon and shell start at rest — total momentum zero. Fire the
+        shell forward and the cannon <em>must</em> recoil backward with
+        exactly enough momentum to keep the total at zero.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 100" id="mCannonSvg">
+            <line x1="10" y1="80" x2="450" y2="80" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"></line>
+            <rect id="mCannonBody" x="200" y="55" width="60" height="24" fill="#333" stroke="white" stroke-width="2"></rect>
+            <circle id="mShell" cx="266" cy="67" r="8" fill="#e34948" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Cannon mass, M</span><b id="mCannonMVal">400 kg</b></div>
+              <input type="range" id="mCannonMSlider" min="100" max="1000" step="50" value="400"></div>
+            <div class="row"><div class="row-head"><span>Shell mass, m</span><b id="mShellMVal">8 kg</b></div>
+              <input type="range" id="mShellMSlider" min="1" max="30" step="1" value="8"></div>
+            <div class="row"><div class="row-head"><span>Muzzle speed, v<sub>shell</sub></span><b id="mShellVVal">120 m/s</b></div>
+              <input type="range" id="mShellVSlider" min="20" max="300" step="10" value="120"></div>
+            <button class="action" id="mFireBtn">🔥 Fire!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Shell's momentum, <var>mv<sub>shell</sub></var></td><td class="v" id="mShellPVal">960 kg·m/s</td></tr>
+              <tr><td class="k">Cannon's recoil velocity, <var>−mv<sub>shell</sub>/M</var></td><td class="v" id="mRecoilVVal">-2.40 m/s</td></tr>
+              <tr><td class="k">Total momentum (should stay 0)</td><td class="v" id="mTotalVal">0.0 kg·m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why a heavier cannon barely moves</summary>
+        <p class="explainer">
+          <var>Mv<sub>cannon</sub></var> + <var>mv<sub>shell</sub></var> = 0
+          (starting momentum) gives <var>v<sub>cannon</sub></var> = −<var>mv<sub>shell</sub>/M</var>.
+          The recoil speed shrinks in direct proportion to how much heavier
+          the cannon is than the shell — the same reason a rifle "kicks"
+          noticeably but the battleship firing a much heavier shell barely
+          shudders: mass ratio, not some difference in the underlying law.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: balloon rocket, revisited</h4>
+        <ol>
+          <li>The balloon-on-a-string demo from the Third Law tab is exactly
+            this recoil idea: air is the "shell," the balloon is the
+            "cannon." Try a fuller balloon (more expelled mass) versus a
+            less-full one at the same starting pressure and compare how far
+            each travels.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= IMPULSE (stub) ================= -->
+    <div class="panel" id="panel-impulse">
+      <h2>Impulse</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you catch a fast ball two
+        ways — rigidly (arm locked stiff) and by letting your arm "give,"
+        moving back with the ball as you catch it. Same ball, same speed,
+        same final result (it stops). Which catch hurts more, and why?
+      </p>
+
+      <p class="explainer"><var>J</var> = <var>FΔt</var> = <var>Δp</var></p>
+
+      <div class="var-list">
+        <div><var>J</var> — impulse: force applied over a time interval (same units as momentum)</div>
+        <div><var>F</var> — (average) force; <var>Δt</var> — the duration the force acts</div>
+        <div><var>Δp</var> — the resulting change in momentum</div>
+      </div>
+
+      <p class="explainer">
+        Stopping a given amount of momentum always takes the same
+        <em>impulse</em> — but that impulse can come from a huge force
+        acting briefly, or a small force acting longer. Every safety device
+        in the prediction above (airbags, padded gloves, a "giving" catch)
+        works the same way: stretch out <var>Δt</var> and the average force
+        <var>F</var> = <var>Δp/Δt</var> drops in direct proportion.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: impulse is the area under a force-time graph</summary>
+        <p class="explainer">
+          For a constant force, <var>J</var> = <var>FΔt</var> is literally
+          base × height — the area of a rectangle on a force-vs-time plot.
+          Real collision forces aren't constant (they typically ramp up and
+          back down over the contact time), but the same idea holds exactly:
+          impulse is whatever area sits under the true force-time curve,
+          and <var>F</var> in the simple formula is really just the
+          <em>average</em> height that would give the same area.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Force-Time Graph Explorer</h3>
+      <p class="explainer">
+        The shaded area is fixed — it's the momentum change this object
+        needs, which doesn't depend on how the stop happens. Stretch the
+        stop out and watch the rectangle get wider and dramatically
+        shorter.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="impGraphSvg">
+            <line x1="40" y1="150" x2="440" y2="150" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="150" class="svg-axis"></line>
+            <path id="impAreaPath" fill="rgba(227,73,72,0.22)" stroke="none"></path>
+            <path id="impLinePath" fill="none" stroke="#e34948" stroke-width="2.5"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="impMVal">70 kg</b></div>
+              <input type="range" id="impMSlider" min="10" max="1500" step="10" value="70"></div>
+            <div class="row"><div class="row-head"><span>Speed change, Δv</span><b id="impDvVal">15 m/s</b></div>
+              <input type="range" id="impDvSlider" min="1" max="30" step="1" value="15"></div>
+            <div class="row"><div class="row-head"><span>Stopping time, Δt</span><b id="impDtVal">0.1 s</b></div>
+              <input type="range" id="impDtSlider" min="0.01" max="1" step="0.01" value="0.1"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Impulse needed, <var>Δp</var> = <var>mΔv</var></td><td class="v" id="impJVal">1050 kg·m/s</td></tr>
+              <tr><td class="k">Average force, <var>Δp/Δt</var></td><td class="v" id="impFVal">10500 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Same Stop, Different Time: Why Padding Works</h3>
+      <p class="explainer">
+        Every one of these scenarios stops the same momentum change; only
+        the time it takes to do it changes. Pick a scenario and see how
+        violently the required force swings.
+      </p>
+      <div class="preset-row" id="impPresetRow">
+        <button data-dt="0.002" class="active">🚗 Dashboard, no airbag (2 ms)</button>
+        <button data-dt="0.08">🎈 Airbag deployed (80 ms)</button>
+        <button data-dt="0.005">🖐️ Rigid catch (5 ms)</button>
+        <button data-dt="0.25">🤲 "Giving" catch (250 ms)</button>
+        <button data-dt="0.003">🥚 Egg onto concrete (3 ms)</button>
+        <button data-dt="0.15">📦 Egg into padded box (150 ms)</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 140" id="impBarSvg">
+            <line x1="30" y1="120" x2="230" y2="120" class="svg-axis"></line>
+            <rect id="impForceBar" x="100" y="120" width="60" height="0" fill="#e34948"></rect>
+            <text x="130" y="134" class="svg-label" text-anchor="middle">force</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass involved, m</span><b id="impSMVal">1 kg</b></div>
+              <input type="range" id="impSMSlider" min="0.05" max="1500" step="0.05" value="1"></div>
+            <div class="row"><div class="row-head"><span>Speed change, Δv</span><b id="impSDvVal">10 m/s</b></div>
+              <input type="range" id="impSDvSlider" min="1" max="30" step="1" value="10"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Stopping time, <var>Δt</var></td><td class="v" id="impSDtVal">0.002 s</td></tr>
+              <tr><td class="k">Impulse, <var>Δp</var></td><td class="v" id="impSJVal">10.0 kg·m/s</td></tr>
+              <tr><td class="k">Average force</td><td class="v" id="impSFVal">5000 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: follow-through in sports is the same trick, run in reverse</summary>
+        <p class="explainer">
+          A golf or tennis follow-through <em>extends</em> the contact
+          time between racket/club and ball on purpose — for a fixed desired
+          <var>Δp</var> given to the ball, a longer <var>Δt</var> would
+          normally mean a smaller force, so players compensate by also
+          increasing the force itself throughout the longer stroke. The
+          point of a follow-through isn't to reduce force at all — it's to
+          keep applying force for as long as possible, maximizing the total
+          impulse (and therefore the ball's speed) instead of cutting the
+          swing short.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= COLLISIONS (stub) ================= -->
+    <div class="panel" id="panel-collisions">
+      <h2>Collisions</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> in a Newton's cradle, you
+        pull back <em>two</em> balls at one end and let them swing into the
+        rest. Does exactly one ball fly out the far side twice as fast, or
+        two balls fly out at the original speed?
+      </p>
+
+      <p class="explainer">
+        Momentum is <strong>always</strong> conserved in a collision.
+        Kinetic energy is conserved only in the special case of an
+        <strong>elastic</strong> collision; a <strong>perfectly inelastic</strong>
+        one (the objects stick together) loses the maximum amount possible
+        while still conserving momentum. Most real collisions land
+        somewhere between those two extremes.
+      </p>
+
+      <div class="var-list">
+        <div><var>e</var> — coefficient of restitution: 1 = perfectly elastic, 0 = perfectly inelastic</div>
+        <div><var>v₁</var>, <var>v₂</var> — velocities before; <var>v₁′</var>, <var>v₂′</var> — velocities after</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Collision Laboratory</h3>
+      <p class="explainer">
+        Slide the elasticity from perfectly inelastic to perfectly elastic
+        and watch momentum stay locked while kinetic energy is only
+        rescued back to 100% right at the elastic end.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 100" id="colCartSvg">
+            <line x1="10" y1="80" x2="450" y2="80" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"></line>
+            <circle id="colBallA" cx="100" cy="66" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="colBallB" cx="300" cy="66" r="14" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Elasticity, e</span><b id="colEVal">1.00 (elastic)</b></div>
+              <input type="range" id="colESlider" min="0" max="1" step="0.05" value="1"></div>
+            <div class="row"><div class="row-head"><span>Mass A, m₁</span><b id="colM1Val">4 kg</b></div>
+              <input type="range" id="colM1Slider" min="1" max="15" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Velocity A, v₁</span><b id="colV1Val">8 m/s</b></div>
+              <input type="range" id="colV1Slider" min="-15" max="15" step="1" value="8"></div>
+            <div class="row"><div class="row-head"><span>Mass B, m₂</span><b id="colM2Val">4 kg</b></div>
+              <input type="range" id="colM2Slider" min="1" max="15" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Velocity B, v₂</span><b id="colV2Val">0 m/s</b></div>
+              <input type="range" id="colV2Slider" min="-15" max="15" step="1" value="0"></div>
+            <button class="action" id="colGoBtn">💥 Collide!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Momentum before / after</td><td class="v" id="colPVal">32.0 / 32.0</td></tr>
+              <tr><td class="k">Velocity A / B after</td><td class="v" id="colVAfterVal">0.0 / 8.0 m/s</td></tr>
+              <tr><td class="k">KE before / after</td><td class="v" id="colKEVal">128.0 / 128.0 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the general collision formula</summary>
+        <p class="explainer">
+          <var>v₁′</var> = [(<var>m₁</var>−<var>em₂</var>)<var>v₁</var> + (1+<var>e</var>)<var>m₂v₂</var>] / (<var>m₁</var>+<var>m₂</var>),
+          and swap 1↔2 for <var>v₂′</var>. Setting <var>e</var> = 1 reduces
+          this to the standard elastic-collision formulas; setting
+          <var>e</var> = 0 makes both formulas collapse to the same shared
+          final velocity — a perfectly inelastic collision, exactly matching
+          the momentum-only result from the previous tab.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Newton's Cradle</h3>
+      <p class="explainer">
+        Choose how many balls you pull back. In this idealized (perfectly
+        elastic, equal-mass) chain, the same number of balls always exits
+        the far end at the same speed — the middle balls barely move at
+        all.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 160" id="cradleSvg">
+            <line x1="20" y1="20" x2="280" y2="20" stroke="var(--muted)" stroke-width="2"></line>
+            <g id="cradleBalls"></g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Balls pulled back</span><b id="cradleKVal">2</b></div>
+              <input type="range" id="cradleKSlider" min="1" max="3" step="1" value="2"></div>
+            <button class="action" id="cradleGoBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Balls that fly out the far side</td><td class="v" id="cradleOutVal">2</td></tr>
+              <tr><td class="k">Why not 1 ball at double speed?</td><td class="v" id="cradleWhyVal">Momentum <em>and</em> energy both fix it</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why exactly k balls, not 1 fast ball, come out</summary>
+        <p class="explainer">
+          One fast ball leaving with double speed would conserve
+          momentum (2<var>m</var>·<var>v</var> either way) but would carry
+          <em>twice</em> the kinetic energy that went in — impossible for an
+          elastic chain. <var>k</var> balls leaving together at the
+          <em>original</em> speed conserves both momentum (<var>k</var> times
+          the single-ball momentum, matching what came in) and kinetic
+          energy simultaneously, which is the only outcome consistent with
+          both laws at once.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Billiard Balls: Two-Dimensional Momentum</h3>
+      <p class="explainer">
+        Hit a stationary ball off-center and watch both balls fly apart at
+        right angles to each other — a real, testable fact about equal-mass
+        elastic collisions, not just a billiards superstition.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 200" id="billiardSvg">
+            <circle id="billTarget" cx="180" cy="100" r="14" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <circle id="billCue" cx="40" cy="100" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <line id="billCuePath" x1="40" y1="100" x2="40" y2="100" stroke="#2a78d6" stroke-width="2" stroke-dasharray="4 3"></line>
+            <line id="billTargetPath" x1="180" y1="100" x2="180" y2="100" stroke="#eb6834" stroke-width="2" stroke-dasharray="4 3"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Impact parameter (how off-center)</span><b id="billBVal">10 units</b></div>
+              <input type="range" id="billBSlider" min="-27" max="27" step="1" value="10"></div>
+            <button class="action" id="billGoBtn">▶ Shoot</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Cue ball's speed after</td><td class="v" id="billCueVVal">—</td></tr>
+              <tr><td class="k">Target ball's speed after</td><td class="v" id="billTargetVVal">—</td></tr>
+              <tr><td class="k">Angle between their paths</td><td class="v" id="billAngleVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: coin collision on a smooth table</h4>
+        <ol>
+          <li>Slide one coin into a second, stationary coin, striking it
+            slightly off-center on a smooth table or countertop. Watch both
+            coins' paths afterward — measuring the angle between them with
+            a protractor should land close to 90°.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= CENTER OF MASS (stub) ================= -->
+    <div class="panel" id="panel-center-of-mass">
+      <h2>Center of Mass</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a fireworks shell explodes
+        in mid-air into dozens of glowing fragments, scattering in every
+        direction. Does the "center" of that expanding sparkle cloud still
+        follow the same smooth arc the unexploded shell would have?
+      </p>
+
+      <p class="explainer">
+        <var>x<sub>com</sub></var> = <var>Σmᵢxᵢ / Σmᵢ</var> (and likewise for <var>y</var>)
+      </p>
+
+      <div class="var-list">
+        <div><var>x<sub>com</sub></var> — the center of mass's position: a mass-weighted average of every particle's position</div>
+        <div><var>mᵢ</var>, <var>xᵢ</var> — the mass and position of particle <var>i</var></div>
+      </div>
+
+      <p class="explainer">
+        The center of mass of a system moves exactly as if all of the
+        system's mass were concentrated there and only the <em>external</em>
+        forces acted on it — internal forces (an explosion, a diver tucking
+        and extending, a rocket's stages separating) can throw individual
+        pieces around violently without changing the center of mass's path
+        at all.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Center-of-Mass Visualizer</h3>
+      <p class="explainer">
+        Drag any of the three masses, or resize them, and watch the center
+        of mass (★) update instantly, always pulled toward whichever mass is
+        currently heaviest.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 300" id="comSvg">
+            <g id="comGrid"></g>
+            <line x1="20" y1="150" x2="280" y2="150" class="svg-axis"></line>
+            <line x1="150" y1="20" x2="150" y2="280" class="svg-axis"></line>
+            <circle id="comP1" cx="90" cy="200" r="16" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <circle id="comP2" cx="210" cy="200" r="12" fill="#eb6834" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <circle id="comP3" cx="150" cy="90" r="10" fill="#1baf7a" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <text id="comStar" x="150" y="150" font-size="22" text-anchor="middle" dominant-baseline="middle">★</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass 1 (blue)</span><b id="comM1Val">6 kg</b></div>
+              <input type="range" id="comM1Slider" min="1" max="15" step="1" value="6"></div>
+            <div class="row"><div class="row-head"><span>Mass 2 (orange)</span><b id="comM2Val">3 kg</b></div>
+              <input type="range" id="comM2Slider" min="1" max="15" step="1" value="3"></div>
+            <div class="row"><div class="row-head"><span>Mass 3 (green)</span><b id="comM3Val">2 kg</b></div>
+              <input type="range" id="comM3Slider" min="1" max="15" step="1" value="2"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Center of mass position</td><td class="v" id="comPosVal">—</td></tr>
+              <tr><td class="k">Total mass</td><td class="v" id="comTotalMVal">11 kg</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the center of mass is a weighted average, not a geometric one</summary>
+        <p class="explainer">
+          If all three masses were equal, the center of mass would sit at
+          the ordinary geometric centroid of the triangle they form. Make
+          one mass much heavier and the center of mass shifts hard toward
+          it — mathematically because each position <var>xᵢ</var> in the sum
+          is <em>weighted</em> by its own mass, so heavier particles simply
+          count for more in the average.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Explosions Don't Change the Center of Mass's Path</h3>
+      <p class="explainer">
+        Launch a projectile and detonate it mid-flight into two equal
+        fragments flying apart. The ghost marker traces the path the
+        <em>unexploded</em> shell would have taken — watch it stay locked to
+        the midpoint between the two fragments the entire time.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 220" id="comExplodeSvg">
+            <line x1="10" y1="200" x2="450" y2="200" stroke="var(--text-primary)" stroke-width="2"></line>
+            <path id="comGhostPath" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"></path>
+            <circle id="comGhost" cx="30" cy="200" r="5" fill="none" stroke="var(--muted)" stroke-width="2"></circle>
+            <circle id="comShell" cx="30" cy="200" r="8" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="comFragA" cx="30" cy="200" r="7" fill="#e34948" stroke="white" stroke-width="2" opacity="0"></circle>
+            <circle id="comFragB" cx="30" cy="200" r="7" fill="#eb6834" stroke="white" stroke-width="2" opacity="0"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Extra scatter speed at explosion</span><b id="comDvVal">8 m/s</b></div>
+              <input type="range" id="comDvSlider" min="2" max="20" step="1" value="8"></div>
+            <button class="action" id="comExplodeBtn">💥 Launch and explode</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Ghost (undisturbed) position</td><td class="v" id="comGhostPosVal">—</td></tr>
+              <tr><td class="k">Midpoint of the two fragments</td><td class="v" id="comMidPosVal">—</td></tr>
+              <tr><td class="k">Match?</td><td class="v" id="comMatchVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the explosion is invisible to the center of mass</summary>
+        <p class="explainer">
+          The explosive force between the two fragments is an
+          <em>internal</em> force — by Newton's Third Law it's equal and
+          opposite on each fragment, so it contributes exactly zero to the
+          system's total momentum. The only <em>external</em> force still
+          acting on the whole system is gravity, exactly as before the
+          explosion — so the center of mass keeps obeying the same
+          projectile-motion equations, completely unaware that anything
+          exploded.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= BALLISTIC PENDULUM (stub) ================= -->
+    <div class="panel" id="panel-ballistic-pendulum">
+      <h2>Ballistic Pendulum</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a bullet is fired into a
+        heavy wooden block hanging from strings, and the block swings up
+        and to the side by some measurable height. Could you work out how
+        fast the bullet was moving just from that one height measurement —
+        without ever timing the bullet itself?
+      </p>
+
+      <p class="explainer">
+        This classic device needs <strong>two different laws</strong> in
+        sequence: momentum conservation gets you through the violent,
+        energy-losing collision itself; energy conservation then carries you
+        through the smooth swing afterward. Neither law alone would work
+        for the whole process.
+      </p>
+
+      <div class="var-list">
+        <div><var>m</var> — bullet mass; <var>v</var> — bullet's (unknown) speed before impact</div>
+        <div><var>M</var> — pendulum block's mass</div>
+        <div><var>V</var> — combined speed of bullet+block immediately after they merge</div>
+        <div><var>h</var> — height the combined block+bullet rises to during the swing</div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why you can't just use energy conservation the whole way through</summary>
+        <p class="explainer">
+          The bullet embedding in the block is a <strong>perfectly
+          inelastic</strong> collision — by definition, it loses the maximum
+          kinetic energy possible while still conserving momentum. Trying to
+          use energy conservation across the collision itself would silently
+          (and wrongly) assume no energy was lost. Momentum conservation is
+          the only law guaranteed to hold across a violent, deforming
+          impact like this; energy conservation only becomes valid again
+          once the collision is over and the swing is smooth and lossless.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Ballistic Pendulum Calculator</h3>
+      <p class="explainer">
+        Set a "true" bullet speed below, and watch the collision-then-swing
+        animation play out. Then check the last row: working backward from
+        only the swing height <var>h</var> recovers the exact same speed you
+        started with.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="bpSvg">
+            <circle cx="150" cy="20" r="4" fill="var(--text-primary)"></circle>
+            <line id="bpRod" x1="150" y1="20" x2="150" y2="170" stroke="var(--muted)" stroke-width="2"></line>
+            <rect id="bpBlock" x="130" y="170" width="40" height="30" fill="#8a5a2b" stroke="white" stroke-width="2"></rect>
+            <circle id="bpBullet" cx="20" cy="185" r="6" fill="#e34948" stroke="white" stroke-width="2"></circle>
+            <path id="bpArc" fill="none" stroke="var(--gridline)" stroke-width="1" stroke-dasharray="3 3"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>"True" bullet speed, v</span><b id="bpVVal">300 m/s</b></div>
+              <input type="range" id="bpVSlider" min="50" max="600" step="10" value="300"></div>
+            <div class="row"><div class="row-head"><span>Bullet mass, m</span><b id="bpMVal">0.01 kg</b></div>
+              <input type="range" id="bpMSlider" min="0.005" max="0.05" step="0.005" value="0.01"></div>
+            <div class="row"><div class="row-head"><span>Block mass, M</span><b id="bpBigMVal">3 kg</b></div>
+              <input type="range" id="bpBigMSlider" min="0.5" max="10" step="0.5" value="3"></div>
+            <button class="action" id="bpGoBtn">🔫 Fire!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Combined speed right after impact, <var>V</var> = <var>mv/(m+M)</var></td><td class="v" id="bpVAfterVal">0.997 m/s</td></tr>
+              <tr><td class="k">Swing height, <var>h</var> = <var>V²/2g</var></td><td class="v" id="bpHVal">0.051 m</td></tr>
+              <tr><td class="k">Speed inferred purely from <var>h</var></td><td class="v" id="bpInferredVal">300.0 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: combining both laws into one formula</summary>
+        <p class="explainer">
+          Momentum conservation across the impact: <var>mv</var> = (<var>m</var>+<var>M</var>)<var>V</var>,
+          so <var>V</var> = <var>mv/(m+M)</var>. Energy conservation across
+          the swing: ½(<var>m</var>+<var>M</var>)<var>V²</var> = (<var>m</var>+<var>M</var>)<var>gh</var>,
+          so <var>V</var> = √(2<var>gh</var>). Setting these equal and
+          solving for <var>v</var>: <var>v</var> = [(<var>m</var>+<var>M</var>)/<var>m</var>]√(2<var>gh</var>) —
+          a bullet's speed, recovered entirely from a ruler measurement of
+          how high a block swings.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Notice: a lighter bullet needs a much bigger speed to swing the block the same amount</h4>
+        <ol>
+          <li>Slide the bullet mass down while holding block mass and swing
+            height roughly fixed (via the inferred-speed formula) — the
+            required bullet speed grows sharply, which is exactly why real
+            ballistic pendulums are built with heavy blocks: it keeps the
+            swing conveniently small and measurable instead of violently
+            large.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/momentum.js"></script>
 </body>
 </html>

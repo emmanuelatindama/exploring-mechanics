@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>3. Work, Energy, and Power — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/energy.css">
 </head>
 <body data-section="03-energy">
 <div class="wrap">
@@ -15,10 +18,933 @@
       <p class="sub">Energy methods often solve a problem more directly than force-based methods.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="work">Work &amp; Work-Energy Theorem</button>
+    <button data-target="kinetic-energy">Kinetic Energy</button>
+    <button data-target="potential-energy">Potential Energy &amp; Conservation</button>
+    <button data-target="conservation-of-energy">Conservation of Energy</button>
+    <button data-target="power-and-efficiency">Power and Efficiency</button>
+    <button data-target="roller-coaster-physics">Roller Coaster Physics</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= WORK & WORK-ENERGY THEOREM (full) ================= -->
+    <div class="panel active" id="panel-work">
+      <h2>Work and the Work-Energy Theorem</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you carry a heavy bag at a
+        perfectly constant height across a flat room. Your arm is clearly
+        exerting a force the whole time. Does physics count that as "doing
+        work" on the bag?
+      </p>
+
+      <p class="explainer">
+        <var>W</var> = <var>F d</var> cosθ &nbsp;&nbsp;·&nbsp;&nbsp; Net work = <var>ΔKE</var> (the Work-Energy Theorem)
+      </p>
+
+      <div class="var-list">
+        <div><var>W</var> — work done by a force (Joules, J)</div>
+        <div><var>F</var> — magnitude of the applied force; <var>d</var> — magnitude of the displacement</div>
+        <div><var>θ</var> — the angle between the force and the displacement directions</div>
+        <div><var>KE</var> — kinetic energy; <var>ΔKE</var> — change in kinetic energy</div>
+      </div>
+
+      <p class="explainer">
+        Work only counts the part of a force that acts <em>along</em> the
+        direction of motion. Carrying that bag at constant height, your
+        upward supporting force is perpendicular to your (horizontal)
+        walking displacement — cosθ = cos90° = 0, so despite feeling tired,
+        you do exactly <strong>zero</strong> work on the bag. Lift it
+        straight up instead and force and displacement point the same way —
+        <strong>positive</strong> work. Lower it slowly against your own
+        resistance and they point opposite ways — <strong>negative</strong>
+        work.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: work is a dot product</summary>
+        <p class="explainer">
+          <var>W</var> = <var>F d</var> cosθ is exactly the dot product
+          <var>F</var>⃗·<var>d</var>⃗ from the Toolkit's vectors tab, applied to
+          force and displacement specifically. That's also why work is a
+          <em>scalar</em> (a single signed number, no direction of its own)
+          even though both of its ingredients are vectors — the dot product
+          strips away everything except "how much of one vector points along
+          the other."
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Force-Distance Graph: Work as Area</h3>
+      <p class="explainer">
+        For a force that stays constant, work is just base × height — the
+        rectangular area under a flat force-distance line. Switch to a
+        spring and the force <em>grows</em> as you stretch it further
+        (<var>F</var> = <var>kx</var>), so the area becomes a triangle
+        instead of a rectangle, and the work formula changes shape right
+        along with it.
+      </p>
+      <div class="mode-toggle" id="wkModeToggle">
+        <button class="active" data-mode="constant"><b>Constant force</b>rectangular area</button>
+        <button data-mode="spring"><b>Spring (variable force)</b>triangular area</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 200" id="wkGraphSvg">
+            <line x1="40" y1="170" x2="440" y2="170" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="170" class="svg-axis"></line>
+            <path id="wkAreaPath" fill="rgba(42,120,214,0.25)" stroke="none"></path>
+            <path id="wkLinePath" fill="none" stroke="#2a78d6" stroke-width="2.5"></path>
+            <text x="45" y="24" class="svg-label">force vs. distance</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row" id="wkFRow"><div class="row-head"><span>Applied force, F</span><b id="wkFVal">30 N</b></div>
+              <input type="range" id="wkFSlider" min="5" max="50" step="5" value="30"></div>
+            <div class="row" id="wkKRow" style="display:none"><div class="row-head"><span>Spring constant, k</span><b id="wkKVal">20 N/m</b></div>
+              <input type="range" id="wkKSlider" min="5" max="50" step="5" value="20"></div>
+            <div class="row"><div class="row-head"><span>Distance / stretch, d</span><b id="wkDVal">4 m</b></div>
+              <input type="range" id="wkDSlider" min="0.5" max="10" step="0.5" value="4"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Force at this distance</td><td class="v" id="wkForceAtVal">30.0 N</td></tr>
+              <tr><td class="k">Work done, <var>W</var> (shaded area)</td><td class="v" id="wkWorkVal">120.0 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why a spring's work formula has that extra factor of ½</summary>
+        <p class="explainer">
+          A triangle's area is ½ × base × height. Here the base is the
+          stretch <var>x</var> and the height is the force <em>at that final
+          point</em>, <var>kx</var> — so work stretching a spring from 0 to
+          <var>x</var> is <var>W</var> = ½<var>x</var>(<var>kx</var>) = ½<var>kx²</var>.
+          The factor of ½ isn't arbitrary; it's simply what "area of a
+          triangle" requires once the force itself is changing linearly
+          instead of staying constant.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Pulling Lab: the Work-Energy Theorem in Action</h3>
+      <p class="explainer">
+        Pull a box across a rough floor. Your applied force does positive
+        work; friction does negative work (and turns that energy into heat).
+        The <em>net</em> work — whatever's left after friction takes its
+        share — is exactly how much kinetic energy the box gains.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 90" id="wkPullSvg">
+            <line x1="10" y1="70" x2="450" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <rect id="wkPullBox" x="20" y="42" width="38" height="26" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Applied force, F</span><b id="wkPullFVal">40 N</b></div>
+              <input type="range" id="wkPullFSlider" min="5" max="100" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Pull distance, d</span><b id="wkPullDVal">5 m</b></div>
+              <input type="range" id="wkPullDSlider" min="1" max="15" step="1" value="5"></div>
+            <div class="row"><div class="row-head"><span>Box mass, m</span><b id="wkPullMVal">6 kg</b></div>
+              <input type="range" id="wkPullMSlider" min="1" max="20" step="1" value="6"></div>
+            <div class="row"><div class="row-head"><span>Friction, μ</span><b id="wkPullMuVal">0.30</b></div>
+              <input type="range" id="wkPullMuSlider" min="0" max="0.8" step="0.05" value="0.30"></div>
+            <button class="action" id="wkPullGoBtn">▶ Pull!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Work by applied force, <var>Fd</var></td><td class="v" id="wkWAppliedVal">200.0 J</td></tr>
+              <tr><td class="k">Work by friction, −<var>μmgd</var></td><td class="v" id="wkWFrictionVal">−88.2 J</td></tr>
+              <tr><td class="k">Net work = <var>ΔKE</var></td><td class="v" id="wkWNetVal">111.8 J</td></tr>
+              <tr><td class="k">Final speed, from rest</td><td class="v" id="wkVFinalVal">6.11 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Positive, Negative, or Zero?</h3>
+      <p class="explainer">
+        Rotate the angle between the force and the direction of motion and
+        watch the sign of the work flip right at 90°.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 160" id="wkAngleSvg">
+            <line x1="30" y1="120" x2="230" y2="120" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"></line>
+            <text x="235" y="124" class="svg-label">motion</text>
+            <line id="wkAngleForce" x1="30" y1="120" x2="90" y2="120" stroke="#e34948" stroke-width="3" marker-end="url(#wkAngleHead)"></line>
+            <path id="wkAngleArc" fill="none" stroke="var(--muted)" stroke-width="1.5"></path>
+            <defs><marker id="wkAngleHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Angle between force and motion, θ</span><b id="wkAngleThetaVal">0°</b></div>
+              <input type="range" id="wkAngleThetaSlider" min="0" max="180" step="5" value="0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">cosθ</td><td class="v" id="wkAngleCosVal">1.000</td></tr>
+              <tr><td class="k">Work, <var>Fd</var>cosθ (F=20N, d=3m)</td><td class="v" id="wkAngleWVal">60.0 J</td></tr>
+              <tr><td class="k">Sign</td><td class="v" id="wkAngleSignVal">Positive</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: feel zero work</h4>
+        <ol>
+          <li>Hold a heavy book out at arm's length and walk across a room at
+            constant height and speed. Your arm gets tired, but by the
+            definition above, you do zero work on the book — all of your
+            effort is fighting to keep it from falling, not moving it along
+            the direction it's traveling.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= KINETIC ENERGY (stub) ================= -->
+    <div class="panel" id="panel-kinetic-energy">
+      <h2>Kinetic Energy</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a car crashes at 60 km/h
+        instead of 30 km/h — twice the speed. Is the energy that has to go
+        somewhere in that crash twice as much, or something else entirely?
+      </p>
+
+      <p class="explainer"><var>KE</var> = ½<var>mv</var>²</p>
+
+      <div class="var-list">
+        <div><var>KE</var> — kinetic energy, the energy an object has because it's moving (Joules, J)</div>
+        <div><var>m</var> — mass; <var>v</var> — speed</div>
+      </div>
+
+      <p class="explainer">
+        Kinetic energy grows with the <em>square</em> of speed, not speed
+        itself. Double the speed and you don't double the kinetic energy —
+        you quadruple it. That's the real answer to the prediction above: a
+        crash at 60 km/h carries four times the energy of one at 30 km/h,
+        which is exactly why speed limits matter so much more than they'd
+        seem to at first glance.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving ½mv² from the work-energy theorem</summary>
+        <p class="explainer">
+          Start an object from rest and apply a constant force <var>F</var>
+          over a distance <var>d</var>. The work-energy theorem says that
+          work becomes its kinetic energy: <var>KE</var> = <var>Fd</var> = <var>(ma)d</var>.
+          From kinematics, <var>v²</var> = <var>2ad</var>, so <var>ad</var> = <var>v²/2</var>.
+          Substituting: <var>KE</var> = <var>m</var>(<var>v²/2</var>) = ½<var>mv²</var>.
+          The formula isn't a separate law — it falls straight out of
+          <var>F</var> = <var>ma</var> and the definition of work.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Speed vs. Kinetic Energy Plotter</h3>
+      <p class="explainer">
+        Drag the speed slider and watch the marker race up the curve far
+        faster than the slider moves — that steepening curve <em>is</em> the
+        v² relationship.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 200" id="keGraphSvg">
+            <line x1="40" y1="170" x2="440" y2="170" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="170" class="svg-axis"></line>
+            <path id="keCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="keMarker" cx="40" cy="170" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed, v</span><b id="keVVal">10 m/s</b></div>
+              <input type="range" id="keVSlider" min="0" max="40" step="1" value="10"></div>
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="keMVal">1000 kg</b></div>
+              <input type="range" id="keMSlider" min="200" max="2000" step="100" value="1000"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Kinetic energy, <var>½mv²</var></td><td class="v" id="keKEVal">50000 J</td></tr>
+              <tr><td class="k">If speed doubled instead</td><td class="v" id="keDoubleVal">200000 J (4×)</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Kinetic Energy in a Collision</h3>
+      <p class="explainer">
+        A moving object strikes a stationary one. Toggle between a
+        perfectly-inelastic collision (they stick together) and an elastic
+        one (they bounce apart) and watch how much kinetic energy survives —
+        the full momentum-based derivation behind these numbers is coming in
+        <a href="../04-momentum/index.html#collisions">Momentum → Collisions</a>;
+        here, the focus is purely on where the energy goes.
+      </p>
+      <div class="mode-toggle" id="keCollideToggle">
+        <button class="active" data-mode="inelastic"><b>Perfectly inelastic</b>they stick together</button>
+        <button data-mode="elastic"><b>Elastic</b>they bounce apart</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 90" id="keCollideSvg">
+            <line x1="10" y1="70" x2="450" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <circle id="keBall1" cx="60" cy="50" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="keBall2" cx="220" cy="50" r="14" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Moving mass, m₁</span><b id="keM1Val">4 kg</b></div>
+              <input type="range" id="keM1Slider" min="1" max="15" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Moving mass speed, v₁</span><b id="keV1Val">8 m/s</b></div>
+              <input type="range" id="keV1Slider" min="1" max="15" step="1" value="8"></div>
+            <div class="row"><div class="row-head"><span>Stationary mass, m₂</span><b id="keM2Val">4 kg</b></div>
+              <input type="range" id="keM2Slider" min="1" max="15" step="1" value="4"></div>
+            <button class="action" id="keCollideBtn">💥 Collide!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Kinetic energy before</td><td class="v" id="keKEBeforeVal">128.0 J</td></tr>
+              <tr><td class="k">Kinetic energy after</td><td class="v" id="keKEAfterVal">64.0 J</td></tr>
+              <tr><td class="k">Fraction lost (to heat, sound, deformation)</td><td class="v" id="keKELostVal">50.0%</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why elastic collisions lose exactly 0%</summary>
+        <p class="explainer">
+          "Elastic" is <em>defined</em> as a collision where kinetic energy
+          is conserved — it's not a coincidence, it's the definition. Real
+          collisions (car crashes, a dropped ball of clay) are almost always
+          somewhere between perfectly elastic and perfectly inelastic; the
+          "lost" energy was never destroyed, it converted into heat, sound,
+          and permanent deformation of the colliding objects.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= POTENTIAL ENERGY & CONSERVATION (stub) ================= -->
+    <div class="panel" id="panel-potential-energy">
+      <h2>Potential Energy and Conservation of Energy</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a ball rolls back and forth
+        in a smooth, frictionless bowl. Does it ever rise higher than the
+        height it was released from? Does it ever stop?
+      </p>
+
+      <p class="explainer">
+        Total mechanical energy = <var>KE</var> + <var>PE</var> = <strong>constant</strong>,
+        as long as no dissipative force (like friction or air resistance) is
+        removing energy from the system.
+      </p>
+
+      <div class="var-list">
+        <div><var>KE</var> — kinetic energy, ½<var>mv²</var></div>
+        <div><var>PE<sub>grav</sub></var> — gravitational potential energy, <var>mgh</var>, where <var>h</var> is height above a chosen reference level</div>
+        <div><var>PE<sub>elastic</sub></var> — elastic potential energy stored in a stretched or compressed spring, ½<var>kx²</var></div>
+        <div>Conservative forces (gravity, ideal springs) store and return energy exactly; dissipative forces (friction, drag) permanently convert it to heat</div>
+      </div>
+
+      <p class="explainer">
+        The ball in the prediction above trades kinetic energy for
+        gravitational potential energy and back, forever, in an idealized
+        frictionless bowl — it always returns to exactly its starting
+        height, never higher (that would create energy from nothing) and
+        never lower forever (nothing is removing energy). Add real friction
+        and the bowl slowly "wins," converting mechanical energy into heat
+        until the ball settles at the bottom.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Energy Skate-Park</h3>
+      <p class="explainer">
+        Release the ball from a chosen height and watch the three bars —
+        kinetic, potential, and (if friction is on) thermal — trade height
+        while their <em>total</em> stays fixed.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 220" id="epBowlSvg">
+            <path id="epBowlPath" fill="none" stroke="var(--text-primary)" stroke-width="2"></path>
+            <circle id="epBall" cx="230" cy="190" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Release height (as % of bowl rim)</span><b id="epH0Val">70%</b></div>
+              <input type="range" id="epH0Slider" min="10" max="100" step="5" value="70"></div>
+            <label class="checkbox"><input type="checkbox" id="epFriction"> Friction (converts energy to heat)</label>
+            <button class="action" id="epGoBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <div style="display:flex; gap:10px; align-items:flex-end; height:100px; margin-bottom:8px;">
+              <svg viewBox="0 0 100 100" style="width:100%; height:100px;" id="epBarsSvg">
+                <rect id="epBarKE" x="10" y="100" width="20" height="0" fill="#e34948"></rect>
+                <rect id="epBarPE" x="40" y="100" width="20" height="0" fill="#1baf7a"></rect>
+                <rect id="epBarHeat" x="70" y="100" width="20" height="0" fill="var(--muted)"></rect>
+                <text x="20" y="112" class="svg-label" text-anchor="middle" font-size="7">KE</text>
+                <text x="50" y="112" class="svg-label" text-anchor="middle" font-size="7">PE</text>
+                <text x="80" y="112" class="svg-label" text-anchor="middle" font-size="7">Heat</text>
+              </svg>
+            </div>
+            <table>
+              <tr><td class="k">Kinetic energy</td><td class="v" id="epKEVal">0 J</td></tr>
+              <tr><td class="k">Potential energy</td><td class="v" id="epPEVal">686 J</td></tr>
+              <tr><td class="k">Heat lost so far</td><td class="v" id="epHeatVal">0 J</td></tr>
+              <tr><td class="k">Total (should stay constant without friction)</td><td class="v" id="epTotalVal">686 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Spring-Launch Simulation</h3>
+      <p class="explainer">
+        Compress a spring and release a ball up a frictionless ramp. All of
+        the spring's stored elastic energy becomes kinetic energy the moment
+        it leaves the spring, then converts again into gravitational
+        potential energy as the ball coasts uphill.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="slSvg">
+            <line x1="10" y1="180" x2="290" y2="180" class="svg-axis"></line>
+            <path id="slRampFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <path id="slSpring" fill="none" stroke="#8a5a2b" stroke-width="3"></path>
+            <circle id="slBall" cx="40" cy="170" r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Spring constant, k</span><b id="slKVal">400 N/m</b></div>
+              <input type="range" id="slKSlider" min="100" max="1000" step="50" value="400"></div>
+            <div class="row"><div class="row-head"><span>Compression, x</span><b id="slXVal">0.3 m</b></div>
+              <input type="range" id="slXSlider" min="0.05" max="0.5" step="0.05" value="0.3"></div>
+            <div class="row"><div class="row-head"><span>Ball mass, m</span><b id="slMVal">1.0 kg</b></div>
+              <input type="range" id="slMSlider" min="0.2" max="3" step="0.1" value="1.0"></div>
+            <button class="action" id="slGoBtn">▶ Launch</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elastic PE stored, <var>½kx²</var></td><td class="v" id="slPEVal">18.0 J</td></tr>
+              <tr><td class="k">Launch speed, <var>v</var> = √(<var>kx²/m</var>)</td><td class="v" id="slVVal">6.00 m/s</td></tr>
+              <tr><td class="k">Max height reached, <var>h</var> = <var>PE/mg</var></td><td class="v" id="slHVal">1.84 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: chaining two different kinds of potential energy</summary>
+        <p class="explainer">
+          This is a three-step conversion: elastic PE (½<var>kx²</var>) → all
+          kinetic energy (½<var>mv²</var>) the instant the ball leaves the
+          spring → all gravitational PE (<var>mgh</var>) at the highest
+          point, where it's momentarily at rest again. Since energy is
+          conserved throughout, all three quantities are equal:
+          ½<var>kx²</var> = ½<var>mv²</var> = <var>mgh</var>, which is
+          exactly how <var>v</var> and <var>h</var> above were solved for
+          without ever tracking the motion in between.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Pendulum Energy Explorer</h3>
+      <p class="explainer">
+        A pendulum released from an angle swaps potential energy for kinetic
+        energy on the way down, reaching its fastest point exactly at the
+        bottom of the swing.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 240" id="penSvg">
+            <circle cx="130" cy="20" r="5" fill="var(--text-primary)"></circle>
+            <line id="penRod" x1="130" y1="20" x2="130" y2="180" stroke="var(--muted)" stroke-width="2"></line>
+            <circle id="penBob" cx="130" cy="180" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Release angle, θ₀</span><b id="penThetaVal">40°</b></div>
+              <input type="range" id="penThetaSlider" min="5" max="80" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Length, L</span><b id="penLVal">1.5 m</b></div>
+              <input type="range" id="penLSlider" min="0.5" max="2.5" step="0.1" value="1.5"></div>
+            <button class="action" id="penGoBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Height dropped, <var>L</var>(1−cosθ₀)</td><td class="v" id="penHVal">0.35 m</td></tr>
+              <tr><td class="k">Speed at the bottom, √(2<var>gL</var>(1−cosθ₀))</td><td class="v" id="penVVal">2.62 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: marble in a bowl</h4>
+        <ol>
+          <li>Release a marble from partway up the side of a smooth bowl.
+            Notice it never climbs higher on the far side than where you let
+            it go — and how much sooner it stops in a rough bowl (like a
+            cereal bowl with a napkin inside) than a smooth one.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= CONSERVATION OF ENERGY (stub) ================= -->
+    <div class="panel" id="panel-conservation-of-energy">
+      <h2>Conservation of Energy</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a braking car's speed
+        drops from 25 m/s to 0. Its kinetic energy clearly disappears — so
+        where, specifically, did it go?
+      </p>
+
+      <p class="explainer">
+        In an <strong>isolated system</strong> (one with no energy crossing
+        its boundary), total energy is exactly conserved — it only ever
+        changes <em>form</em>. "Lost" energy is never actually destroyed;
+        it's converted into a form that's easy to overlook, usually heat,
+        sound, or permanent deformation.
+      </p>
+
+      <p class="explainer">
+        The braking car's kinetic energy becomes heat in the brake pads and
+        tires (and a little sound) — track your hand along a car's wheel
+        well right after a hard stop and you can feel it directly. Widget 1
+        tracks exactly this kind of accounting, second by second, for two
+        different scenarios.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Energy-Accounting Tracker</h3>
+      <p class="explainer">
+        Pick a scenario and watch three running totals — kinetic, potential,
+        and heat — evolve over time. However they individually change, their
+        sum never does.
+      </p>
+      <div class="mode-toggle" id="eaModeToggle">
+        <button class="active" data-mode="braking"><b>Braking car</b>kinetic energy → heat</button>
+        <button data-mode="falling"><b>Falling with air resistance</b>potential → kinetic + heat</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 200" id="eaGraphSvg">
+            <line x1="40" y1="170" x2="440" y2="170" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="170" class="svg-axis"></line>
+            <path id="eaKEPath" fill="none" stroke="#e34948" stroke-width="2.5"></path>
+            <path id="eaPEPath" fill="none" stroke="#1baf7a" stroke-width="2.5"></path>
+            <path id="eaHeatPath" fill="none" stroke="var(--muted)" stroke-width="2.5"></path>
+            <line id="eaMarkerLine" x1="40" y1="10" x2="40" y2="170" stroke="var(--text-primary)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <text x="45" y="24" class="svg-label" fill="#e34948">— kinetic</text>
+            <text x="45" y="36" class="svg-label" fill="#1baf7a">— potential</text>
+            <text x="45" y="48" class="svg-label" fill="var(--muted)">— heat</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls" id="eaBrakingControls">
+            <div class="row"><div class="row-head"><span>Initial speed, v₀</span><b id="eaV0Val">25 m/s</b></div>
+              <input type="range" id="eaV0Slider" min="5" max="35" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Friction, μ</span><b id="eaMuVal">0.60</b></div>
+              <input type="range" id="eaMuSlider" min="0.2" max="1.0" step="0.05" value="0.60"></div>
+          </div>
+          <div class="controls" id="eaFallingControls" style="display:none">
+            <div class="row"><div class="row-head"><span>Drop height, y₀</span><b id="eaY0Val">80 m</b></div>
+              <input type="range" id="eaY0Slider" min="20" max="150" step="5" value="80"></div>
+            <div class="row"><div class="row-head"><span>Drag coefficient, b</span><b id="eaBVal">0.05</b></div>
+              <input type="range" id="eaBSlider" min="0.005" max="0.15" step="0.005" value="0.05"></div>
+          </div>
+          <button class="action" id="eaPlayBtn">▶ Play</button>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Kinetic energy now</td><td class="v" id="eaKEVal">—</td></tr>
+              <tr><td class="k">Potential energy now</td><td class="v" id="eaPEVal">—</td></tr>
+              <tr><td class="k">Heat generated so far</td><td class="v" id="eaHeatVal">—</td></tr>
+              <tr><td class="k">Total (constant)</td><td class="v" id="eaTotalVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why "heat" here is just bookkeeping, not a separate force</summary>
+        <p class="explainer">
+          The heat curve isn't computed from some new law — it's just
+          whatever's missing: <var>Heat</var>(<var>t</var>) = <var>E</var>₀ − <var>KE</var>(<var>t</var>) − <var>PE</var>(<var>t</var>).
+          That's the entire content of "energy is conserved": once you know
+          how kinetic and potential energy changed, the heat term is forced,
+          not independently measured. It's the same accounting trick used to
+          find rope tension in the last section — solve for everything else,
+          and the remaining unknown is whatever balances the books.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= POWER AND EFFICIENCY (stub) ================= -->
+    <div class="panel" id="panel-power-and-efficiency">
+      <h2>Power and Efficiency</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> two people each climb the
+        same flight of stairs, lifting the same body weight the same
+        height. One sprints up in 5 seconds; the other strolls up in 30
+        seconds. Did they do the same amount of work? Did they produce the
+        same power?
+      </p>
+
+      <p class="explainer"><var>P</var> = <var>W/t</var> = <var>Fv</var> &nbsp;&nbsp;·&nbsp;&nbsp; Efficiency = <var>P<sub>out</sub>/P<sub>in</sub></var></p>
+
+      <div class="var-list">
+        <div><var>P</var> — power, the <em>rate</em> of doing work (Watts, W = J/s)</div>
+        <div><var>W</var> — work; <var>t</var> — time; <var>F</var> — force; <var>v</var> — speed</div>
+        <div>Efficiency — the fraction of input power that comes out as useful output power (the rest becomes waste heat)</div>
+      </div>
+
+      <p class="explainer">
+        Both stair-climbers in the prediction above do <em>exactly</em> the
+        same work (same weight, same height gained) — work doesn't care
+        about time at all. But the sprinter produces six times the power,
+        because power is work divided by how long it took. This is the
+        entire reason a small motor can still lift a heavy load (given
+        enough time) while a large motor is needed to lift it
+        <em>quickly</em>.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: two equivalent formulas for power</summary>
+        <p class="explainer">
+          <var>P</var> = <var>W/t</var> works for a single event with a
+          clear start and end. For continuous motion — a car cruising, a
+          cyclist pedaling — it's often more useful to write
+          <var>P</var> = <var>Fv</var>: since <var>W</var> = <var>Fd</var>
+          and <var>v</var> = <var>d/t</var>, dividing both sides by
+          <var>t</var> gives <var>W/t</var> = <var>F</var>(<var>d/t</var>) = <var>Fv</var>.
+          Same physics, whichever form fits the situation better.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Stair-Climbing Power Estimate</h3>
+      <p class="explainer">
+        Estimate your own power output climbing a real staircase, and see
+        how it stacks up against a lightbulb and a horsepower.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 160" id="pwrStairSvg">
+            <path id="pwrStairPath" fill="none" stroke="var(--text-primary)" stroke-width="3"></path>
+            <circle id="pwrStairDot" cx="20" cy="140" r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Body mass, m</span><b id="pwrMVal">70 kg</b></div>
+              <input type="range" id="pwrMSlider" min="30" max="120" step="5" value="70"></div>
+            <div class="row"><div class="row-head"><span>Height climbed, h</span><b id="pwrHVal">4 m</b></div>
+              <input type="range" id="pwrHSlider" min="1" max="15" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Time taken, t</span><b id="pwrTVal">6 s</b></div>
+              <input type="range" id="pwrTSlider" min="2" max="30" step="1" value="6"></div>
+            <button class="action" id="pwrGoBtn">▶ Climb!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Work done, <var>mgh</var></td><td class="v" id="pwrWVal">2744 J</td></tr>
+              <tr><td class="k">Power, <var>W/t</var></td><td class="v" id="pwrPVal">457 W</td></tr>
+              <tr><td class="k">In horsepower (746 W each)</td><td class="v" id="pwrHPVal">0.61 hp</td></tr>
+              <tr><td class="k">Equivalent to this many 60 W bulbs</td><td class="v" id="pwrBulbVal">7.6</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Bicycle Power Calculator</h3>
+      <p class="explainer">
+        Cycling power has to fight three things at once: gravity on a climb,
+        rolling resistance from the tires, and air drag — and drag alone
+        grows with the <em>cube</em> of speed, which is why going twice as
+        fast on the flat takes vastly more than twice the effort.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 120" id="pwrBikeSvg">
+            <line x1="10" y1="100" x2="190" y2="100" class="svg-axis"></line>
+            <circle cx="70" cy="90" r="16" fill="none" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <circle cx="130" cy="90" r="16" fill="none" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <line x1="70" y1="90" x2="100" y2="45" stroke="var(--text-primary)" stroke-width="3"></line>
+            <line x1="130" y1="90" x2="100" y2="45" stroke="var(--text-primary)" stroke-width="3"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed, v</span><b id="pwrVVal">8 m/s</b></div>
+              <input type="range" id="pwrVSlider" min="1" max="18" step="1" value="8"></div>
+            <div class="row"><div class="row-head"><span>Slope</span><b id="pwrSlopeVal">0°</b></div>
+              <input type="range" id="pwrSlopeSlider" min="-5" max="15" step="1" value="0"></div>
+            <div class="row"><div class="row-head"><span>Rider + bike mass, m</span><b id="pwrBikeMVal">80 kg</b></div>
+              <input type="range" id="pwrBikeMSlider" min="50" max="110" step="5" value="80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Gravity power (0 on the flat)</td><td class="v" id="pwrGravPVal">0.0 W</td></tr>
+              <tr><td class="k">Rolling-resistance power</td><td class="v" id="pwrRollPVal">31.4 W</td></tr>
+              <tr><td class="k">Air-drag power</td><td class="v" id="pwrDragPVal">27.6 W</td></tr>
+              <tr><td class="k">Total power required</td><td class="v" id="pwrTotalPVal">59.0 W</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why drag power scales as v³</summary>
+        <p class="explainer">
+          Air-drag <em>force</em> already grows with <var>v²</var> (more
+          air hit per second <em>and</em> each hit is harder). Power is
+          force times speed, so drag power is <var>v²</var> × <var>v</var> = <var>v³</var>.
+          That cubic growth is why elite cyclists spend enormous effort
+          shaving off small amounts of drag (aerodynamic helmets, tucked
+          positions) — at high speed, drag dominates the whole power budget.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Machine-Efficiency Explorer</h3>
+      <p class="explainer">
+        No real machine is 100% efficient — friction, heat, and vibration
+        always claim some of the input power. A motor lifting a crane's
+        load, a winch, or a bicycle's chain drive all follow the same
+        accounting.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 100" id="pwrEffSvg">
+            <rect x="20" y="30" width="60" height="40" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="50" y="54" class="svg-label" text-anchor="middle">Input</text>
+            <rect x="180" y="30" width="60" height="40" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="210" y="54" class="svg-label" text-anchor="middle">Output</text>
+            <rect x="100" y="20" width="60" height="60" rx="8" fill="#2a78d6" opacity="0.15" stroke="#2a78d6" stroke-width="2"></rect>
+            <text x="130" y="54" class="svg-label" text-anchor="middle">Machine</text>
+            <line x1="80" y1="50" x2="100" y2="50" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#pwrArrow)"></line>
+            <line x1="160" y1="50" x2="180" y2="50" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#pwrArrow)"></line>
+            <defs><marker id="pwrArrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="var(--text-primary)"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Input power</span><b id="pwrEffInVal">500 W</b></div>
+              <input type="range" id="pwrEffInSlider" min="50" max="2000" step="50" value="500"></div>
+            <div class="row"><div class="row-head"><span>Efficiency</span><b id="pwrEffPctVal">75%</b></div>
+              <input type="range" id="pwrEffSlider" min="10" max="100" step="5" value="75"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Useful output power</td><td class="v" id="pwrEffOutVal">375 W</td></tr>
+              <tr><td class="k">Power wasted as heat</td><td class="v" id="pwrEffLostVal">125 W</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: measure your own stair-climbing power</h4>
+        <ol>
+          <li>Time yourself climbing a known number of stairs (each about
+            0.17 m), then compute <var>m</var>(your weight in kg) × <var>g</var> × <var>h</var>
+            (total height) ÷ your time — that's your power in watts.</li>
+          <li>Compare it to a 60 W lightbulb and to 746 W (one horsepower) —
+            most people land somewhere around ¼ to ½ a horsepower in a hard
+            sprint up a flight of stairs.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= ROLLER COASTER PHYSICS (stub) ================= -->
+    <div class="panel" id="panel-roller-coaster-physics">
+      <h2>Roller Coaster Physics</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a coaster car crests the
+        top of a hill. Do you feel heavier, lighter, or the same as
+        standing still — and does that feeling have anything to do with
+        your actual weight changing?
+      </p>
+
+      <p class="explainer">
+        A coaster (ignoring track friction and air resistance) is a pure
+        energy-conservation machine: <var>½mv²</var> + <var>mgh</var> = constant
+        along the whole ride. But what you <em>feel</em> isn't your speed or
+        height — it's the track's normal force on you, your <strong>apparent
+        weight</strong>, which can differ sharply from <var>mg</var>.
+      </p>
+
+      <div class="var-list">
+        <div><var>h</var> — height above a reference level; <var>v</var> — speed</div>
+        <div><var>N</var> — normal force from the seat/track on the rider; apparent weight</div>
+        <div><var>r</var> — radius of curvature of the track at a hill's crest or a dip's bottom</div>
+        <div><var>G</var> — apparent weight expressed as a multiple of ordinary weight, <var>G</var> = <var>N/mg</var></div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Hill-to-Hill Speed via Energy Conservation</h3>
+      <p class="explainer">
+        Drag the probe along the track. Speed depends only on how far
+        <em>below</em> the very first hill the probe currently is — nothing
+        else about the track's shape matters.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="rcTrackSvg">
+            <path id="rcTrackPath" fill="none" stroke="var(--text-primary)" stroke-width="2.5"></path>
+            <circle id="rcProbe" cx="30" cy="30" r="9" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Probe position along track</span><b id="rcPosVal">0%</b></div>
+              <input type="range" id="rcPosSlider" min="0" max="100" step="1" value="0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Height below the first hill's crest</td><td class="v" id="rcDropVal">0.0 m</td></tr>
+              <tr><td class="k">Speed here, √(2<var>g</var>·drop)</td><td class="v" id="rcVVal">0.0 m/s</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="rcVerdictVal">Starting point</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the second hill must be shorter than the first</summary>
+        <p class="explainer">
+          At the very top of the first hill the car is (approximately) at
+          rest, so its total energy is entirely <var>mgh</var><sub>1</sub>.
+          At any later point, <var>½mv²</var> + <var>mgh</var> = <var>mgh</var><sub>1</sub>,
+          so <var>v²</var> = 2<var>g</var>(<var>h</var><sub>1</sub> − <var>h</var>).
+          For <var>v²</var> to stay non-negative, <var>h</var> can never
+          exceed <var>h</var><sub>1</sub> — which is exactly why no later
+          hill on a real coaster (without an extra motor) is ever built
+          taller than the first one.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Apparent Weight and G-Forces</h3>
+      <p class="explainer">
+        This is the part of coaster design with real safety stakes: taking a
+        dip or crest too fast, at too tight a radius, can push apparent
+        weight to levels that cause tunnel vision, blackout, or (in
+        documented historical cases of poorly-designed rides) fatal injury.
+        Real coasters are engineered to keep momentary G-forces within a
+        well-studied safe envelope.
+      </p>
+      <div class="mode-toggle" id="rcGModeToggle">
+        <button class="active" data-mode="crest"><b>Hilltop (crest)</b>you feel lighter</button>
+        <button data-mode="dip"><b>Valley (dip)</b>you feel heavier</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 140" id="rcGSvg">
+            <path id="rcGTrackPath" fill="none" stroke="var(--text-primary)" stroke-width="2.5"></path>
+            <circle id="rcGCar" cx="130" cy="30" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <line id="rcGArrow" stroke="#e34948" stroke-width="3" marker-end="url(#rcGHead)"></line>
+            <defs><marker id="rcGHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed, v</span><b id="rcGVVal">15 m/s</b></div>
+              <input type="range" id="rcGVSlider" min="2" max="35" step="1" value="15"></div>
+            <div class="row"><div class="row-head"><span>Radius of curvature, r</span><b id="rcGRVal">20 m</b></div>
+              <input type="range" id="rcGRSlider" min="5" max="60" step="1" value="20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Centripetal acceleration, <var>v²/r</var></td><td class="v" id="rcGCentVal">11.25 m/s²</td></tr>
+              <tr><td class="k">Apparent weight, <var>G</var> = <var>N/mg</var></td><td class="v" id="rcGVal">-0.15 G</td></tr>
+              <tr><td class="k">How that feels</td><td class="v" id="rcGFeelVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving apparent weight at a crest and a dip</summary>
+        <p class="explainer">
+          At a hilltop, both gravity and the track's normal force point
+          toward the center of the curve (downward), so Newton's Second Law
+          along that direction reads <var>mg</var> − <var>N</var> = <var>mv²/r</var>,
+          giving <var>N</var> = <var>mg</var> − <var>mv²/r</var> — less than
+          your ordinary weight, and it can reach exactly zero (true
+          weightlessness, momentarily) or even go negative, meaning the
+          track would need to actively hold you down (this is exactly a
+          vertical-circle problem, developed fully in
+          <a href="../06-circular-motion/index.html#vertical-circles">Circular Motion → Vertical Circles</a>).
+          At a dip, the normal force points up while gravity points down,
+          both relative to a center of curvature that's now <em>above</em>
+          the car, giving <var>N</var> − <var>mg</var> = <var>mv²/r</var>,
+          so <var>N</var> = <var>mg</var> + <var>mv²/r</var> — always more
+          than ordinary weight.
+        </p>
+      </details>
+
+      <div class="callout">
+        <strong>Why this matters:</strong> sustained vertical G-forces above
+        roughly 4–5<var>G</var> can cause a person to gray out or black out
+        as blood is pulled away from the brain; brief peaks somewhat higher
+        are tolerable, but design margins matter enormously — this is a
+        large part of why coaster engineering is a licensed, heavily
+        regulated field, and why historical rides that got this wrong have
+        caused real injuries and deaths. Nothing here is a substitute for
+        that engineering; it's just the same <var>N</var> = <var>mg</var> ± <var>mv²/r</var>
+        relationship you can check for yourself above.
+      </div>
+
+      <h3 class="subhead">Widget 3 — Minimum Height to Complete a Loop</h3>
+      <p class="explainer">
+        A car needs a minimum speed at the very top of a loop just to keep
+        contact with the track at all (<var>N</var> ≥ 0) — which sets a
+        minimum height the first hill must have, purely from energy
+        conservation. The circular-motion side of this derivation belongs to
+        <a href="../06-circular-motion/index.html#vertical-circles">Circular Motion → Vertical Circles</a>;
+        here, the focus is just the energy bookkeeping that gets the car there.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 220" id="rcLoopSvg">
+            <line x1="10" y1="200" x2="210" y2="200" stroke="var(--text-primary)" stroke-width="2"></line>
+            <circle id="rcLoopCircle" cx="110" cy="140" r="60" fill="none" stroke="var(--border)" stroke-width="3"></circle>
+            <line id="rcLoopHillLine" x1="10" y1="200" x2="50" y2="80" stroke="var(--text-primary)" stroke-width="3"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Loop radius, r</span><b id="rcLoopRVal">10 m</b></div>
+              <input type="range" id="rcLoopRSlider" min="3" max="20" step="1" value="10"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Minimum speed at the top, √(<var>gr</var>)</td><td class="v" id="rcLoopVVal">9.90 m/s</td></tr>
+              <tr><td class="k">Minimum hill height, <var>h</var> = 2.5<var>r</var></td><td class="v" id="rcLoopHVal">25.0 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: where the 2.5r comes from</summary>
+        <p class="explainer">
+          At minimum speed, gravity alone supplies the centripetal force at
+          the loop's top: <var>mg</var> = <var>mv</var><sub>top</sub><var>²/r</var>,
+          so <var>v</var><sub>top</sub><var>²</var> = <var>gr</var>. Energy
+          conservation from the first hill (height <var>h</var>, at rest) to
+          the loop's top (height 2<var>r</var>, speed <var>v</var><sub>top</sub>)
+          gives <var>mgh</var> = <var>mg</var>(2<var>r</var>) + ½<var>mv</var><sub>top</sub><var>²</var> = 2<var>mgr</var> + ½<var>mgr</var>,
+          so <var>h</var> = 2.5<var>r</var> — the hill must be built two and a
+          half times taller than the loop itself, regardless of the car's
+          mass.
+        </p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/energy.js"></script>
 </body>
 </html>

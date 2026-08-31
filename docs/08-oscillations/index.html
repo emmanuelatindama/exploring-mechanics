@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>8. Oscillations, Resonance, and Chaos — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/oscillations.css">
 </head>
 <body data-section="08-oscillations">
 <div class="wrap">
@@ -12,12 +15,720 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 8. Oscillations</p>
       <h1>8. Oscillations, Resonance, and Chaos</h1>
+      <p class="sub">Nearly anything given a small nudge away from a stable resting point oscillates back and forth in exactly the same mathematical way.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="simple-harmonic-motion">Simple Harmonic Motion</button>
+    <button data-target="pendulums">Pendulums</button>
+    <button data-target="damping">Damping</button>
+    <button data-target="driven-oscillations">Driven Oscillations</button>
+    <button data-target="resonance">Resonance</button>
+    <button data-target="coupled-oscillators">Coupled Oscillators and Nonlinear Motion</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= SIMPLE HARMONIC MOTION (full) ================= -->
+    <div class="panel active" id="panel-simple-harmonic-motion">
+      <h2>Simple Harmonic Motion</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a mass on a spring is
+        pulled twice as far from its resting position before being
+        released. Does it complete each full back-and-forth cycle twice as
+        slowly, since it now has twice as far to travel?
+      </p>
+
+      <p class="explainer"><var>x</var>(<var>t</var>) = <var>A</var>cos(<var>ωt</var> + <var>φ</var>) &nbsp;&nbsp;·&nbsp;&nbsp; <var>ω</var> = √(<var>k/m</var>) &nbsp;&nbsp;·&nbsp;&nbsp; <var>T</var> = 2π/<var>ω</var></p>
+
+      <div class="var-list">
+        <div><var>A</var> — amplitude: the maximum displacement from equilibrium</div>
+        <div><var>ω</var> — angular frequency; <var>T</var> — period (time for one full cycle); <var>φ</var> — phase (where in the cycle it starts)</div>
+        <div><var>k</var> — spring constant; <var>m</var> — mass</div>
+        <div>Restoring force: always points back toward equilibrium, and (for SHM specifically) grows in direct proportion to displacement: <var>F</var> = −<var>kx</var></div>
+      </div>
+
+      <p class="explainer">
+        The answer to the prediction is no — and that's the single most
+        surprising fact about simple harmonic motion. Amplitude
+        <var>A</var> doesn't appear anywhere in the period formula
+        <var>T</var> = 2π√(<var>m/k</var>). A bigger swing does have farther
+        to travel, but it also picks up proportionally more restoring force
+        and speed along the way, and those two effects exactly cancel.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why F = −kx leads to a cosine solution</summary>
+        <p class="explainer">
+          Newton's Second Law with a linear restoring force gives
+          <var>m</var>(<var>d²x/dt²</var>) = −<var>kx</var>, or
+          <var>d²x/dt²</var> = −(<var>k/m</var>)<var>x</var>. The function
+          that keeps reproducing itself (times a negative constant) under
+          differentiation twice is exactly sine or cosine, which is why
+          <var>x</var>(<var>t</var>) = <var>A</var>cos(<var>ωt</var> + <var>φ</var>)
+          solves the equation for <var>ω</var> = √(<var>k/m</var>) — you can
+          check this by differentiating it twice and substituting back in.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Spring-Mass Simulator</h3>
+      <p class="explainer">
+        Change the mass or spring stiffness and watch the period change —
+        but change only the amplitude, and the period stays exactly the
+        same, confirming the prediction above. The two bars track kinetic
+        and potential energy trading places, always summing to the same
+        total.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 120" id="springSvg">
+            <line x1="20" y1="60" x2="20" y2="100" stroke="var(--text-primary)" stroke-width="4"></line>
+            <path id="springCoil" fill="none" stroke="#8a5a2b" stroke-width="3"></path>
+            <rect id="springMass" x="0" y="45" width="30" height="30" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+          </svg>
+          <p class="pane-label">Position, <var>x(t)</var></p>
+          <svg viewBox="0 0 500 100" id="springXtSvg">
+            <line x1="40" y1="50" x2="480" y2="50" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
+            <path id="springXtPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+          </svg>
+          <div style="display:flex; gap:10px; align-items:flex-end; height:70px; margin-top:6px;">
+            <svg viewBox="0 0 100 70" style="width:180px; height:70px;" id="springBarsSvg">
+              <rect id="springBarKE" x="10" y="60" width="20" height="0" fill="#e34948"></rect>
+              <rect id="springBarPE" x="40" y="60" width="20" height="0" fill="#1baf7a"></rect>
+              <text x="20" y="68" class="svg-label" text-anchor="middle" font-size="7">KE</text>
+              <text x="50" y="68" class="svg-label" text-anchor="middle" font-size="7">PE</text>
+            </svg>
+          </div>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Spring constant, k</span><b id="springKVal">40 N/m</b></div>
+              <input type="range" id="springKSlider" min="5" max="150" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="springMVal">1.0 kg</b></div>
+              <input type="range" id="springMSlider" min="0.2" max="5" step="0.1" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Amplitude, A</span><b id="springAVal">0.15 m</b></div>
+              <input type="range" id="springASlider" min="0.05" max="0.3" step="0.01" value="0.15"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Angular frequency, <var>ω</var> = √(<var>k/m</var>)</td><td class="v" id="springWVal">6.32 rad/s</td></tr>
+              <tr><td class="k">Period, <var>T</var> = 2π/<var>ω</var></td><td class="v" id="springTVal">0.99 s</td></tr>
+              <tr><td class="k">Total energy, ½<var>kA²</var></td><td class="v" id="springEVal">0.45 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Phase-Space Plot: Velocity vs. Position</h3>
+      <p class="explainer">
+        Instead of plotting position against time, plot velocity against
+        position at the same instant. SHM always traces a perfect ellipse
+        here — a single, elegant fingerprint of "restoring force
+        proportional to displacement."
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 220" id="phaseSvg">
+            <line x1="20" y1="110" x2="200" y2="110" class="svg-axis"></line>
+            <line x1="110" y1="20" x2="110" y2="200" class="svg-axis"></line>
+            <path id="phaseEllipse" fill="none" stroke="var(--gridline)" stroke-width="1.5"></path>
+            <circle id="phaseDot" cx="110" cy="110" r="6" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <text x="205" y="114" class="svg-label">x</text>
+            <text x="114" y="18" class="svg-label">v</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="readout">
+            <table>
+              <tr><td class="k">Current position, x</td><td class="v" id="phaseXVal">—</td></tr>
+              <tr><td class="k">Current velocity, v</td><td class="v" id="phaseVVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why phase space is exactly an ellipse</summary>
+        <p class="explainer">
+          With <var>x</var> = <var>A</var>cos(<var>ωt</var>) and
+          <var>v</var> = −<var>Aω</var>sin(<var>ωt</var>), then
+          (<var>x/A</var>)² + (<var>v/Aω</var>)² = cos²(<var>ωt</var>) + sin²(<var>ωt</var>) = 1 —
+          the equation of an ellipse with semi-axes <var>A</var> and
+          <var>Aω</var>, for any amplitude or frequency at all. The
+          system's entire future is completely captured by where its single
+          dot currently sits on that curve.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: rubber band and a weight</h4>
+        <ol>
+          <li>Hang a weight from a rubber band or slinky and time 10 full
+            bounces, twice — once with a small pull, once with a much
+            bigger one. The times per bounce should come out nearly
+            identical, matching the amplitude-independent period here.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= PENDULUMS (stub) ================= -->
+    <div class="panel" id="panel-pendulums">
+      <h2>Pendulums</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a heavy bowling ball and a
+        light tennis ball hang from identical strings of the same length.
+        Swung gently, does one swing back and forth faster than the other?
+      </p>
+
+      <p class="explainer"><var>T</var> = 2π√(<var>L/g</var>) &nbsp;(for small swing angles)</p>
+
+      <div class="var-list">
+        <div><var>T</var> — period; <var>L</var> — pendulum length; <var>g</var> — local gravitational acceleration</div>
+        <div>Small-angle approximation — valid for swings up to roughly 15–20°; the period formula drifts noticeably beyond that</div>
+      </div>
+
+      <p class="explainer">
+        Mass doesn't appear anywhere in the small-angle period formula — the
+        answer to the prediction is no, they swing at the same rate,
+        regardless of weight. That's the same mass-cancellation trick from
+        free fall, and for the same underlying reason: a heavier bob feels
+        proportionally more restoring force <em>and</em> proportionally more
+        inertia resisting it, and the two cancel exactly.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Pendulum Timer</h3>
+      <p class="explainer">
+        Set a length and a planet's gravity, then use the on-screen swing
+        count to check your own reaction-time-based timing against the
+        exact formula.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 220" id="pendTimerSvg">
+            <circle cx="100" cy="20" r="5" fill="var(--text-primary)"></circle>
+            <line id="pendTimerRod" x1="100" y1="20" x2="100" y2="180" stroke="var(--muted)" stroke-width="2"></line>
+            <circle id="pendTimerBob" cx="100" cy="180" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Length, L</span><b id="pendTimerLVal">1.0 m</b></div>
+              <input type="range" id="pendTimerLSlider" min="0.2" max="2.5" step="0.1" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Gravity, g</span><b id="pendTimerGVal">9.8 m/s²</b></div>
+              <input type="range" id="pendTimerGSlider" min="1.6" max="25" step="0.1" value="9.8"></div>
+            <button class="action" id="pendTimerGoBtn">▶ Start swinging</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Period, <var>T</var> = 2π√(<var>L/g</var>)</td><td class="v" id="pendTimerTVal">2.01 s</td></tr>
+              <tr><td class="k">Full swings completed</td><td class="v" id="pendTimerCountVal">0</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — When the Small-Angle Approximation Breaks Down</h3>
+      <p class="explainer">
+        "Small angle" is doing real work in that formula. Push the release
+        angle up toward 90° and watch the true period pull noticeably ahead
+        of the constant-<var>T</var> approximation.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:560px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Release angle, θ₀</span><b id="pendAngleThetaVal">15°</b></div>
+              <input type="range" id="pendAngleThetaSlider" min="1" max="150" step="1" value="15"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Small-angle period, <var>T</var>₀</td><td class="v" id="pendAngleT0Val">2.01 s</td></tr>
+              <tr><td class="k">More accurate real period</td><td class="v" id="pendAngleTRealVal">2.01 s</td></tr>
+              <tr><td class="k">Error from using the simple formula</td><td class="v" id="pendAngleErrVal">0.03%</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the correction series, and physical vs. simple pendulums</summary>
+        <p class="explainer">
+          The exact large-angle period is <var>T</var> = <var>T</var>₀(1 + θ₀²/16 + 11θ₀⁴/3072 + ⋯),
+          with θ₀ in radians — a correction that grows with the
+          <em>square</em> of the angle, which is why it's negligible for a
+          small nudge but very much not for a wide swing. Separately, a real
+          swinging object with size and shape (a "physical pendulum" — a
+          swinging rod, a person on a swing) follows the same form with
+          <var>L</var> replaced by <var>I</var>/(<var>md</var>), where
+          <var>I</var> is its moment of inertia and <var>d</var> is the
+          distance from the pivot to its center of mass — the "simple
+          pendulum" (a point mass on a massless string) is the special case
+          where all the mass already sits at that one distance.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: same length, different weight</h4>
+        <ol>
+          <li>Tie a heavy washer and a light one to identical-length strings
+            and swing them side by side with small swings — they should
+            stay in sync the whole time, confirming mass doesn't affect the
+            period.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= DAMPING (stub) ================= -->
+    <div class="panel" id="panel-damping">
+      <h2>Damping</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a car's shock absorbers
+        wear out and provide less resistance than they should. Does the car
+        now bounce back to level <em>faster</em> after a bump, or slower?
+      </p>
+
+      <p class="explainer"><var>ζ</var> = <var>c</var> / (2√(<var>mk</var>)) &nbsp;— the damping ratio sorts every case into one of three regimes</p>
+
+      <div class="var-list">
+        <div><var>ζ</var> — damping ratio: <var>ζ</var> &lt; 1 underdamped, <var>ζ</var> = 1 critically damped, <var>ζ</var> &gt; 1 overdamped</div>
+        <div><var>c</var> — damping coefficient (resistance strength); <var>m</var> — mass; <var>k</var> — spring constant</div>
+      </div>
+
+      <p class="explainer">
+        Counterintuitively, <strong>less</strong> damping doesn't mean a
+        faster return to rest — it means the car overshoots level and
+        oscillates before settling (underdamped). The fastest possible
+        return <em>without any overshoot at all</em> is exactly
+        <var>ζ</var> = 1 (critically damped) — piling on <em>more</em>
+        damping than that (overdamped) actually slows the return back down
+        again, just without any bounce.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Damped-Oscillator Explorer</h3>
+      <p class="explainer">
+        Slide the damping ratio through all three regimes and watch both
+        the motion and the decay envelope change character.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 140" id="dampXtSvg">
+            <line x1="40" y1="70" x2="480" y2="70" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="130" class="svg-axis"></line>
+            <path id="dampEnvelopeTop" fill="none" stroke="var(--gridline)" stroke-width="1" stroke-dasharray="3 3"></path>
+            <path id="dampEnvelopeBottom" fill="none" stroke="var(--gridline)" stroke-width="1" stroke-dasharray="3 3"></path>
+            <path id="dampXtPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="preset-row" id="dampPresetRow">
+              <button data-zeta="0.15">Underdamped</button>
+              <button data-zeta="1.0" class="active">Critical</button>
+              <button data-zeta="2.5">Overdamped</button>
+            </div>
+            <div class="row"><div class="row-head"><span>Damping ratio, ζ</span><b id="dampZetaVal">1.00</b></div>
+              <input type="range" id="dampZetaSlider" min="0.05" max="3" step="0.05" value="1.0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Natural frequency, <var>ω<sub>n</sub></var> = √(<var>k/m</var>)</td><td class="v" id="dampWnVal">6.32 rad/s</td></tr>
+              <tr><td class="k">Regime</td><td class="v" id="dampRegimeVal">Critically damped</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the three solution forms</summary>
+        <p class="explainer">
+          Underdamped (<var>ζ</var> &lt; 1): <var>x</var>(<var>t</var>) = <var>Ae</var><sup>−<var>ζω<sub>n</sub>t</sub></sup>cos(<var>ω<sub>d</sub>t</var>),
+          with <var>ω<sub>d</sub></var> = <var>ω<sub>n</sub></var>√(1−<var>ζ²</var>) — an
+          oscillation inside a decaying envelope. Critically damped
+          (<var>ζ</var> = 1): <var>x</var>(<var>t</var>) = (<var>A</var> + <var>Bt</var>)<var>e</var><sup>−<var>ω<sub>n</sub>t</sup></var> —
+          the fastest non-oscillating return. Overdamped (<var>ζ</var> &gt; 1):
+          a sum of two decaying exponentials, both slower than the critical
+          case's — piling on damping trades oscillation for sluggishness.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Car Suspension After a Bump</h3>
+      <p class="explainer">
+        Same three regimes, now as an actual worn-vs-fresh shock absorber:
+        watch what "less damping" really looks like on the road.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 140" id="suspensionSvg">
+            <line x1="10" y1="120" x2="210" y2="120" stroke="var(--text-primary)" stroke-width="2"></line>
+            <line id="suspensionSpring" x1="60" y1="120" x2="60" y2="80" stroke="#8a5a2b" stroke-width="3"></line>
+            <line id="suspensionDamper" x1="160" y1="120" x2="160" y2="80" stroke="var(--muted)" stroke-width="5"></line>
+            <rect id="suspensionCar" x="30" y="40" width="160" height="40" rx="8" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Shock condition</span><b id="suspZetaVal">ζ = 1.00</b></div>
+              <input type="range" id="suspZetaSlider" min="0.05" max="3" step="0.05" value="1.0"></div>
+            <button class="action" id="suspBumpBtn">🚗 Hit a bump</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Behavior</td><td class="v" id="suspBehaviorVal">Returns to level fastest, no bounce</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: press down on a car's bumper</h4>
+        <ol>
+          <li>Push down firmly on a parked car's hood or bumper and let go.
+            A car with healthy shocks settles in about one gentle dip; one
+            with worn shocks bounces noticeably before settling — that's a
+            real damping ratio dropping toward (or below) the underdamped
+            regime.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= DRIVEN OSCILLATIONS (stub) ================= -->
+    <div class="panel" id="panel-driven-oscillations">
+      <h2>Driven Oscillations</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you push a playground
+        swing at exactly its own natural back-and-forth rate versus at some
+        random, mismatched rate. Does the timing of your pushes actually
+        matter, as long as you're putting in the same effort?
+      </p>
+
+      <p class="explainer">Steady-state amplitude: <var>A</var>(<var>ω</var>) = <var>F₀/m</var> / √[(<var>ω<sub>n</sub></var>²−<var>ω</var>²)² + (2<var>ζω<sub>n</sub>ω</var>)²]</p>
+
+      <div class="var-list">
+        <div><var>ω</var> — the driving (pushing) frequency; <var>ω<sub>n</sub></var> — the system's own natural frequency</div>
+        <div><var>F₀</var> — the strength of each push; <var>δ</var> — the phase lag between the push and the resulting motion</div>
+      </div>
+
+      <p class="explainer">
+        Timing matters enormously — that's the whole answer to the
+        prediction. Push at nearly the natural frequency and even gentle
+        pushes build up a large steady swing; push at a badly mismatched
+        rate and you mostly fight the swing's own motion, getting a
+        disappointing amplitude no matter how hard you push.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Swing-Pushing Explorer</h3>
+      <p class="explainer">
+        Slide the pushing rate away from the natural frequency (1.0× on the
+        slider) and watch the steady swing amplitude collapse — along with
+        the timing between your push and the swing's own motion drifting
+        out of sync.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 130" id="drivenAmpSvg">
+            <line x1="40" y1="110" x2="480" y2="110" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="110" class="svg-axis"></line>
+            <path id="drivenAmpPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="drivenAmpMarker" cx="40" cy="110" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push rate, ω/ω<sub>n</sub></span><b id="drivenRatioVal">1.00×</b></div>
+              <input type="range" id="drivenRatioSlider" min="0.2" max="2.5" step="0.02" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Damping in the system, ζ</span><b id="drivenZetaVal">0.15</b></div>
+              <input type="range" id="drivenZetaSlider" min="0.05" max="0.6" step="0.05" value="0.15"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Steady-state amplitude (relative)</td><td class="v" id="drivenAmpVal">—</td></tr>
+              <tr><td class="k">Phase lag, <var>δ</var>, between push and motion</td><td class="v" id="drivenPhaseVal">—</td></tr>
+              <tr><td class="k">Timing description</td><td class="v" id="drivenDescVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the phase lag formula and its three landmarks</summary>
+        <p class="explainer">
+          <var>δ</var> = atan[2<var>ζω<sub>n</sub>ω</var> / (<var>ω<sub>n</sub></var>² − <var>ω</var>²)].
+          Far below resonance (<var>ω</var> ≪ <var>ω<sub>n</sub></var>), the
+          motion follows the push almost instantly (<var>δ</var> ≈ 0). Far
+          above resonance (<var>ω</var> ≫ <var>ω<sub>n</sub></var>), the
+          motion lags a full half-cycle behind (<var>δ</var> ≈ 180°) — you're
+          effectively pushing against the swing more often than with it,
+          which is exactly why the amplitude is small there too. Exactly at
+          resonance, the lag is precisely 90°, the quarter-cycle timing that
+          turns out to pump in energy most efficiently.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: swing timing</h4>
+        <ol>
+          <li>Push a playground swing at its own natural rate (matching its
+            already-established rhythm) versus deliberately pushing too
+            fast or too slow — the mismatched timing builds up almost no
+            height even with equally hard pushes.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= RESONANCE (stub) ================= -->
+    <div class="panel" id="panel-resonance">
+      <h2>Resonance</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> soldiers marching in
+        perfect step across a lightweight footbridge have, historically,
+        occasionally caused the bridge to sway alarmingly or even fail —
+        while the same soldiers walking normally (out of step) across it
+        would not. What's different about marching in step?
+      </p>
+
+      <p class="explainer">Resonance: driving frequency ≈ natural frequency ⟹ amplitude peaks</p>
+
+      <div class="var-list">
+        <div>Resonance — driving a system at (or very near) its own natural frequency, producing a dramatically larger steady-state response than any other driving frequency</div>
+        <div>Lower damping ⟹ a taller, narrower resonance peak; higher damping ⟹ a shorter, broader one</div>
+      </div>
+
+      <p class="explainer">
+        Marching in step means every footfall is a push delivered at the
+        exact same frequency, over and over — the last tab's amplitude
+        formula peaking right where driving frequency matches the bridge's
+        own natural sway frequency. Normal out-of-step walking spreads
+        footfalls across essentially random timing relative to the bridge's
+        motion, which barely pumps in any energy at all.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Resonance Curve Family</h3>
+      <p class="explainer">
+        The same driving-frequency sweep from the last tab, now with
+        multiple damping levels drawn together. Low damping doesn't just
+        raise the peak — it makes the peak dangerously narrow, meaning even
+        a small mismatch between driving and natural frequency still gives
+        a huge response.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 160" id="resCurveSvg">
+            <line x1="40" y1="140" x2="480" y2="140" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="140" class="svg-axis"></line>
+            <path id="resCurve1" fill="none" stroke="#e34948" stroke-width="2"></path>
+            <path id="resCurve2" fill="none" stroke="#eb6834" stroke-width="2"></path>
+            <path id="resCurve3" fill="none" stroke="#1baf7a" stroke-width="2"></path>
+            <path id="resCurve4" fill="none" stroke="#2a78d6" stroke-width="2"></path>
+            <text x="45" y="24" class="svg-label" fill="#e34948">ζ = 0.05</text>
+            <text x="45" y="36" class="svg-label" fill="#eb6834">ζ = 0.15</text>
+            <text x="45" y="48" class="svg-label" fill="#1baf7a">ζ = 0.4</text>
+            <text x="45" y="60" class="svg-label" fill="#2a78d6">ζ = 1.0</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Inspect damping level, ζ</span><b id="resZetaVal">0.05</b></div>
+              <input type="range" id="resZetaSlider" min="0.05" max="1.0" step="0.05" value="0.05"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Peak amplitude (relative)</td><td class="v" id="resPeakAmpVal">10.01×</td></tr>
+              <tr><td class="k">Frequency where the peak occurs, <var>ω<sub>peak</sub>/ω<sub>n</sub></var></td><td class="v" id="resPeakFreqVal">0.995×</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the peak sits slightly below ωₙ</summary>
+        <p class="explainer">
+          Maximizing <var>A</var>(<var>ω</var>) with respect to <var>ω</var>
+          gives the peak exactly at <var>ω</var><sub>peak</sub> = <var>ω<sub>n</sub></var>√(1 − 2<var>ζ²</var>),
+          slightly below the natural frequency itself, with peak height
+          growing roughly as 1/(2<var>ζ</var>) for small <var>ζ</var>. As
+          <var>ζ</var> → 0, the peak frequency creeps back toward exactly
+          <var>ω<sub>n</sub></var> and the peak height blows up without
+          bound — an undamped system driven exactly at resonance has no
+          steady-state amplitude limit at all.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Why Engineers Fear Resonance</h3>
+      <p class="explainer">
+        The Tacoma Narrows Bridge (1940) and the original Millennium
+        Bridge's pedestrian-induced sway are the textbook cases: a
+        structure's natural frequency happened to land inside a range that
+        wind or footsteps could realistically drive it at.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:560px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Structure's natural frequency</span><b id="bridgeFnVal">1.0 Hz</b></div>
+              <input type="range" id="bridgeFnSlider" min="0.2" max="3" step="0.1" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Driving frequency (footsteps, wind gusts, ...)</span><b id="bridgeFdVal">1.0 Hz</b></div>
+              <input type="range" id="bridgeFdSlider" min="0.2" max="3" step="0.1" value="1.0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Frequency mismatch</td><td class="v" id="bridgeMismatchVal">0.0%</td></tr>
+              <tr><td class="k">Risk assessment</td><td class="v" id="bridgeRiskVal">🔴 High — near-perfect resonance match</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: wine glass and your voice</h4>
+        <ol>
+          <li>Tap a wine glass to hear its natural pitch, then try humming
+            that exact same note near it — with the glass close to your
+            mouth, you may feel it buzz distinctly more than at any other
+            pitch you hum, a small-scale version of the same effect.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= COUPLED OSCILLATORS AND NONLINEAR MOTION (stub) ================= -->
+    <div class="panel" id="panel-coupled-oscillators">
+      <h2>Coupled Oscillators and Nonlinear Motion</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> two double pendulums are
+        released from angles that differ by less than a tenth of a degree —
+        close enough to look identical to the eye. A minute later, are they
+        still swinging in near-identical paths, or could they be doing
+        something completely different from each other?
+      </p>
+
+      <p class="explainer">
+        Two tuning forks at slightly different pitches, played together,
+        produce a slow "wah-wah-wah" throb called <strong>beats</strong> —
+        a simple, exactly-solvable stand-in for the same energy-sloshing
+        idea behind two coupled pendulums trading swing amplitude back and
+        forth. A double pendulum, meanwhile, is simple to describe and
+        almost impossible to predict for long: it's <strong>chaotic</strong>.
+      </p>
+
+      <div class="var-list">
+        <div>Beat frequency — |<var>f₁</var> − <var>f₂</var>|, the slow throbbing rate from combining two nearby frequencies</div>
+        <div>Normal modes — the special combined motions of a coupled system that <em>do</em> repeat cleanly, unlike a generic combination</div>
+        <div>Chaos — a deterministic system (no randomness anywhere in the equations) whose outcomes are still practically unpredictable because tiny input differences blow up over time</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Beats: Two Nearby Frequencies Combined</h3>
+      <p class="explainer">
+        Bring the two frequencies close together and watch the combined
+        wave's envelope throb slowly — that slow envelope rate is exactly
+        the difference between the two frequencies, nothing more exotic
+        than simple addition of two waves.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 140" id="beatsSvg">
+            <line x1="10" y1="70" x2="490" y2="70" class="svg-axis"></line>
+            <path id="beatsEnvTop" fill="none" stroke="var(--gridline)" stroke-width="1" stroke-dasharray="3 3"></path>
+            <path id="beatsEnvBottom" fill="none" stroke="var(--gridline)" stroke-width="1" stroke-dasharray="3 3"></path>
+            <path id="beatsWave" fill="none" stroke="#2a78d6" stroke-width="1.8" d=""></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Frequency 1, f₁</span><b id="beatsF1Val">4.0 Hz</b></div>
+              <input type="range" id="beatsF1Slider" min="1" max="10" step="0.1" value="4.0"></div>
+            <div class="row"><div class="row-head"><span>Frequency 2, f₂</span><b id="beatsF2Val">4.5 Hz</b></div>
+              <input type="range" id="beatsF2Slider" min="1" max="10" step="0.1" value="4.5"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Beat frequency, |<var>f₁</var> − <var>f₂</var>|</td><td class="v" id="beatsBeatVal">0.5 Hz</td></tr>
+              <tr><td class="k">Time between loud/quiet pulses</td><td class="v" id="beatsPeriodVal">2.00 s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the trig identity behind beats</summary>
+        <p class="explainer">
+          sin(2π<var>f₁t</var>) + sin(2π<var>f₂t</var>) = 2cos(2π <sup>(<var>f₁</var>−<var>f₂</var>)</sup>⁄₂<var>t</var>) sin(2π <sup>(<var>f₁</var>+<var>f₂</var>)</sup>⁄₂<var>t</var>).
+          Read the right side as a fast oscillation at the <em>average</em>
+          frequency, whose amplitude is itself slowly modulated by a cosine
+          at <em>half</em> the frequency difference — since amplitude
+          modulation doesn't care about sign, the perceived beat rate is the
+          full difference |<var>f₁</var> − <var>f₂</var>|.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Double Pendulum: Sensitive Dependence on Initial Conditions</h3>
+      <p class="explainer">
+        Two double pendulums, released a hair's breadth apart in starting
+        angle. Watch how long they stay looking alike — and how total,
+        unrecognizable the split becomes afterward. Nothing random is
+        happening in the equations at all; the unpredictability is entirely
+        built from the ordinary nonlinear physics compounding on itself.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 240" id="doublePendSvg">
+            <circle cx="150" cy="30" r="3" fill="var(--text-primary)"></circle>
+            <path id="dpTraceA" fill="none" stroke="#2a78d6" stroke-width="1" opacity="0.5"></path>
+            <path id="dpTraceB" fill="none" stroke="#e34948" stroke-width="1" opacity="0.5"></path>
+            <line id="dpRod1A" x1="150" y1="30" x2="150" y2="100" stroke="#2a78d6" stroke-width="2"></line>
+            <line id="dpRod2A" x1="150" y1="100" x2="150" y2="170" stroke="#2a78d6" stroke-width="2"></line>
+            <circle id="dpBob1A" cx="150" cy="100" r="6" fill="#2a78d6" stroke="white" stroke-width="1.5"></circle>
+            <circle id="dpBob2A" cx="150" cy="170" r="6" fill="#2a78d6" stroke="white" stroke-width="1.5"></circle>
+            <line id="dpRod1B" x1="150" y1="30" x2="150" y2="100" stroke="#e34948" stroke-width="2" opacity="0.85"></line>
+            <line id="dpRod2B" x1="150" y1="100" x2="150" y2="170" stroke="#e34948" stroke-width="2" opacity="0.85"></line>
+            <circle id="dpBob1B" cx="150" cy="100" r="5" fill="#e34948" stroke="white" stroke-width="1.5" opacity="0.85"></circle>
+            <circle id="dpBob2B" cx="150" cy="170" r="5" fill="#e34948" stroke="white" stroke-width="1.5" opacity="0.85"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Starting angle (both rods), θ₀</span><b id="dpThetaVal">100°</b></div>
+              <input type="range" id="dpThetaSlider" min="30" max="170" step="5" value="100"></div>
+            <div class="row"><div class="row-head"><span>Initial gap between the two runs</span><b id="dpGapVal">0.05°</b></div>
+              <input type="range" id="dpGapSlider" min="0.01" max="2" step="0.01" value="0.05"></div>
+            <button class="action" id="dpGoBtn">▶ Release both</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time</td><td class="v" id="dpTVal">0.0 s</td></tr>
+              <tr><td class="k">Tip separation (blue vs. red)</td><td class="v" id="dpSepVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why "chaotic" doesn't mean "random"</summary>
+        <p class="explainer">
+          The double pendulum's equations of motion are completely
+          deterministic — given exact initial conditions, the future is, in
+          principle, exactly fixed. What makes it chaotic is that nearby
+          starting points separate <em>exponentially</em> over time (roughly
+          <var>Δθ</var>(<var>t</var>) ≈ <var>Δθ</var>₀<var>e</var><sup><var>λt</var></sup>
+          for a positive "Lyapunov exponent" <var>λ</var>), so any
+          real-world uncertainty in your starting angle — no matter how
+          tiny — eventually grows to swamp any prediction. It's the polar
+          opposite of the orbit simulator from Section 6, where nearby
+          starting speeds gave smoothly, predictably different (not
+          wildly diverging) ellipses.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: two out-of-tune guitar strings</h4>
+        <ol>
+          <li>Tune two guitar strings almost, but not quite, to the same
+            pitch, then pluck both together — you'll hear the volume throb
+            up and down at the beat frequency, exactly matching Widget 1.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/oscillations.js"></script>
 </body>
 </html>

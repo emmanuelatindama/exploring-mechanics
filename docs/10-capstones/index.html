@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>10. Real-World Capstone Simulations — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/capstones.css">
 </head>
 <body data-section="10-capstones">
 <div class="wrap">
@@ -12,13 +15,292 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 10. Capstones</p>
       <h1>10. Real-World Capstone Simulations</h1>
-      <p class="sub">Larger multi-topic projects, built incrementally rather than all at once.</p>
+      <p class="sub">Larger multi-topic projects, each combining several earlier sections into one working model.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="bowling-physics">Bowling Physics</button>
+    <button data-target="bicycle-mechanics">Bicycle Mechanics</button>
+    <button data-target="roller-coaster-design">Roller-Coaster Design</button>
+    <button data-target="bridge-resonance">Bridge Resonance</button>
+    <button data-target="bow-energy-model">Bow Energy Model</button>
+    <button data-target="catapult-motion-model">Catapult Motion Model</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= BOWLING PHYSICS ================= -->
+    <div class="panel active" id="panel-bowling-physics">
+      <h2>Bowling Physics</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a bowling ball is thrown down the lane without any spin at all, sliding at first before it starts to roll normally. Does it slide down the whole lane, or does something change partway?</p>
+      <div class="stage-list"><span>Rolling without slipping</span><span>Friction</span><span>Moment of inertia</span><span>Momentum</span><span>Collisions</span></div>
+      <p class="explainer">While skidding: <var>a</var> = −<var>μg</var> (linear), <var>α</var> = 5<var>μg</var>/(2<var>R</var>) (angular) &nbsp;&nbsp;·&nbsp;&nbsp; rolling begins at <var>v</var> = 5<var>v</var>₀/7</p>
+      <div class="var-list">
+        <div><var>v</var>₀ — the ball's initial thrown speed with no spin; <var>μ</var> — kinetic friction between ball and lane; <var>R</var> — ball radius</div>
+        <div>Friction acts backward on the ball's motion but forward as a torque, simultaneously slowing its slide and spinning it up, until the surface speed at the contact point reaches zero — the rolling condition <var>v</var> = <var>ωR</var></div>
+      </div>
+      <h3 class="subhead">Widget — Skid-to-Roll Transition and Pin Impact</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 60" id="bowlSvg">
+            <line x1="20" y1="40" x2="280" y2="40" class="svg-axis"></line>
+            <line id="bowlSkidMarker" x1="20" y1="20" x2="20" y2="50" stroke="#eb6834" stroke-width="1.5" stroke-dasharray="3,3"></line>
+            <circle id="bowlBall" cx="20" cy="40" r="8" fill="#2a78d6" stroke="white" stroke-width="1.5"></circle>
+            <rect id="bowlPin" x="292" y="30" width="6" height="18" fill="#1baf7a"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial speed, v₀</span><b id="bowlV0Val">6.0 m/s</b></div>
+              <input type="range" id="bowlV0Slider" min="2" max="10" step="0.2" value="6"></div>
+            <div class="row"><div class="row-head"><span>Friction, μ</span><b id="bowlMuVal">0.10</b></div>
+              <input type="range" id="bowlMuSlider" min="0.02" max="0.3" step="0.01" value="0.1"></div>
+            <button class="action" id="bowlGoBtn">▶ Throw</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Time to start rolling</td><td class="v" id="bowlSkidTimeVal">—</td></tr>
+              <tr><td class="k">Distance skidded first</td><td class="v" id="bowlSkidDistVal">—</td></tr>
+              <tr><td class="k">Speed once rolling, 5v₀/7</td><td class="v" id="bowlRollSpeedVal">—</td></tr>
+              <tr><td class="k">Pin speed after impact</td><td class="v" id="bowlPinSpeedVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: where 5v₀/7 comes from</summary>
+        <p class="explainer">With <var>v</var>(<var>t</var>) = <var>v</var>₀ − <var>μgt</var> and <var>ω</var>(<var>t</var>) = (5<var>μg</var>/2<var>R</var>)<var>t</var> (starting from zero spin), rolling begins when <var>v</var> = <var>ωR</var>: <var>v</var>₀ − <var>μgt</var> = (5<var>μg</var>/2)<var>t</var>, giving <var>t</var> = <var>v</var>₀/(3.5<var>μg</var>). Substituting back, <var>v</var><sub>roll</sub> = <var>v</var>₀ − <var>μg</var>·<var>v</var>₀/(3.5<var>μg</var>) = <var>v</var>₀(1 − 1/3.5) = 5<var>v</var>₀/7 — independent of <var>μ</var> and <var>R</var> entirely, though the time and distance to reach it are not.</p>
+      </details>
+    </div>
+
+    <!-- ================= BICYCLE MECHANICS ================= -->
+    <div class="panel" id="panel-bicycle-mechanics">
+      <h2>Bicycle Mechanics</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> you're climbing a hill and shift to a lower gear at the same pedaling cadence. Your wheel spins slower — but does that also mean you're now pushing the pedals with less force?</p>
+      <div class="stage-list"><span>Gears</span><span>Torque</span><span>Power</span><span>Hill climbing</span><span>Rolling resistance</span></div>
+      <p class="explainer">Wheel speed = cadence × (front teeth / rear teeth) × wheel radius &nbsp;&nbsp;·&nbsp;&nbsp; Power = Force × speed</p>
+      <div class="var-list">
+        <div>Gear ratio = front chainring teeth / rear cog teeth — a lower gear (smaller ratio) trades wheel speed for more torque at the same rider power and cadence</div>
+        <div>On a hill, the rider's fixed power output caps top speed once gravity's pull along the slope grows large enough</div>
+      </div>
+      <h3 class="subhead">Widget — Gearing, Power, and Hill-Climbing Speed</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 140" id="bikeSvg">
+            <line x1="10" y1="120" x2="190" y2="120" class="svg-axis"></line>
+            <circle cx="60" cy="100" r="24" fill="none" stroke="var(--muted)" stroke-width="2"></circle>
+            <circle cx="140" cy="100" r="24" fill="none" stroke="var(--muted)" stroke-width="2"></circle>
+            <g id="bikeWheel" style="animation: bikeSpin linear infinite;">
+              <line x1="140" y1="100" x2="140" y2="76" stroke="#2a78d6" stroke-width="2"></line>
+              <line x1="140" y1="100" x2="164" y2="100" stroke="#2a78d6" stroke-width="2"></line>
+            </g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Cadence</span><b id="bikeCadenceVal">80 rpm</b></div>
+              <input type="range" id="bikeCadenceSlider" min="40" max="120" step="1" value="80"></div>
+            <div class="row"><div class="row-head"><span>Front chainring teeth</span><b id="bikeFrontVal">34</b></div>
+              <input type="range" id="bikeFrontSlider" min="20" max="52" step="1" value="34"></div>
+            <div class="row"><div class="row-head"><span>Rear cog teeth</span><b id="bikeRearVal">18</b></div>
+              <input type="range" id="bikeRearSlider" min="11" max="34" step="1" value="18"></div>
+            <div class="row"><div class="row-head"><span>Hill slope</span><b id="bikeSlopeVal">4°</b></div>
+              <input type="range" id="bikeSlopeSlider" min="0" max="15" step="0.5" value="4"></div>
+            <div class="row"><div class="row-head"><span>Rider power</span><b id="bikePowerVal">200 W</b></div>
+              <input type="range" id="bikePowerSlider" min="50" max="400" step="10" value="200"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Wheel speed from cadence/gearing</td><td class="v" id="bikeWheelSpeedVal">—</td></tr>
+              <tr><td class="k">Power-limited max speed on this hill</td><td class="v" id="bikeMaxSpeedVal">—</td></tr>
+              <tr><td class="k">Actual speed (the smaller of the two)</td><td class="v" id="bikeSpeedVal">—</td></tr>
+              <tr><td class="k">Rear-wheel torque</td><td class="v" id="bikeTorqueVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <style>@keyframes bikeSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }</style>
+      <p class="explainer">This is the same gear-ratio tradeoff from <a href="../05-simple-machines/index.html#gears">Section 5's Gears tab</a>, now driving a full hill-climb speed calculation.</p>
+    </div>
+
+    <!-- ================= ROLLER COASTER DESIGN ================= -->
+    <div class="panel" id="panel-roller-coaster-design">
+      <h2>Roller-Coaster Design</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> you're designing a coaster with one hill leading into one vertical loop. If the hill is exactly twice as tall as the loop, is that automatically enough height for the cart to safely complete the loop?</p>
+      <div class="stage-list"><span>Energy conservation</span><span>Loops</span><span>Normal force</span><span>Frictional loss</span><span>Safety constraints</span></div>
+      <p class="explainer">Minimum loop-top speed: <var>v</var><sub>min</sub> = √(<var>gr</var>) &nbsp;&nbsp;·&nbsp;&nbsp; Available energy after losses: (1 − loss%)·<var>mgH</var></p>
+      <div class="var-list">
+        <div><var>H</var> — hill height; <var>r</var> — loop radius (so the loop's top sits at height 2<var>r</var>)</div>
+        <div>"Loss%" bundles track friction and air drag as a simple fraction of the hill's potential energy that never makes it to kinetic energy</div>
+      </div>
+      <h3 class="subhead">Widget — Hill Height vs. Loop Safety</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="coasterSvg">
+            <line x1="20" y1="180" x2="280" y2="180" class="svg-axis"></line>
+            <path id="coasterHillPath" fill="none" stroke="#2a78d6" stroke-width="3"></path>
+            <circle id="coasterLoopCircle" cx="220" cy="150" r="30" fill="none" stroke="#eb6834" stroke-width="3"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Hill height, H</span><b id="coasterHillVal">25 m</b></div>
+              <input type="range" id="coasterHillSlider" min="5" max="50" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Loop radius, r</span><b id="coasterLoopRVal">8 m</b></div>
+              <input type="range" id="coasterLoopRSlider" min="2" max="15" step="0.5" value="8"></div>
+            <div class="row"><div class="row-head"><span>Friction + drag loss</span><b id="coasterLossVal">10%</b></div>
+              <input type="range" id="coasterLossSlider" min="0" max="40" step="1" value="10"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Speed reaching loop top</td><td class="v" id="coasterSpeedAtLoopVal">—</td></tr>
+              <tr><td class="k">Minimum required speed</td><td class="v" id="coasterMinSpeedVal">—</td></tr>
+            </table>
+            <p><span class="verdict-badge" id="coasterVerdict">—</span></p>
+          </div>
+        </div>
+      </div>
+      <p class="explainer">This combines the loop condition from <a href="../06-circular-motion/index.html#vertical-circles">Section 6's Vertical Circles tab</a> with the energy-loss ideas from <a href="../03-energy/index.html#roller-coaster-physics">Section 3's Roller Coaster Physics tab</a>.</p>
+    </div>
+
+    <!-- ================= BRIDGE RESONANCE ================= -->
+    <div class="panel" id="panel-bridge-resonance">
+      <h2>Bridge Resonance</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a pedestrian bridge is jostled at a rate far from its natural sway frequency, then at a rate very close to it, with the same-sized push each time. Does the bridge respond the same way both times?</p>
+      <div class="stage-list"><span>Mass-spring model</span><span>Natural frequency</span><span>Damping</span><span>Driven oscillation</span><span>Resonance</span></div>
+      <p class="explainer">Natural frequency: <var>ω</var><sub>n</sub> = √(<var>k/m</var>) &nbsp;&nbsp;·&nbsp;&nbsp; Amplitude ratio: 1/√((1−<var>r²</var>)² + (2<var>ζr</var>)²), &nbsp;<var>r</var> = <var>ω</var>/<var>ω</var><sub>n</sub></p>
+      <div class="var-list">
+        <div><var>k</var> — effective structural stiffness; <var>m</var> — effective oscillating mass; <var>ζ</var> — damping ratio (structural damping, dampers, etc.)</div>
+        <div><var>r</var> — ratio of driving frequency to natural frequency; the closer <var>r</var> is to 1, the larger the amplification, especially for small <var>ζ</var></div>
+      </div>
+      <h3 class="subhead">Widget — Resonance Curve</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 100" id="bridgeSvg">
+            <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
+            <path id="bridgeCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5"></path>
+            <circle id="bridgeMarker" cx="40" cy="90" r="5" fill="#e34948"></circle>
+            <text x="440" y="20" class="svg-label">amplitude vs. driving frequency ratio</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Stiffness, k</span><b id="bridgeKVal">500000 N/m</b></div>
+              <input type="range" id="bridgeKSlider" min="100000" max="2000000" step="50000" value="500000"></div>
+            <div class="row"><div class="row-head"><span>Oscillating mass, m</span><b id="bridgeMVal">20000 kg</b></div>
+              <input type="range" id="bridgeMSlider" min="5000" max="60000" step="1000" value="20000"></div>
+            <div class="row"><div class="row-head"><span>Damping ratio, ζ</span><b id="bridgeZetaVal">0.05</b></div>
+              <input type="range" id="bridgeZetaSlider" min="1" max="60" step="1" value="5"></div>
+            <div class="row"><div class="row-head"><span>Driving frequency (footsteps/wind)</span><b id="bridgeFreqVal">0.80 Hz</b></div>
+              <input type="range" id="bridgeFreqSlider" min="0.1" max="3" step="0.05" value="0.8"></div>
+          </div>
+          <div class="readout">
+            <table><tr><td class="k">Natural frequency, <var>ω</var><sub>n</sub>/2π</td><td class="v" id="bridgeWnVal">—</td></tr>
+            <tr><td class="k">Amplification factor</td><td class="v" id="bridgeAmpVal">—</td></tr></table>
+            <p><span class="verdict-badge" id="bridgeWarn">—</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="try-at-home">
+        <h4>Real-world case: the Millennium Bridge (London, 2000)</h4>
+        <ol><li>Pedestrians' side-to-side sway synchronized with the bridge's lateral natural frequency, producing exactly this kind of amplitude growth, and the bridge was closed within days to add dampers — increasing <var>ζ</var> directly, the same lever this widget exposes.</li></ol>
+      </div>
+      <p class="explainer">Same resonance mechanism as <a href="../08-oscillations/index.html#resonance">Section 8's Resonance tab</a>, applied here to a structure instead of a single mass on a spring.</p>
+    </div>
+
+    <!-- ================= BOW ENERGY MODEL ================= -->
+    <div class="panel" id="panel-bow-energy-model">
+      <h2>Bow Energy Model</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> drawing a bow twice as far back, with the same bow, stores how much more elastic energy — twice as much, or more?</p>
+      <div class="stage-list"><span>Elastic energy</span><span>Draw length</span><span>Projectile mass</span><span>Efficiency</span></div>
+      <p class="explainer">Stored energy (simplified linear-draw model): <var>PE</var> = ½<var>kd</var>² &nbsp;&nbsp;·&nbsp;&nbsp; Launch speed: <var>v</var> = √(2·<var>PE</var>·<var>η</var>/<var>m</var>)</p>
+      <div class="var-list">
+        <div><var>k</var> — effective draw stiffness; <var>d</var> — draw length; <var>η</var> — energy-transfer efficiency (some energy stays in the limbs and string rather than reaching the arrow)</div>
+        <div><var>m</var> — arrow mass</div>
+      </div>
+      <h3 class="subhead">Widget — Force-Draw Curve and Arrow Speed</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 240 140" id="bowSvg">
+            <line x1="20" y1="120" x2="230" y2="120" class="svg-axis"></line>
+            <line x1="20" y1="10" x2="20" y2="120" class="svg-axis"></line>
+            <polygon id="bowAreaFill" fill="#2a78d633"></polygon>
+            <path id="bowForceCurve" fill="none" stroke="#2a78d6" stroke-width="2.5"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Draw stiffness, k</span><b id="bowKVal">300 N/m</b></div>
+              <input type="range" id="bowKSlider" min="100" max="800" step="10" value="300"></div>
+            <div class="row"><div class="row-head"><span>Draw length, d</span><b id="bowDrawVal">0.60 m</b></div>
+              <input type="range" id="bowDrawSlider" min="0.2" max="0.9" step="0.02" value="0.6"></div>
+            <div class="row"><div class="row-head"><span>Arrow mass</span><b id="bowMassVal">25 g</b></div>
+              <input type="range" id="bowMassSlider" min="10" max="60" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Transfer efficiency, η</span><b id="bowEffVal">80%</b></div>
+              <input type="range" id="bowEffSlider" min="30" max="95" step="1" value="80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Stored elastic energy</td><td class="v" id="bowPeVal">—</td></tr>
+              <tr><td class="k">Arrow launch speed</td><td class="v" id="bowSpeedVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="explainer">This is an educational model of elastic-energy transfer, not an instructional guide for building or drawing a real bow — real bow force-draw curves are noticeably non-linear.</p>
+    </div>
+
+    <!-- ================= CATAPULT MOTION MODEL ================= -->
+    <div class="panel" id="panel-catapult-motion-model">
+      <h2>Catapult Motion Model</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a longer catapult arm, given the same driving torque, releases the projectile at a higher speed. True or false?</p>
+      <div class="stage-list"><span>Torque</span><span>Rotational inertia</span><span>Energy transfer</span><span>Projectile motion</span><span>Numerical methods</span></div>
+      <p class="explainer">Angular acceleration: <var>α</var> = <var>τ</var>/<var>I</var>, &nbsp;<var>I</var> = <var>mL²</var> &nbsp;&nbsp;·&nbsp;&nbsp; Launch speed: <var>v</var> = <var>ωL</var>, with <var>ω</var> from <var>ω²</var> = 2<var>αθ</var><sub>release</sub></p>
+      <div class="var-list">
+        <div><var>τ</var> — driving torque; <var>L</var> — arm length; <var>m</var> — projectile mass (dominating the arm's own inertia in this simplified model)</div>
+        <div><var>θ</var><sub>release</sub> — the swing angle at which the projectile is released, as an abstract parameter rather than a mechanical latch design</div>
+      </div>
+      <h3 class="subhead">Widget — Launch Speed and Trajectory</h3>
+      <p class="explainer">This is a numerical model of abstract mechanics, not a guide for constructing or optimizing a physical device.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="catapultSvg">
+            <line x1="0" y1="180" x2="300" y2="180" class="svg-axis"></line>
+            <path id="catapultTrajPath" fill="none" stroke="var(--gridline)" stroke-width="2" stroke-dasharray="4,4"></path>
+            <circle id="catapultProjectile" cx="20" cy="180" r="6" fill="#e34948"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Arm length, L</span><b id="catapultArmVal">2.0 m</b></div>
+              <input type="range" id="catapultArmSlider" min="0.5" max="4" step="0.1" value="2"></div>
+            <div class="row"><div class="row-head"><span>Driving torque, τ</span><b id="catapultTorqueVal">400 N·m</b></div>
+              <input type="range" id="catapultTorqueSlider" min="50" max="1000" step="10" value="400"></div>
+            <div class="row"><div class="row-head"><span>Projectile mass, m</span><b id="catapultMassVal">2.0 kg</b></div>
+              <input type="range" id="catapultMassSlider" min="0.5" max="10" step="0.1" value="2"></div>
+            <div class="row"><div class="row-head"><span>Release angle (swing traveled)</span><b id="catapultReleaseVal">60°</b></div>
+              <input type="range" id="catapultReleaseSlider" min="10" max="120" step="1" value="60"></div>
+            <button class="action" id="catapultGoBtn">▶ Launch</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Launch speed</td><td class="v" id="catapultLaunchSpeedVal">—</td></tr>
+              <tr><td class="k">Range</td><td class="v" id="catapultRangeVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the prediction above is false</summary>
+        <p class="explainer">A longer arm increases moment of inertia <var>I</var> = <var>mL²</var> quadratically, while it only increases the lever-arm advantage (and the tip's speed for a given <var>ω</var>) linearly. Since angular acceleration <var>α</var> = <var>τ</var>/<var>I</var> ∝ 1/<var>L</var>², and tip speed <var>v</var> = <var>ωL</var> with <var>ω</var> ∝ √<var>α</var> ∝ 1/<var>L</var>, the net launch speed actually scales as <var>v</var> ∝ 1/√<var>L</var> for a fixed torque — a <em>longer</em> arm gives a <em>slower</em> launch unless the driving torque also increases to compensate.</p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/capstones.js"></script>
 </body>
 </html>

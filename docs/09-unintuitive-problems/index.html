@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>9. Counterintuitive Mechanics Problems — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/unintuitive.css">
 </head>
 <body data-section="09-unintuitive-problems">
 <div class="wrap">
@@ -12,13 +15,497 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 9. Unintuitive Problems</p>
       <h1>9. Counterintuitive Mechanics Problems</h1>
-      <p class="sub">"What do you predict will happen?" — ask before revealing the result.</p>
+      <p class="sub">Predict first, then check — every one of these looks wrong until you work through the mechanics underneath it.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="double-cone-uphill">Double Cone Rolling Uphill</button>
+    <button data-target="spool-paradox">Spool / Yo-Yo Paradox</button>
+    <button data-target="rolling-race">Rolling Race</button>
+    <button data-target="falling-slinky">Falling Slinky</button>
+    <button data-target="pulley-distance-puzzle">Movable-Pulley Distance Puzzle</button>
+    <button data-target="chain-fountain">Chain Fountain</button>
+    <button data-target="brachistochrone">Brachistochrone Curve</button>
+    <button data-target="tautochrone">Tautochrone Curve</button>
+    <button data-target="catenary">Catenary vs. Parabola</button>
+    <button data-target="tennis-racket-theorem">Tennis-Racket Theorem</button>
+    <button data-target="gyroscopic-precession">Gyroscopic Precession</button>
+    <button data-target="bead-on-rotating-hoop">Bead on a Rotating Hoop</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= DOUBLE CONE UPHILL ================= -->
+    <div class="panel active" id="panel-double-cone-uphill">
+      <h2>Double Cone Rolling Uphill</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a double cone (two cones glued base-to-base) is set on two rails that spread apart as they go up a shallow incline. Released at the narrow end, it rolls toward the wide end and up the slope. Does its center of mass actually rise?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A double cone placed on diverging rails appears to roll uphill. Its center of mass actually moves downward as the rails spread apart — the shape sinks into the widening V faster than the rails climb.</p></div>
+      <div class="var-list">
+        <div>As the rails diverge, the cone's tapered body must sink deeper between them to keep touching both rails</div>
+        <div>That sinking (drop into the V) competes against the incline's genuine rise</div>
+        <div>When the sink rate wins, the true center-of-mass height falls even though the visible position moves toward what looks like "uphill"</div>
+      </div>
+      <h3 class="subhead">Widget — Rise Rate vs. Sink Rate</h3>
+      <p class="explainer">These two rates are simplified stand-ins for the full 3D geometry (which depends on the incline angle, the rail half-angle, and the cone's own half-angle). Push the sink rate above the rise rate to reproduce the paradox.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="coneSvg">
+            <polygon id="coneRailTop" points="20,150 280,150" fill="none" stroke="var(--muted)" stroke-width="2"></polygon>
+            <polygon id="coneRailBot" points="20,160 280,160" fill="none" stroke="var(--muted)" stroke-width="2"></polygon>
+            <circle id="coneShape" cx="20" cy="150" r="12" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <p class="pane-label">True center-of-mass height along the track</p>
+          <svg viewBox="0 0 300 140" id="coneCmSvg">
+            <line x1="20" y1="120" x2="280" y2="120" class="svg-axis"></line>
+            <path id="coneCmPlotPath" fill="none" stroke="#1baf7a" stroke-width="2.5" d=""></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Incline rise rate</span><b id="coneRiseVal">0.30</b></div>
+              <input type="range" id="coneRiseSlider" min="0" max="100" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>V-groove sink rate</span><b id="coneSinkVal">0.60</b></div>
+              <input type="range" id="coneSinkSlider" min="0" max="100" step="1" value="60"></div>
+            <div class="row"><div class="row-head"><span>Position along track</span><b id="conePosVal">50%</b></div>
+              <input type="range" id="conePosSlider" min="0" max="100" step="1" value="50"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Apparent rail climb</td><td class="v" id="coneRailRiseVal">—</td></tr>
+              <tr><td class="k">Net true CM height change</td><td class="v" id="coneCmHeightVal">—</td></tr>
+            </table>
+            <p><span class="verdict-badge" id="coneVerdict">—</span></p>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why this is really a geometry problem, not a dynamics one</summary>
+        <p class="explainer">No force does negative work here — the cone is simply released and rolls under gravity, converting potential energy to kinetic energy exactly as always. The "paradox" is purely about where the center of mass sits geometrically: as the rails diverge, the cone's local rolling radius at the contact points changes, and for the right combination of rail half-angle <var>α</var> and cone half-angle <var>β</var>, that radius change lowers the axle faster than the incline raises it. Energy conservation (<var>E</var> = <var>mgh</var> + ½<var>mv²</var> + rotational terms) is never violated — <var>h</var> is just decreasing the whole time.</p>
+      </details>
+      <div class="try-at-home">
+        <h4>Try it for real: two rulers and a paper cone pair</h4>
+        <ol><li>Tape two paper cones base-to-base, prop up two straight edges (rulers work) at a shallow angle so they diverge slightly going "uphill," and release the double cone at the narrow end — it rolls to the wide end on its own.</li></ol>
+      </div>
+    </div>
+
+    <!-- ================= SPOOL PARADOX ================= -->
+    <div class="panel" id="panel-spool-paradox">
+      <h2>Spool / Yo-Yo Paradox</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a spool of thread rests on a table with the string unwinding from underneath the hub and running out at some angle above the floor. You pull the string toward yourself. Does the spool always roll toward you?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>Pulling a string wound around a spool can make the spool roll either toward the pulling force or away from it, depending only on the angle of the string.</p></div>
+      <p class="explainer">Moment arm about the contact point: <var>d</var> = <var>R</var>cos<var>θ</var> − <var>r</var> &nbsp;&nbsp;·&nbsp;&nbsp; critical angle: <var>θ</var><sub>c</sub> = arccos(<var>r/R</var>)</p>
+      <div class="var-list">
+        <div><var>R</var> — outer (rolling) radius of the spool; <var>r</var> — inner radius where the string is wound</div>
+        <div><var>θ</var> — angle of the string above horizontal</div>
+        <div>Torques are taken about the contact point with the ground, where static friction acts with zero moment arm</div>
+      </div>
+      <h3 class="subhead">Widget — Critical Angle Explorer</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 200" id="spoolSvg">
+            <line x1="20" y1="160" x2="280" y2="160" stroke="var(--muted)" stroke-width="2"></line>
+            <circle cx="150" cy="100" r="60" fill="none" stroke="#2a78d6" stroke-width="3"></circle>
+            <circle id="spoolHub" cx="150" cy="100" r="24" fill="var(--surface-1)" stroke="#2a78d6" stroke-width="2"></circle>
+            <line id="spoolString" x1="150" y1="124" x2="240" y2="124" stroke="#eb6834" stroke-width="2.5"></line>
+            <circle id="spoolArrow" cx="240" cy="124" r="5" fill="#eb6834"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Inner radius ratio, r/R</span><b id="spoolRVal">0.40</b></div>
+              <input type="range" id="spoolRSlider" min="10" max="90" step="1" value="40"></div>
+            <div class="row"><div class="row-head"><span>Pull angle, θ</span><b id="spoolThetaVal">20°</b></div>
+              <input type="range" id="spoolThetaSlider" min="0" max="90" step="1" value="20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Critical angle, <var>θ</var><sub>c</sub></td><td class="v" id="spoolThetaCVal">—</td></tr>
+              <tr><td class="k">Moment arm, <var>R</var>cos<var>θ</var> − <var>r</var></td><td class="v" id="spoolArmVal">—</td></tr>
+            </table>
+            <p><span class="verdict-badge" id="spoolDirVal">—</span></p>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving the moment arm</summary>
+        <p class="explainer">Take torques about the ground contact point <var>P</var> (friction there produces no torque about itself). The string leaves the hub tangent to the circle of radius <var>r</var>. Working out the perpendicular distance from <var>P</var> to that tangent line for a string exiting underneath the hub at angle <var>θ</var> gives exactly <var>R</var>cos<var>θ</var> − <var>r</var>. This changes sign at <var>θ</var><sub>c</sub> = arccos(<var>r/R</var>), which is why the rolling direction flips there.</p>
+      </details>
+    </div>
+
+    <!-- ================= ROLLING RACE ================= -->
+    <div class="panel" id="panel-rolling-race">
+      <h2>Rolling Race</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a hoop, a solid cylinder, a hollow sphere, and a solid sphere — all released from rest at the same height on the same ramp. Do they reach the bottom together, the way objects in free fall do?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>They do not. Even though every shape starts with the same potential energy and reaches the bottom with the same total energy, more of a hoop's energy goes into spinning rather than moving forward, so it arrives last.</p></div>
+      <p class="explainer"><var>a</var> = <var>g</var>sin<var>α</var> / (1 + <var>β</var>) &nbsp;&nbsp;where&nbsp;&nbsp; <var>β</var> = <var>I</var>/(<var>mR²</var>)</p>
+      <div class="var-list">
+        <div><var>β</var> — a shape factor from the moment of inertia: hoop <var>β</var>=1, hollow sphere <var>β</var>=2/3, solid cylinder <var>β</var>=1/2, solid sphere <var>β</var>=2/5</div>
+        <div>A larger <var>β</var> means more energy is diverted into spin for the same speed, leaving less to accelerate the object forward</div>
+      </div>
+      <h3 class="subhead">Widget — Race Simulator</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 90" id="raceTrackSvg">
+            <line x1="20" y1="20" x2="280" y2="20" class="svg-axis"></line>
+            <circle id="raceShape-hoop" cx="20" cy="20" r="7" fill="#e34948"></circle>
+            <line x1="20" y1="35" x2="280" y2="35" class="svg-axis"></line>
+            <circle id="raceShape-cyl" cx="20" cy="35" r="7" fill="#2a78d6"></circle>
+            <line x1="20" y1="50" x2="280" y2="50" class="svg-axis"></line>
+            <circle id="raceShape-sphereHollow" cx="20" cy="50" r="7" fill="#eb6834"></circle>
+            <line x1="20" y1="65" x2="280" y2="65" class="svg-axis"></line>
+            <circle id="raceShape-sphereSolid" cx="20" cy="65" r="7" fill="#1baf7a"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp angle, α</span><b id="raceAngleVal">20°</b></div>
+              <input type="range" id="raceAngleSlider" min="5" max="60" step="1" value="20"></div>
+            <div class="row"><div class="row-head"><span>Ramp length, L</span><b id="raceLenVal">2 m</b></div>
+              <input type="range" id="raceLenSlider" min="0.5" max="5" step="0.1" value="2"></div>
+            <button class="action" id="raceGoBtn">▶ Race</button>
+          </div>
+          <div class="readout" id="raceResults"></div>
+        </div>
+      </div>
+      <div class="try-at-home">
+        <h4>Try it for real: any four round objects</h4>
+        <ol><li>Race a hula-hoop-like ring against a can of food and a solid ball down a ramp — the ball wins every time, regardless of mass, exactly as this widget predicts.</li></ol>
+      </div>
+    </div>
+
+    <!-- ================= FALLING SLINKY ================= -->
+    <div class="panel" id="panel-falling-slinky">
+      <h2>Falling Slinky</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a slinky hangs stretched from one end. The moment it's released, does the bottom immediately start falling, along with the rest of it?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>The bottom of a stretched slinky can remain almost motionless immediately after release — it doesn't start moving until a compression wave, traveling down from the released top, physically reaches it.</p></div>
+      <div class="var-list">
+        <div>While hanging, every coil is in local equilibrium: the tension above it balances the weight of everything below</div>
+        <div>Releasing the top removes the support only at the top — that information can only travel down the slinky as fast as the internal spring wave itself, not instantly</div>
+        <div>Until the wave arrives, a coil still feels the same local forces it did before release, so it doesn't move</div>
+      </div>
+      <h3 class="subhead">Widget — Mass-Spring Chain Model</h3>
+      <p class="explainer">This models the slinky as a chain of point masses connected by springs, starting from the correct stretched equilibrium under gravity, then releases the top and integrates the motion of every node.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 260" id="slinkySvg"></svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <button class="action" id="slinkyDropBtn">▶ Release</button>
+          </div>
+          <p class="pane-label" id="slinkyStatus">—</p>
+          <svg viewBox="0 0 500 100" id="slinkyPlotSvg">
+            <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
+            <path id="slinkyTopPlotPath" fill="none" stroke="#eb6834" stroke-width="2"></path>
+            <path id="slinkyPlotPath" fill="none" stroke="#e34948" stroke-width="2.5"></path>
+            <text x="440" y="20" class="svg-label">top (orange), bottom (red) drop vs. time</text>
+          </svg>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the effect isn't instantaneous</summary>
+        <p class="explainer">A slinky is not rigid — it behaves like a very soft spring with mass distributed along its length, so disturbances propagate through it at a finite wave speed, just as sound propagates through air at a finite speed rather than everywhere at once. Because the whole slinky's center of mass has no external support once released (aside from gravity), it falls at exactly <var>g</var> throughout — but individual coils can still be motionless relative to the ground while the center of mass falls, as long as the coils above them are collapsing downward just as fast.</p>
+      </details>
+      <div class="try-at-home">
+        <h4>Try it for real: a real slinky and a phone camera</h4>
+        <ol><li>Film a hanging slinky drop in slow-motion mode and watch the bottom coil — it stays still noticeably longer than you'd expect before the collapsing top half reaches it.</li></ol>
+      </div>
+    </div>
+
+    <!-- ================= PULLEY DISTANCE PUZZLE ================= -->
+    <div class="panel" id="panel-pulley-distance-puzzle">
+      <h2>Movable-Pulley Distance Puzzle</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a load hangs from a movable pulley, supported by a rope that runs up to a fixed pulley and back down to your hand. If you pull one meter of rope through your hand, does the load rise by one meter?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A load lifted by a movable pulley rises only part of the distance that the free end of the rope is pulled — because two rope segments support it, each one only needs to shorten by half the total distance pulled.</p></div>
+      <p class="explainer">Rise = pull distance / 2 &nbsp;&nbsp;·&nbsp;&nbsp; Force needed = Weight / 2</p>
+      <div class="var-list">
+        <div>Work conservation: input work (force × pull distance) equals output work (weight × rise distance) for an ideal system</div>
+      </div>
+      <h3 class="subhead">Widget — Rope-Segment Tracker</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 200" id="puzzleSvg">
+            <line x1="90" y1="10" x2="90" y2="20" stroke="var(--text-primary)" stroke-width="3"></line>
+            <line x1="210" y1="10" x2="210" y2="20" stroke="var(--text-primary)" stroke-width="3"></line>
+            <line id="puzzleRopeLeft" x1="90" y1="20" x2="150" y2="120" stroke="#8a5a2b" stroke-width="2.5"></line>
+            <line id="puzzleRopeRight" x1="210" y1="20" x2="150" y2="120" stroke="#8a5a2b" stroke-width="2.5"></line>
+            <circle id="puzzlePulley" cx="150" cy="120" r="10" fill="var(--surface-1)" stroke="#2a78d6" stroke-width="2.5"></circle>
+            <rect id="puzzleLoad" x="135" y="180" width="30" height="24" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Rope pulled through hand</span><b id="puzzlePullVal">0.5 m</b></div>
+              <input type="range" id="puzzlePullSlider" min="0" max="2" step="0.05" value="0.5"></div>
+            <div class="row"><div class="row-head"><span>Load weight, W</span><b id="puzzleWeightVal">50 N</b></div>
+              <input type="range" id="puzzleWeightSlider" min="10" max="200" step="5" value="50"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Load rise</td><td class="v" id="puzzleRiseVal">—</td></tr>
+              <tr><td class="k">Force required at your hand</td><td class="v" id="puzzleForceVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="explainer">This is the same mechanical-advantage tradeoff from <a href="../05-simple-machines/index.html#pulleys">Section 5's Pulleys tab</a> — reduced force always costs you distance, in exact proportion.</p>
+    </div>
+
+    <!-- ================= CHAIN FOUNTAIN ================= -->
+    <div class="panel" id="panel-chain-fountain">
+      <h2>Chain Fountain</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a long bead chain is poured out of a raised container into a lower one. Does the falling chain just drop straight down toward the lower container, or could it visibly arc upward above the container's rim first?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A chain falling from a container can rise above the rim before descending — the "chain fountain" or Mould effect. The full explanation is still an active topic of physics research.</p></div>
+      <div class="var-list">
+        <div>A naive model treats the chain like an idealized flexible rope: tension only ever supports the hanging weight below, which predicts no rise at all</div>
+        <div>Real chains have local rigidity — lifting a link off the pile isn't just lifting a point mass, it briefly requires levering the rest of the coiled pile, which pushes back with extra force beyond just gravity</div>
+      </div>
+      <h3 class="subhead">Widget — Naive Model vs. the Observed Extra Force</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 170" id="fountainSvg">
+            <line x1="20" y1="150" x2="280" y2="150" class="svg-axis"></line>
+            <path id="fountainArc" fill="none" stroke="#2a78d6" stroke-width="3"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Fall speed, v</span><b id="fountainVVal">3.0 m/s</b></div>
+              <input type="range" id="fountainVSlider" min="0.5" max="8" step="0.1" value="3"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Naive model prediction</td><td class="v" id="fountainNaiveVal">—</td></tr>
+              <tr><td class="k">Rough upper-bound rise height, v²/2g</td><td class="v" id="fountainHeightVal">—</td></tr>
+              <tr><td class="k">Cited extra pile-reaction term</td><td class="v" id="fountainExtraVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the Biggins–Warner explanation (2014)</summary>
+        <p class="explainer">Biggins and Warner modeled the pile of chain as briefly rigid near where a link is picked up, so lifting a link there requires an additional force of roughly <var>F</var><sub>extra</sub> ≈ <var>μv²</var>, where <var>μ</var> is mass per unit length and <var>v</var> is the chain's speed — on top of the weight it's already supporting. That extra push from the pile is what launches the chain fountain above the rim; a perfectly flexible idealized chain would show no such effect.</p>
+      </details>
+    </div>
+
+    <!-- ================= BRACHISTOCHRONE ================= -->
+    <div class="panel" id="panel-brachistochrone">
+      <h2>Brachistochrone Curve</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a bead slides frictionlessly from point A down to a lower point B, under gravity only. Is the straight line between them the fastest path?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>The straight-line path is not the fastest path between two points under gravity — the ideal curve (found by Johann Bernoulli in 1696) is a cycloid, which dips down steeply at first to build speed early, even though it's a longer path overall.</p></div>
+      <h3 class="subhead">Widget — Four-Way Race</h3>
+      <p class="explainer">All four beads start at rest at the same point and finish at the same point. Watch which one wins.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 320 180" id="brachSvg">
+            <path id="brachPath-line" fill="none" stroke="#e34948" stroke-width="1.5" opacity="0.5"></path>
+            <path id="brachPath-arc" fill="none" stroke="#2a78d6" stroke-width="1.5" opacity="0.5"></path>
+            <path id="brachPath-parabola" fill="none" stroke="#eb6834" stroke-width="1.5" opacity="0.5"></path>
+            <path id="brachPath-cycloid" fill="none" stroke="#1baf7a" stroke-width="1.5" opacity="0.5"></path>
+            <circle id="brachBead-line" cx="40" cy="20" r="5" fill="#e34948"></circle>
+            <circle id="brachBead-arc" cx="40" cy="20" r="5" fill="#2a78d6"></circle>
+            <circle id="brachBead-parabola" cx="40" cy="20" r="5" fill="#eb6834"></circle>
+            <circle id="brachBead-cycloid" cx="40" cy="20" r="5" fill="#1baf7a"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls"><button class="action" id="brachGoBtn">▶ Race</button></div>
+          <div class="readout" id="brachResults"></div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why a cycloid, specifically</summary>
+        <p class="explainer">Minimizing total travel time <var>T</var> = ∫ d<var>s</var>/<var>v</var> with <var>v</var> = √(2<var>gy</var>) (from energy conservation) is a calculus-of-variations problem. Applying the Euler–Lagrange equation to this functional produces a differential equation whose solution is exactly the parametric cycloid <var>x</var> = <var>R</var>(<var>θ</var> − sin<var>θ</var>), <var>y</var> = <var>R</var>(1 − cos<var>θ</var>) — the curve traced by a point on the rim of a rolling circle of radius <var>R</var>.</p>
+      </details>
+    </div>
+
+    <!-- ================= TAUTOCHRONE ================= -->
+    <div class="panel" id="panel-tautochrone">
+      <h2>Tautochrone Curve</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> four beads are released from rest at four different points along the same curved dip, some closer to the bottom than others. Does the bead that starts closer to the bottom always arrive first?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A bead sliding on an inverted cycloid reaches the bottom in exactly the same time, no matter where along the curve it starts — the same curve that solves the brachistochrone problem is also "tautochrone" (same-time).</p></div>
+      <p class="explainer">Time to the bottom = <var>T</var>/4 = <var>π</var>√(<var>R</var>/<var>g</var>), independent of the starting point</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 320 150" id="tautoSvg">
+            <path id="tautoPath" fill="none" stroke="var(--gridline)" stroke-width="2"></path>
+            <circle id="tautoBead-0" cx="0" cy="0" r="6"></circle>
+            <circle id="tautoBead-1" cx="0" cy="0" r="6"></circle>
+            <circle id="tautoBead-2" cx="0" cy="0" r="6"></circle>
+            <circle id="tautoBead-3" cx="0" cy="0" r="6"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls"><button class="action" id="tautoGoBtn">▶ Release all four</button></div>
+          <div class="readout"><table><tr><td class="k">Time for every bead to reach bottom</td><td class="v" id="tautoPeriodVal">—</td></tr></table></div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: this is why pendulum clocks used cycloidal cheeks</summary>
+        <p class="explainer">Christiaan Huygens proved this isochronism and built pendulum clocks with cycloid-shaped guides ("cheeks") near the pivot, forcing the bob's path to be a cycloid rather than a circular arc — making the clock's period genuinely independent of swing amplitude, rather than only approximately so for small angles as with an ordinary pendulum (compare <a href="../08-oscillations/index.html#pendulums">Section 8's Pendulums tab</a>).</p>
+      </details>
+    </div>
+
+    <!-- ================= CATENARY ================= -->
+    <div class="panel" id="panel-catenary">
+      <h2>Catenary vs. Parabola</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a chain or cable is hung freely between two supports, sagging under its own weight. Is the resulting curve a parabola, the same shape a thrown ball traces?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A freely hanging uniform chain forms a catenary, not a parabola — a subtly different curve described by a hyperbolic cosine, even though the two look nearly identical for small sag.</p></div>
+      <p class="explainer">Catenary: <var>y</var> = <var>a</var>·cosh(<var>x/a</var>) − <var>a</var> &nbsp;&nbsp;vs.&nbsp;&nbsp; parabola: <var>y</var> = <var>x²</var>/(2<var>a</var>)</p>
+      <div class="var-list">
+        <div><var>a</var> — a scale parameter set by the chain's weight per length and the tension at the lowest point; smaller <var>a</var> means a deeper sag</div>
+        <div>A hanging chain supports its own weight uniformly along its own arc length; a parabola is the shape for a load distributed uniformly along the horizontal span instead (like a suspension bridge's deck) — that distinction is exactly why the two curves differ</div>
+      </div>
+      <h3 class="subhead">Widget — Overlay Comparison</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="catSvg">
+            <line x1="0" y1="180" x2="300" y2="180" class="svg-axis"></line>
+            <path id="catCatenaryPath" fill="none" stroke="#2a78d6" stroke-width="2.5"></path>
+            <path id="catParabolaPath" fill="none" stroke="#e34948" stroke-width="2" stroke-dasharray="5,4"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Scale parameter, a</span><b id="catAVal">80</b></div>
+              <input type="range" id="catASlider" min="30" max="300" step="5" value="80"></div>
+          </div>
+          <div class="readout"><table><tr><td class="k">Max deviation between the curves</td><td class="v" id="catDevVal">—</td></tr></table></div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why cosh shows up</summary>
+        <p class="explainer">Balancing horizontal tension <var>T</var><sub>0</sub> against the weight of chain hanging below each point gives the differential equation <var>d²y/dx²</var> = (1/<var>a</var>)√(1+(<var>dy/dx</var>)²), with <var>a</var> = <var>T</var><sub>0</sub>/(weight per length). Solving it produces <var>y</var> = <var>a</var>cosh(<var>x/a</var>) − <var>a</var>, exactly. Expanding cosh in a Taylor series, cosh(<var>u</var>) ≈ 1 + <var>u²</var>/2 for small <var>u</var>, shows why the catenary looks almost exactly parabolic near its lowest point but visibly diverges near the supports.</p>
+      </details>
+    </div>
+
+    <!-- ================= TENNIS RACKET THEOREM ================= -->
+    <div class="panel" id="panel-tennis-racket-theorem">
+      <h2>Tennis-Racket Theorem</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a rigid object (a tennis racket, a book held closed with a rubber band, a smartphone) has three different principal axes of rotation. Thrown spinning cleanly about any of the three, does it keep spinning cleanly about that same axis?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>Rotation about an object's intermediate principal axis is unstable, causing unexpected flipping mid-flight — the intermediate-axis theorem, also called the Dzhanibekov effect after the cosmonaut who noticed it with a spinning bolt in orbit.</p></div>
+      <p class="explainer"><var>I</var><sub>1</sub>d<var>ω</var><sub>1</sub>/d<var>t</var> = (<var>I</var><sub>2</sub>−<var>I</var><sub>3</sub>)<var>ω</var><sub>2</sub><var>ω</var><sub>3</sub> &nbsp;(and cyclic permutations) — Euler's free rigid-body equations</p>
+      <div class="var-list">
+        <div><var>I</var><sub>1</sub> &lt; <var>I</var><sub>2</sub> &lt; <var>I</var><sub>3</sub> — the three principal moments of inertia, smallest to largest</div>
+        <div><var>ω</var><sub>1</sub>, <var>ω</var><sub>2</sub>, <var>ω</var><sub>3</sub> — the spin components about each of those three axes</div>
+        <div>With no applied torque, these equations alone govern how a spin that starts purely along one axis leaks into the others</div>
+      </div>
+      <h3 class="subhead">Widget — Spin About Each Axis</h3>
+      <p class="explainer">Choose which axis the object starts spinning about (with a tiny nudge on the other two, as any real throw has). Watch the three spin-component graphs — stable axes barely wobble; the intermediate axis produces huge swings and repeated flips.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="racketSvg">
+            <g id="racketRect"><rect x="-40" y="-10" width="80" height="20" fill="#2a78d6" stroke="white" stroke-width="2"></rect></g>
+          </svg>
+          <p class="pane-label" id="racketStatus">—</p>
+          <svg viewBox="0 0 500 100">
+            <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
+            <path id="racketPlot1" fill="none" stroke="#2a78d6" stroke-width="2"></path>
+            <path id="racketPlot2" fill="none" stroke="#eb6834" stroke-width="2"></path>
+            <path id="racketPlot3" fill="none" stroke="#1baf7a" stroke-width="2"></path>
+            <text x="440" y="20" class="svg-label">ω1 (blue), ω2 (orange), ω3 (green)</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><span>Initial spin axis</span></div>
+            <button class="action racketAxisBtn active" data-axis="0">Axis 1 (smallest I) — stable</button>
+            <button class="action racketAxisBtn" data-axis="1">Axis 2 (intermediate I) — unstable</button>
+            <button class="action racketAxisBtn" data-axis="2">Axis 3 (largest I) — stable</button>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why exactly the middle axis is unstable</summary>
+        <p class="explainer">Linearizing Euler's equations around <var>ω</var>≈(<var>ω</var>0,0,0) (spin purely about axis 1) gives small perturbations that oscillate, since (<var>I</var>1−<var>I</var>2) and (<var>I</var>3−<var>I</var>1) have opposite signs relative to needed for growth — same for axis 3. But linearizing around spin purely about axis 2, the corresponding coefficients both come out with signs that reinforce growth instead of oscillation, producing exponential runaway until the nonlinear terms take over and flip the object end over end.</p>
+      </details>
+    </div>
+
+    <!-- ================= GYROSCOPIC PRECESSION ================= -->
+    <div class="panel" id="panel-gyroscopic-precession">
+      <h2>Gyroscopic Precession</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a fast-spinning wheel is suspended by a string tied to just one end of its axle, with the other end sticking out horizontally, unsupported. Gravity pulls down on the unsupported end. Does that end simply fall?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>A torque applied to a spinning wheel produces motion in a direction that doesn't match naive intuition — instead of falling, the axle sweeps around slowly in a horizontal circle (precesses).</p></div>
+      <p class="explainer"><var>Ω</var> = <var>τ</var>/<var>L</var></p>
+      <div class="var-list">
+        <div><var>Ω</var> — the precession rate, how fast the axle sweeps around</div>
+        <div><var>τ</var> — the applied torque (here, from gravity acting at a distance from the support)</div>
+        <div><var>L</var> — the wheel's spin angular momentum; a faster or heavier spinning wheel has larger <var>L</var></div>
+      </div>
+      <h3 class="subhead">Widget — Precession Rate</h3>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 200" id="gyroSvg">
+            <circle cx="150" cy="100" r="70" fill="none" stroke="var(--gridline)" stroke-width="1"></circle>
+            <circle cx="150" cy="100" r="4" fill="var(--text-primary)"></circle>
+            <line id="gyroAxisLine" x1="150" y1="100" x2="220" y2="100" stroke="#2a78d6" stroke-width="3"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Applied torque, τ</span><b id="gyroTorqueVal">1.0 N·m</b></div>
+              <input type="range" id="gyroTorqueSlider" min="0.1" max="5" step="0.1" value="1"></div>
+            <div class="row"><div class="row-head"><span>Spin angular momentum, L</span><b id="gyroSpinVal">5.0 kg·m²/s</b></div>
+              <input type="range" id="gyroSpinSlider" min="1" max="20" step="0.5" value="5"></div>
+          </div>
+          <div class="readout"><table><tr><td class="k">Precession rate, <var>Ω</var> = <var>τ</var>/<var>L</var></td><td class="v" id="gyroOmegaVal">—</td></tr></table></div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why torque causes precession instead of falling</summary>
+        <p class="explainer">Torque changes angular momentum: <var>τ</var> = d<var>L</var>/d<var>t</var>. Because the wheel's angular momentum vector <var>L</var> already points along the spin axis and is large, a torque perpendicular to <var>L</var> (from gravity) doesn't add to <var>L</var>'s magnitude — it rotates its direction instead, exactly the way a force always perpendicular to a velocity produces circular motion rather than a speed change. The axle sweeps sideways because that's the direction <var>L</var> is being pushed, not because gravity's downward pull vanishes.</p>
+      </details>
+      <p class="explainer">This is the same angular-momentum-conservation idea from <a href="../07-rotation-and-rolling/index.html#angular-momentum">Section 7's Angular Momentum and Gyroscopes tab</a>, isolated here as its own "surprise."</p>
+    </div>
+
+    <!-- ================= BEAD ON A ROTATING HOOP ================= -->
+    <div class="panel" id="panel-bead-on-rotating-hoop">
+      <h2>Bead on a Rotating Hoop</h2>
+      <p class="explainer"><strong>Make a prediction first:</strong> a bead sits at the bottom of a circular hoop that's free to rotate about a vertical diameter. As you spin the hoop faster and faster, does the bead just stay put at the bottom the whole time?</p>
+      <div class="surprise-box"><h4>The surprise</h4><p>As hoop rotation increases past a critical speed, the stable equilibrium position of the bead splits into two new positions away from the bottom — a textbook example of a bifurcation.</p></div>
+      <p class="explainer">Critical rotation speed: <var>Ω</var><sub>c</sub> = √(<var>g/R</var>) &nbsp;&nbsp;·&nbsp;&nbsp; new equilibria (for <var>Ω</var> &gt; <var>Ω</var><sub>c</sub>): cos<var>θ</var> = <var>g</var>/(<var>Ω²R</var>)</p>
+      <div class="var-list">
+        <div><var>R</var> — hoop radius; <var>Ω</var> — the hoop's rotation rate about the vertical axis</div>
+        <div><var>θ</var> — the bead's angle away from the bottom of the hoop</div>
+      </div>
+      <h3 class="subhead">Widget — Equilibrium Bifurcation</h3>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 500 200" id="hoopSvg">
+            <circle cx="90" cy="100" r="70" fill="none" stroke="var(--gridline)" stroke-width="2"></circle>
+            <circle id="hoopBead" cx="90" cy="170" r="7" fill="#2a78d6" stroke="white" stroke-width="1.5"></circle>
+            <circle id="hoopBead2" cx="90" cy="170" r="7" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <line x1="260" y1="70" x2="480" y2="70" class="svg-axis"></line>
+            <path id="hoopBifPath1" fill="none" stroke="#2a78d6" stroke-width="2"></path>
+            <path id="hoopBifPath2" fill="none" stroke="#eb6834" stroke-width="2"></path>
+            <circle id="hoopBifMarker" cx="260" cy="70" r="5" fill="var(--text-primary)"></circle>
+            <text x="270" y="18" class="svg-label">equilibrium angle vs. Ω (bifurcation diagram)</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Rotation rate, Ω</span><b id="hoopOmegaVal">1.0 rad/s</b></div>
+              <input type="range" id="hoopOmegaSlider" min="1" max="50" step="1" value="10"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Critical rate, <var>Ω</var><sub>c</sub> = √(<var>g/R</var>)</td><td class="v" id="hoopOmegaCVal">—</td></tr>
+            </table>
+            <p id="hoopEqVal">—</p>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the effective-potential picture</summary>
+        <p class="explainer">In the rotating frame, the bead behaves as if moving in an effective potential <var>V</var><sub>eff</sub>(<var>θ</var>) that combines real gravity with the centrifugal term: <var>V</var><sub>eff</sub> ∝ −cos<var>θ</var> − (<var>Ω</var>²<var>R</var>/2<var>g</var>)sin²<var>θ</var>. For small <var>Ω</var>, this potential has a single minimum at <var>θ</var>=0. Past <var>Ω</var><sub>c</sub>, that minimum turns into a local maximum (unstable), and two new minima appear symmetrically — a pitchfork bifurcation, the same mathematical structure that shows up across many branches of physics wherever a symmetric equilibrium loses stability as a parameter is increased.</p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/unintuitive.js"></script>
 </body>
 </html>

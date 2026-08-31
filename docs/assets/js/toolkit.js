@@ -433,10 +433,12 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initTabs();
-    initScaling();
-    initVectors();
-    initCoordinates();
-    initFrames();
-    initFBD();
+    if (document.body.dataset.section === "00-toolkit") {
+      initScaling();
+      initVectors();
+      initCoordinates();
+      initFrames();
+      initFBD();
+    }
   });
 })();

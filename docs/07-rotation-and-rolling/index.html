@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>7. Rotational Mechanics and Rolling — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/rotation.css">
 </head>
 <body data-section="07-rotation-and-rolling">
 <div class="wrap">
@@ -12,12 +15,766 @@
     <div class="titles">
       <p class="crumbs"><a href="../index.html">Exploring Mechanics</a> / 7. Rotation and Rolling</p>
       <h1>7. Rotational Mechanics and Rolling</h1>
+      <p class="sub">Every straight-line idea from Kinematics and Newton's Laws has a rotational twin — this section is that translation, one concept at a time.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="angular-kinematics">Angular Kinematics</button>
+    <button data-target="torque">Torque</button>
+    <button data-target="moment-of-inertia">Moment of Inertia</button>
+    <button data-target="rotational-energy">Rotational Energy</button>
+    <button data-target="rolling-motion">Rolling Without Slipping</button>
+    <button data-target="angular-momentum">Angular Momentum and Gyroscopes</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= ANGULAR KINEMATICS (full) ================= -->
+    <div class="panel active" id="panel-angular-kinematics">
+      <h2>Angular Kinematics</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a spinning fan blade has
+        every part turning at the exact same angular speed. Does a point
+        near the tip move through space faster, slower, or at the same
+        speed as a point near the hub?
+      </p>
+
+      <p class="explainer"><var>v</var> = <var>rω</var> &nbsp;&nbsp;·&nbsp;&nbsp; ω = <var>Δθ/Δt</var> &nbsp;&nbsp;·&nbsp;&nbsp; α = <var>Δω/Δt</var></p>
+
+      <div class="var-list">
+        <div><var>θ</var> — angular position (radians); <var>ω</var> — angular velocity; <var>α</var> — angular acceleration</div>
+        <div><var>r</var> — distance from the rotation axis; <var>v</var> — tangential (straight-line) speed at that radius</div>
+      </div>
+
+      <p class="explainer">
+        Every point on a spinning rigid body shares the exact same
+        <var>ω</var> — that's what "rigid" and "spinning together" mean.
+        But tangential speed <var>v</var> = <var>rω</var> depends on
+        <var>r</var> too, so a point farther from the axis sweeps through
+        more actual distance per second, moving faster in the ordinary
+        sense, even while turning at the identical angular rate.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: the full linear-to-angular translation table</summary>
+        <p class="explainer">
+          Every linear kinematics equation from Section 1 has a rotational
+          twin, symbol for symbol: <var>x</var> → <var>θ</var>,
+          <var>v</var> → <var>ω</var>, <var>a</var> → <var>α</var>. So
+          <var>v</var> = <var>u</var> + <var>at</var> becomes
+          <var>ω</var> = <var>ω₀</var> + <var>αt</var>, and
+          <var>s</var> = <var>ut</var> + ½<var>at²</var> becomes
+          <var>θ</var> = <var>θ₀</var> + <var>ω₀t</var> + ½<var>αt²</var>.
+          Nothing new needs deriving — the mathematics is identical, only
+          the physical meaning of each symbol has changed.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Rotating Disk: Same ω, Different v</h3>
+      <p class="explainer">
+        Drag any marker to a new radius, or spin the disk faster — every
+        marker always shares the same angular speed, but their tangential
+        speed readouts (and the length of their velocity arrows) scale
+        directly with how far out they sit.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 300" id="diskSvg">
+            <circle cx="150" cy="150" r="120" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></circle>
+            <circle cx="150" cy="150" r="4" fill="var(--text-primary)"></circle>
+            <g id="diskMarkerA"><circle r="9" fill="#2a78d6" stroke="white" stroke-width="2"></circle><line stroke="#2a78d6" stroke-width="2.5" marker-end="url(#diskHeadBlue)"></line></g>
+            <g id="diskMarkerB"><circle r="9" fill="#eb6834" stroke="white" stroke-width="2"></circle><line stroke="#eb6834" stroke-width="2.5" marker-end="url(#diskHeadOrange)"></line></g>
+            <defs>
+              <marker id="diskHeadBlue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker>
+              <marker id="diskHeadOrange" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#eb6834"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Angular speed, ω</span><b id="diskWVal">2.0 rad/s</b></div>
+              <input type="range" id="diskWSlider" min="0" max="6" step="0.2" value="2.0"></div>
+            <div class="row"><div class="row-head"><span>Blue marker radius, r<sub>A</sub></span><b id="diskRAVal">0.4</b></div>
+              <input type="range" id="diskRASlider" min="0.1" max="1" step="0.05" value="0.4"></div>
+            <div class="row"><div class="row-head"><span>Orange marker radius, r<sub>B</sub></span><b id="diskRBVal">0.9</b></div>
+              <input type="range" id="diskRBSlider" min="0.1" max="1" step="0.05" value="0.9"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Blue tangential speed, <var>r<sub>A</sub>ω</var></td><td class="v" id="diskVAVal">0.80 (units)</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Orange tangential speed, <var>r<sub>B</sub>ω</var></td><td class="v" id="diskVBVal">1.80 (units)</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Angular Motion Graph Lab</h3>
+      <p class="explainer">
+        Set an initial spin and an angular acceleration and watch the
+        θ–<var>t</var>, ω–<var>t</var>, and α–<var>t</var> graphs trace out —
+        exactly the same shapes as the linear motion graphs from Section 1,
+        just relabeled.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 140 140" id="amDiskSvg">
+            <circle cx="70" cy="70" r="55" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></circle>
+            <line id="amSpoke" x1="70" y1="70" x2="70" y2="15" stroke="var(--text-primary)" stroke-width="3"></line>
+          </svg>
+          <p class="pane-label">Angular position, θ(t)</p>
+          <svg viewBox="0 0 500 110" id="amThetaSvg">
+            <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
+            <path id="amThetaPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+          </svg>
+          <p class="pane-label">Angular velocity, ω(t)</p>
+          <svg viewBox="0 0 500 90" id="amOmegaSvg">
+            <line x1="40" y1="45" x2="480" y2="45" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="80" class="svg-axis"></line>
+            <line id="amOmegaLine" x1="40" y1="45" x2="40" y2="45" stroke="#1baf7a" stroke-width="2.5"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial angular velocity, ω₀</span><b id="amW0Val">1.0 rad/s</b></div>
+              <input type="range" id="amW0Slider" min="-3" max="3" step="0.5" value="1.0"></div>
+            <div class="row"><div class="row-head"><span>Angular acceleration, α</span><b id="amAVal">0.5 rad/s²</b></div>
+              <input type="range" id="amASlider" min="-2" max="2" step="0.1" value="0.5"></div>
+            <button class="action" id="amPlayBtn">▶ Play</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Elapsed time, t</td><td class="v" id="amTVal">0.0 s</td></tr>
+              <tr><td class="k">Angular position, θ</td><td class="v" id="amThetaVal">0.00 rad</td></tr>
+              <tr><td class="k">Angular velocity, ω</td><td class="v" id="amWVal">1.00 rad/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: bicycle wheel reflectors</h4>
+        <ol>
+          <li>Watch a bicycle wheel with reflectors near the hub and near
+            the rim while riding past at night, or film one spinning — the
+            rim reflector visibly blurs into a streak far more than the hub
+            one, exactly matching <var>v</var> = <var>rω</var>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= TORQUE (stub) ================= -->
+    <div class="panel" id="panel-torque">
+      <h2>Torque</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you push a heavy door
+        with the exact same force, first right next to the hinge, then out
+        at the handle, then finally at the handle but pushing at a shallow
+        angle instead of straight-on. Do all three pushes turn the door
+        equally well?
+      </p>
+
+      <p class="explainer"><var>τ</var> = <var>Fr</var>sinθ</p>
+
+      <div class="var-list">
+        <div><var>τ</var> — torque, the turning effect of a force about a pivot</div>
+        <div><var>F</var> — the applied force; <var>r</var> — distance from the pivot to where it's applied</div>
+        <div><var>θ</var> — the angle between the force and the lever arm (the line from pivot to push point)</div>
+      </div>
+
+      <p class="explainer">
+        Force alone doesn't determine how well something turns — <em>where</em>
+        and <em>at what angle</em> you push matters just as much. Pushing
+        right at the hinge (small <var>r</var>) barely turns the door no
+        matter how hard you push; pushing at a shallow angle (small
+        sinθ) wastes most of the force on a component that just presses
+        along the door instead of turning it.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Door Push Explorer</h3>
+      <p class="explainer">
+        Move the push point and rotate the push angle. The torque readout
+        (and the door's swing speed) responds to both independently — try
+        finding a spot and angle that produces exactly zero torque despite
+        a nonzero force.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="doorSvg">
+            <line x1="30" y1="20" x2="30" y2="200" stroke="var(--text-primary)" stroke-width="6"></line>
+            <g id="doorGroup">
+              <line x1="30" y1="110" x2="270" y2="110" stroke="#8a5a2b" stroke-width="10" stroke-linecap="round"></line>
+              <circle id="doorPushPoint" cx="220" cy="110" r="8" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            </g>
+            <line id="doorForceArrow" stroke="#e34948" stroke-width="3" marker-end="url(#doorHead)"></line>
+            <defs><marker id="doorHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push force, F</span><b id="doorFVal">40 N</b></div>
+              <input type="range" id="doorFSlider" min="5" max="100" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Push angle from the door, θ</span><b id="doorThetaVal">90°</b></div>
+              <input type="range" id="doorThetaSlider" min="0" max="180" step="5" value="90"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Distance from hinge, r (drag the blue dot)</td><td class="v" id="doorRVal">1.90 m</td></tr>
+              <tr><td class="k">Torque, <var>Fr</var>sinθ</td><td class="v" id="doorTauVal">76.0 N·m</td></tr>
+              <tr><td class="k">Effect</td><td class="v" id="doorEffectVal">Swings open</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: torque as a cross product</summary>
+        <p class="explainer">
+          <var>τ</var> = <var>Fr</var>sinθ is the magnitude of the vector
+          cross product <var>τ</var>⃗ = <var>r</var>⃗ × <var>F</var>⃗ — the
+          sinθ factor is exactly what makes a force pointed directly along
+          the lever arm (θ = 0° or 180°) produce zero torque no matter how
+          large <var>F</var> is, since that force has no component actually
+          perpendicular to the arm to do any turning.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Balanced Torques Are Not the Same as Balanced Forces</h3>
+      <p class="explainer">
+        Two equal, opposite forces at different points on a beam can
+        balance in torque (no net spin) while the beam still accelerates
+        sideways — or balance in force while still spinning faster and
+        faster. They're two separate conditions, and satisfying one says
+        nothing about the other.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 100" id="torqueBalanceSvg">
+            <line x1="20" y1="50" x2="280" y2="50" stroke="#8a5a2b" stroke-width="10" stroke-linecap="round"></line>
+            <line id="tbF1Arrow" stroke="#2a78d6" stroke-width="3" marker-end="url(#tbHead1)"></line>
+            <line id="tbF2Arrow" stroke="#eb6834" stroke-width="3" marker-end="url(#tbHead2)"></line>
+            <defs>
+              <marker id="tbHead1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker>
+              <marker id="tbHead2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#eb6834"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Force 1, at the left end (up/down)</span><b id="tbF1Val">20 N</b></div>
+              <input type="range" id="tbF1Slider" min="-50" max="50" step="5" value="20"></div>
+            <div class="row"><div class="row-head"><span>Force 2, at the right end (up/down)</span><b id="tbF2Val">-20 N</b></div>
+              <input type="range" id="tbF2Slider" min="-50" max="50" step="5" value="-20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Net force (should be 0 for translational equilibrium)</td><td class="v" id="tbNetFVal">0 N</td></tr>
+              <tr><td class="k">Net torque about the center (should be 0 for rotational equilibrium)</td><td class="v" id="tbNetTVal">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="tbVerdictVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: this pair is a pure "couple"</summary>
+        <p class="explainer">
+          Two equal, opposite, parallel forces acting at different points —
+          set both sliders to opposite equal values — form what's called a
+          "couple": net force is always exactly zero (nothing accelerates
+          the beam's center of mass anywhere), yet the net torque is
+          <em>not</em> zero, so the beam spins in place, faster and faster,
+          around its own center forever. It's the cleanest possible
+          illustration that force balance and torque balance are
+          independent bookkeeping.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= MOMENT OF INERTIA (stub) ================= -->
+    <div class="panel" id="panel-moment-of-inertia">
+      <h2>Moment of Inertia</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a hoop and a solid disk,
+        made of the same material with the same total mass and the same
+        radius, race down the same ramp. Do they tie?
+      </p>
+
+      <p class="explainer"><var>I</var> = <var>Σm<sub>i</sub>r<sub>i</sub>²</var> &nbsp;(sums up every bit of mass, weighted by how far it sits from the axis)</p>
+
+      <div class="var-list">
+        <div><var>I</var> — moment of inertia: rotational inertia, the rotational analogue of mass</div>
+        <div><var>m<sub>i</sub></var>, <var>r<sub>i</sub></var> — the mass of a tiny piece of the object and its distance from the rotation axis</div>
+      </div>
+
+      <p class="explainer">
+        Unlike ordinary mass, <var>I</var> depends on <em>how that mass is
+        arranged</em>, not just how much there is. A hoop puts every bit of
+        its mass out at the rim (all of it far from the axis); a solid disk
+        spreads mass all the way from the center out to the rim. Same total
+        mass, same radius, very different <var>I</var> — which is why they
+        won't tie down that ramp (the full race is in the next tabs).
+      </p>
+
+      <h3 class="subhead">Widget 1 — Shape-and-Inertia Explorer</h3>
+      <p class="explainer">
+        Same mass, same radius, four different shapes. Watch how
+        differently "hard to spin up" each one is.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 100 140" id="shapeBarSvg">
+            <line x1="10" y1="120" x2="90" y2="120" class="svg-axis"></line>
+            <rect id="shapeBarHoop" x="8" y="120" width="14" height="0" fill="#2a78d6"></rect>
+            <rect id="shapeBarDisk" x="30" y="120" width="14" height="0" fill="#eb6834"></rect>
+            <rect id="shapeBarSphere" x="52" y="120" width="14" height="0" fill="#1baf7a"></rect>
+            <rect id="shapeBarRod" x="74" y="120" width="14" height="0" fill="#e34948"></rect>
+            <text x="15" y="132" class="svg-label" text-anchor="middle" font-size="6">hoop</text>
+            <text x="37" y="132" class="svg-label" text-anchor="middle" font-size="6">disk</text>
+            <text x="59" y="132" class="svg-label" text-anchor="middle" font-size="6">sphere</text>
+            <text x="81" y="132" class="svg-label" text-anchor="middle" font-size="6">rod</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="shapeMVal">2 kg</b></div>
+              <input type="range" id="shapeMSlider" min="0.5" max="10" step="0.5" value="2"></div>
+            <div class="row"><div class="row-head"><span>Radius (or half-length for the rod), r</span><b id="shapeRVal">0.3 m</b></div>
+              <input type="range" id="shapeRSlider" min="0.1" max="1" step="0.05" value="0.3"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Hoop, <var>I</var> = <var>mr²</var></td><td class="v" id="shapeIHoopVal">0.180 kg·m²</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Disk, <var>I</var> = ½<var>mr²</var></td><td class="v" id="shapeIDiskVal">0.090 kg·m²</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Solid sphere, <var>I</var> = ⅖<var>mr²</var></td><td class="v" id="shapeISphereVal">0.072 kg·m²</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#e34948"></span>Rod about its center, <var>I</var> = <var>mr²/3</var></td><td class="v" id="shapeIRodVal">0.060 kg·m²</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the hoop always wins (has the largest I)</summary>
+        <p class="explainer">
+          Every one of these formulas has the form <var>I</var> = <var>kmr²</var>
+          for some shape-dependent fraction <var>k</var> ≤ 1. The hoop has
+          <var>k</var> = 1 — the theoretical maximum — because literally all
+          of its mass sits at the full radius <var>r</var>. Every other
+          shape has some mass closer to the axis than <var>r</var>, which
+          can only pull the average <var>r²</var> (and so <var>k</var>) down,
+          never up.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — The Spinning Chair: Changing I on Purpose</h3>
+      <p class="explainer">
+        A person on a spinning stool pulls their arms in. Their mass hasn't
+        changed, but pulling it closer to the spin axis shrinks <var>I</var> —
+        and (as the next tab on angular momentum shows) their spin rate has
+        to jump to compensate.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 140" id="chairSvg">
+            <circle cx="100" cy="70" r="10" fill="var(--text-primary)"></circle>
+            <line id="chairArmLeft" x1="100" y1="70" x2="30" y2="70" stroke="#2a78d6" stroke-width="4" stroke-linecap="round"></line>
+            <line id="chairArmRight" x1="100" y1="70" x2="170" y2="70" stroke="#2a78d6" stroke-width="4" stroke-linecap="round"></line>
+            <circle id="chairHandLeft" cx="30" cy="70" r="6" fill="#2a78d6"></circle>
+            <circle id="chairHandRight" cx="170" cy="70" r="6" fill="#2a78d6"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Body's own moment of inertia (torso, fixed)</span><b id="chairIBodyVal">2.0 kg·m²</b></div>
+              <input type="range" id="chairIBodySlider" min="0.5" max="5" step="0.1" value="2.0"></div>
+            <div class="row"><div class="row-head"><span>Hand mass (each hand)</span><b id="chairHandMVal">3 kg</b></div>
+              <input type="range" id="chairHandMSlider" min="1" max="8" step="0.5" value="3"></div>
+            <label class="checkbox"><input type="checkbox" id="chairArmsIn"> Arms pulled in</label>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Hand distance from axis</td><td class="v" id="chairRVal">0.70 m</td></tr>
+              <tr><td class="k">Total moment of inertia, <var>I</var></td><td class="v" id="chairITotalVal">4.94 kg·m²</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: office-chair spin</h4>
+        <ol>
+          <li>Sit in a rotating office chair, get someone to spin you gently
+            with your arms out, then pull your arms in tight — you should
+            feel yourself speed up noticeably, matching this widget's
+            <var>I</var> drop.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= ROTATIONAL ENERGY (stub) ================= -->
+    <div class="panel" id="panel-rotational-energy">
+      <h2>Rotational Energy</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a solid sphere and a hoop,
+        same mass and radius, are released from rest at the top of the same
+        ramp and roll (without slipping) to the bottom. Do they arrive at
+        the same speed?
+      </p>
+
+      <p class="explainer"><var>KE<sub>rot</sub></var> = ½<var>Iω²</var> &nbsp;&nbsp;·&nbsp;&nbsp; Rolling object's total KE = ½<var>mv²</var> + ½<var>Iω²</var></p>
+
+      <div class="var-list">
+        <div><var>KE<sub>rot</sub></var> — rotational kinetic energy, stored in spinning motion alone</div>
+        <div><var>I</var> — moment of inertia; <var>ω</var> — angular speed</div>
+        <div>A rolling object has <em>both</em> translational KE (½<var>mv²</var>) and rotational KE (½<var>Iω²</var>) at once</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Flywheel Energy Storage</h3>
+      <p class="explainer">
+        A flywheel is a purely rotational battery: no chemistry, just spin.
+        Some buses and trains genuinely use flywheels to store braking
+        energy and give it back on acceleration.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 140 140" id="flywheelSvg">
+            <circle cx="70" cy="70" r="55" fill="var(--chip)" stroke="var(--border)" stroke-width="6"></circle>
+            <line id="flywheelSpoke" x1="70" y1="70" x2="70" y2="15" stroke="var(--text-primary)" stroke-width="3"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Moment of inertia, I</span><b id="flyIVal">4 kg·m²</b></div>
+              <input type="range" id="flyISlider" min="0.5" max="20" step="0.5" value="4"></div>
+            <div class="row"><div class="row-head"><span>Spin rate, ω</span><b id="flyWVal">100 rad/s</b></div>
+              <input type="range" id="flyWSlider" min="10" max="300" step="10" value="100"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Stored rotational energy, ½<var>Iω²</var></td><td class="v" id="flyKEVal">20000 J</td></tr>
+              <tr><td class="k">Equivalent: a car this heavy at this speed</td><td class="v" id="flyCarVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why ½Iω² is the rotational twin of ½mv²</summary>
+        <p class="explainer">
+          Split a spinning object into tiny mass pieces <var>m<sub>i</sub></var>,
+          each moving at its own tangential speed <var>v<sub>i</sub></var> = <var>r<sub>i</sub>ω</var>.
+          Total kinetic energy is <var>Σ½m<sub>i</sub>v<sub>i</sub>²</var> = <var>Σ½m<sub>i</sub>r<sub>i</sub>²ω²</var> = ½ω²<var>Σm<sub>i</sub>r<sub>i</sub>²</var> = ½<var>Iω²</var>,
+          using the moment-of-inertia definition directly. It's not a new
+          law — it's ordinary <var>KE</var> = ½<var>mv²</var>, added up
+          piece by piece around the object.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Rolling-Race Predictor</h3>
+      <p class="explainer">
+        Release different shapes from the same height and let energy
+        conservation (now split between translation <em>and</em> rotation)
+        predict the finishing order before you ever build the ramp.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:560px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp height, h</span><b id="raceHVal">1.5 m</b></div>
+              <input type="range" id="raceHSlider" min="0.3" max="4" step="0.1" value="1.5"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">🥇 Solid sphere, <var>v</var> = √(10<var>gh</var>/7)</td><td class="v" id="raceSphereVal">—</td></tr>
+              <tr><td class="k">🥈 Solid disk/cylinder, <var>v</var> = √(4<var>gh</var>/3)</td><td class="v" id="raceDiskVal">—</td></tr>
+              <tr><td class="k">🥉 Hoop/thin ring, <var>v</var> = √(<var>gh</var>)</td><td class="v" id="raceHoopVal">—</td></tr>
+              <tr><td class="k">Frictionless sliding block, for comparison, <var>v</var> = √(2<var>gh</var>)</td><td class="v" id="raceBlockVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving the sphere's √(10gh/7)</summary>
+        <p class="explainer">
+          Energy conservation: <var>mgh</var> = ½<var>mv²</var> + ½<var>Iω²</var>.
+          For rolling without slipping, <var>ω</var> = <var>v/r</var>, and
+          for a solid sphere <var>I</var> = (2/5)<var>mr²</var>. Substituting:
+          <var>mgh</var> = ½<var>mv²</var> + ½(2/5)<var>mr²</var>(<var>v/r</var>)² = ½<var>mv²</var>(1 + 2/5) = (7/10)<var>mv²</var>.
+          Solving for <var>v</var> gives √(10<var>gh</var>/7) — mass and
+          radius both cancel completely, so the result only depends on
+          shape (through that 2/5), never on size or weight.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= ROLLING WITHOUT SLIPPING (stub) ================= -->
+    <div class="panel" id="panel-rolling-motion">
+      <h2>Rolling Without Slipping</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a bowling ball is thrown
+        down the lane sliding, with almost no spin at all. Does it slide
+        all the way to the pins, or does something change partway down?
+      </p>
+
+      <p class="explainer">Rolling condition (no slipping): <var>v</var> = <var>rω</var></p>
+
+      <div class="var-list">
+        <div><var>v</var> — the center's translational speed; <var>ω</var> — angular speed; <var>r</var> — radius</div>
+        <div>Static friction — enforces the rolling condition; it does zero work and costs zero energy while rolling continues without slipping</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — The Rolling Race, Animated</h3>
+      <p class="explainer">
+        Now watch the Rotational Energy tab's prediction actually play out —
+        same height, same ramp, released together.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 400 200" id="raceSimSvg">
+            <path id="raceRampFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <circle id="raceSphereBall" r="11" fill="#1baf7a" stroke="white" stroke-width="2"></circle>
+            <circle id="raceDiskBall" r="11" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <circle id="raceHoopBall" r="11" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp angle, θ</span><b id="raceSimThetaVal">20°</b></div>
+              <input type="range" id="raceSimThetaSlider" min="5" max="45" step="1" value="20"></div>
+            <button class="action" id="raceSimGoBtn">▶ Release all three</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Sphere finish time</td><td class="v" id="raceSimSphereVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Disk finish time</td><td class="v" id="raceSimDiskVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Hoop finish time</td><td class="v" id="raceSimHoopVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Yo-Yo / Spool Model</h3>
+      <p class="explainer">
+        A falling yo-yo is "rolling without slipping" along its own string —
+        the string's contact point on the axle can't slip, which slows the
+        fall dramatically compared to a plain dropped weight.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 120 220" id="yoyoSvg">
+            <line x1="60" y1="10" x2="60" y2="200" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+            <line id="yoyoString" x1="60" y1="10" x2="60" y2="60" stroke="var(--muted)" stroke-width="2"></line>
+            <circle id="yoyoBody" cx="60" cy="60" r="22" fill="var(--chip)" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <circle cx="60" cy="60" r="4" fill="var(--text-primary)"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Outer radius, R</span><b id="yoyoRVal">0.03 m</b></div>
+              <input type="range" id="yoyoRSlider" min="0.01" max="0.06" step="0.005" value="0.03"></div>
+            <div class="row"><div class="row-head"><span>Axle (string) radius, r</span><b id="yoyoAxleVal">0.005 m</b></div>
+              <input type="range" id="yoyoAxleSlider" min="0.002" max="0.02" step="0.001" value="0.005"></div>
+            <button class="action" id="yoyoGoBtn">▶ Drop</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Fall acceleration, <var>g/(1+I/mr²)</var></td><td class="v" id="yoyoAVal">0.11 m/s²</td></tr>
+              <tr><td class="k">Compare to free fall</td><td class="v" id="yoyoCompareVal">86× slower</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the thin axle matters so much</summary>
+        <p class="explainer">
+          Treating the yo-yo as a uniform disk, <var>I</var> = ½<var>mR²</var>,
+          so the fall acceleration is <var>g</var>/(1 + <var>R²</var>/2<var>r²</var>).
+          Because the axle radius <var>r</var> is so much smaller than the
+          body radius <var>R</var>, that ratio <var>R²/r²</var> is huge,
+          making the whole denominator huge and the fall dramatically
+          slower than free fall — exactly why yo-yos hang and spin for a
+          satisfying few seconds instead of just dropping.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Bowling Ball: From Sliding to Rolling</h3>
+      <p class="explainer">
+        Answering the prediction: friction between the ball and the lane
+        keeps decelerating its slide and speeding up its spin until
+        <var>v</var> = <var>rω</var> is finally satisfied — at which point
+        the ball switches to true rolling and friction's job is done.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:560px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial slide speed, v₀</span><b id="bowlV0Val">8 m/s</b></div>
+              <input type="range" id="bowlV0Slider" min="2" max="15" step="0.5" value="8"></div>
+            <div class="row"><div class="row-head"><span>Initial spin (0 = pure slide)</span><b id="bowlW0Val">0 rad/s</b></div>
+              <input type="range" id="bowlW0Slider" min="0" max="40" step="2" value="0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Final true-rolling speed, (5/7)<var>v₀</var> + (2/7)<var>rω₀</var></td><td class="v" id="bowlVfVal">5.71 m/s</td></tr>
+              <tr><td class="k">Speed lost to friction while skidding</td><td class="v" id="bowlLostVal">2.29 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why angular momentum about the contact point is conserved</summary>
+        <p class="explainer">
+          Friction acts exactly at the contact point, so it exerts zero
+          torque about that specific point (zero lever arm) — meaning
+          angular momentum measured about the contact point stays constant
+          throughout the skid, even though the ball's linear momentum and
+          spin are each changing. Setting initial and final angular
+          momentum about that point equal, then imposing the final rolling
+          condition <var>v<sub>f</sub></var> = <var>rω<sub>f</sub></var>,
+          gives the (5/7)<var>v₀</var> + (2/7)<var>rω₀</var> formula
+          directly for a solid sphere.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= ANGULAR MOMENTUM AND GYROSCOPES (stub) ================= -->
+    <div class="panel" id="panel-angular-momentum">
+      <h2>Angular Momentum and Gyroscopes</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a spinning bicycle wheel
+        is held by its axle by someone sitting on a stool that spins
+        freely. They flip the wheel upside down. Does anything happen to
+        <em>them</em>, even though they never touched the stool?
+      </p>
+
+      <p class="explainer"><var>L</var> = <var>Iω</var> &nbsp;(conserved whenever no external torque acts)</p>
+
+      <div class="var-list">
+        <div><var>L</var> — angular momentum</div>
+        <div><var>I</var> — moment of inertia; <var>ω</var> — angular velocity (both are direction-sensitive here)</div>
+        <div>Precession — the slow sideways sweep of a spin axis under torque, instead of simply toppling</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Figure Skater: Finishing the Conservation Law</h3>
+      <p class="explainer">
+        Section 7's Moment of Inertia tab showed <var>I</var> dropping when
+        arms pull in. Here's the payoff: <var>L</var> = <var>Iω</var> has to
+        stay fixed with no external torque, so if <var>I</var> drops,
+        <var>ω</var> <em>must</em> climb to compensate — exactly, not
+        approximately.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 140" id="skaterSvg">
+            <circle cx="100" cy="70" r="10" fill="var(--text-primary)"></circle>
+            <line id="skaterArmLeft" x1="100" y1="70" x2="30" y2="70" stroke="#2a78d6" stroke-width="4" stroke-linecap="round"></line>
+            <line id="skaterArmRight" x1="100" y1="70" x2="170" y2="70" stroke="#2a78d6" stroke-width="4" stroke-linecap="round"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Body's own I (fixed)</span><b id="skaterIBodyVal">2.0 kg·m²</b></div>
+              <input type="range" id="skaterIBodySlider" min="0.5" max="5" step="0.1" value="2.0"></div>
+            <div class="row"><div class="row-head"><span>Arm mass (each)</span><b id="skaterHandMVal">3 kg</b></div>
+              <input type="range" id="skaterHandMSlider" min="1" max="8" step="0.5" value="3"></div>
+            <div class="row"><div class="row-head"><span>Starting spin, arms out</span><b id="skaterW0Val">2.0 rad/s</b></div>
+              <input type="range" id="skaterW0Slider" min="0.5" max="5" step="0.1" value="2.0"></div>
+            <button class="action" id="skaterPullBtn">🤸 Pull arms in</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">I with arms out / in</td><td class="v" id="skaterIVal">4.94 / 2.14 kg·m²</td></tr>
+              <tr><td class="k">Angular momentum, L (constant)</td><td class="v" id="skaterLVal">9.87 kg·m²/s</td></tr>
+              <tr><td class="k">Spin rate with arms in</td><td class="v" id="skaterWInVal">4.62 rad/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: this is the rotational twin of momentum conservation</summary>
+        <p class="explainer">
+          Just like linear momentum <var>p</var> = <var>mv</var> stays fixed
+          with no external force, angular momentum <var>L</var> = <var>Iω</var>
+          stays fixed with no external torque. Pulling arms in doesn't apply
+          any external torque about the spin axis (the pulling force acts
+          along a line through that axis), so <var>L</var> before and after
+          must match exactly: <var>I</var><sub>out</sub><var>ω</var><sub>out</sub> = <var>I</var><sub>in</sub><var>ω</var><sub>in</sub>.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — The Bicycle-Wheel Reaction</h3>
+      <p class="explainer">
+        Answering the prediction: yes — flipping the wheel reverses its
+        angular momentum vector. Since nothing external is touching the
+        stool+person+wheel system, <em>they</em> must start spinning to
+        keep the system's total angular momentum unchanged.
+      </p>
+      <div class="widget">
+        <div class="widget-side" style="max-width:560px">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Wheel's angular momentum, L<sub>wheel</sub></span><b id="bikeWheelLVal">3.0 kg·m²/s</b></div>
+              <input type="range" id="bikeWheelLSlider" min="0.5" max="10" step="0.5" value="3.0"></div>
+            <div class="row"><div class="row-head"><span>Person + stool moment of inertia, I<sub>person</sub></span><b id="bikeWheelIVal">4.0 kg·m²</b></div>
+              <input type="range" id="bikeWheelISlider" min="1" max="15" step="0.5" value="4.0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Change in the wheel's L when flipped, 2<var>L</var><sub>wheel</sub></td><td class="v" id="bikeWheelDLVal">6.0 kg·m²/s</td></tr>
+              <tr><td class="k">Resulting person+stool spin rate</td><td class="v" id="bikeWheelWVal">1.50 rad/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Gyroscopic Precession</h3>
+      <p class="explainer">
+        A fast-spinning top under gravity doesn't fall over — its spin axis
+        instead sweeps slowly around in a circle. Torque changes the
+        <em>direction</em> of angular momentum here, not just its size, and
+        the two vectors being perpendicular is exactly what turns "falling"
+        into "precessing."
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 200" id="gyroSvg">
+            <circle cx="100" cy="100" r="70" fill="none" stroke="var(--gridline)" stroke-width="1.5"></circle>
+            <line id="gyroAxis" x1="100" y1="100" x2="100" y2="30" stroke="var(--text-primary)" stroke-width="3"></line>
+            <circle id="gyroTip" cx="100" cy="30" r="6" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Spin angular momentum, L</span><b id="gyroLVal">5.0 kg·m²/s</b></div>
+              <input type="range" id="gyroLSlider" min="1" max="15" step="0.5" value="5.0"></div>
+            <div class="row"><div class="row-head"><span>Tipping torque (from gravity), τ</span><b id="gyroTauVal">2.0 N·m</b></div>
+              <input type="range" id="gyroTauSlider" min="0.2" max="6" step="0.2" value="2.0"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Precession rate, Ω = <var>τ/L</var></td><td class="v" id="gyroOmegaVal">0.40 rad/s</td></tr>
+              <tr><td class="k">What happens</td><td class="v" id="gyroEffectVal">Slow, steady precession</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why faster spin means slower, steadier precession</summary>
+        <p class="explainer">
+          Precession rate Ω = <var>τ/L</var> — for a <em>fixed</em> tipping
+          torque, a larger spin angular momentum <var>L</var> gives a
+          <em>smaller</em> Ω. That's why a fast top precesses slowly and
+          looks almost stationary, while a nearly-stopped top wobbles
+          wildly right before it topples — as <var>L</var> shrinks toward
+          zero, precession rate blows up, and the simple "torque only
+          changes direction" picture breaks down entirely.
+        </p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/rotation.js"></script>
 </body>
 </html>

@@ -1,0 +1,7 @@
+/* Section-specific additions for 02-newtons-laws, layered on top of
+   toolkit.css and kinematics.css's shared widget primitives
+   (.widget/.controls/.readout/.var-list/.try-at-home/.subhead/etc). */
+
+.impact-flash {
+  transition: opacity 0.15s ease;
+}

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2. Newton's Laws and Forces — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/newtons-laws.css">
 </head>
 <body data-section="02-newtons-laws">
 <div class="wrap">
@@ -15,10 +18,1246 @@
       <p class="sub">This section explains why motion changes.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="inertia">Newton's First Law: Inertia</button>
+    <button data-target="newtons-second-law">Newton's Second Law</button>
+    <button data-target="newtons-third-law">Newton's Third Law</button>
+    <button data-target="friction">Friction</button>
+    <button data-target="inclined-planes">Inclined Planes</button>
+    <button data-target="tension-and-connected-objects">Tension and Connected Objects</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= NEWTON'S FIRST LAW: INERTIA (full) ================= -->
+    <div class="panel active" id="panel-inertia">
+      <h2>Newton's First Law: Inertia</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a magician yanks a
+        tablecloth out from under a full table setting, and the plates barely
+        move. A driver slams the brakes, and an unbelted passenger keeps
+        sliding forward even though the car has already stopped. What do
+        these two tricks have in common? Both are Newton's First Law doing
+        exactly what it says: <em>an object keeps doing whatever it was
+        already doing — staying still, or moving at constant velocity —
+        until a net force makes it do otherwise.</em>
+      </p>
+
+      <p class="explainer">
+        <var>ΣF</var> = 0 &nbsp;⟹&nbsp; <var>a</var> = 0 &nbsp;⟹&nbsp; constant velocity (including velocity = 0, i.e. staying at rest)
+      </p>
+
+      <div class="var-list">
+        <div><var>ΣF</var> — net (total, vector-summed) force acting on an object</div>
+        <div><var>a</var> — acceleration</div>
+        <div><var>m</var> — mass, the object's resistance to being accelerated ("inertia")</div>
+        <div><var>μ</var> — coefficient of friction (how strongly a surface resists sliding)</div>
+        <div><var>g</var> — gravitational acceleration ≈ 9.8 m/s²</div>
+        <div><var>v₀</var> — an object's velocity before any new net force acts on it</div>
+      </div>
+
+      <p class="explainer">
+        <strong>Inertia</strong> isn't a force — it's a property. It's the
+        reason a net force is <em>required</em> to change motion at all, and
+        the reason two objects of different mass respond differently to the
+        same force. Every widget below is really the same law, staged three
+        different ways: something continues moving (or sitting still) simply
+        because nothing has managed to force it to do otherwise yet.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why "no net force" includes "balanced forces," not just "no forces"</summary>
+        <p class="explainer">
+          Newton's First Law is often mis-stated as "an object at rest stays
+          at rest, and a moving object keeps moving, unless a force acts on
+          it." The precise statement uses <em>net</em> force: a book sitting
+          on a table has two real forces on it (gravity pulling down, the
+          table pushing up) that are individually nonzero but sum to
+          <var>ΣF</var> = 0 — that's why it doesn't accelerate. A hockey puck
+          gliding at constant velocity on ice isn't force-free either
+          (gravity and the ice's support still act on it); it's simply that
+          those vertical forces balance and the horizontal friction force is
+          small enough to ignore over a short glide. "Constant velocity" is
+          the general case; "at rest" is just the special case where that
+          constant velocity happens to be zero.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Coin, Card, and Cup</h3>
+      <p class="explainer">
+        This is the tablecloth trick shrunk down to a coin balanced on a
+        playing card over a cup's opening. Flick the card away fast enough
+        and the coin barely moves before the card is gone — then gravity (not
+        the flick) drops it straight into the cup. Flick too gently, or use
+        too high a friction coefficient, and the coin gets dragged along
+        with the card instead.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 240" id="ccSvg">
+            <line x1="15" y1="230" x2="285" y2="230" stroke="var(--text-primary)" stroke-width="2"></line>
+            <path d="M95,150 L205,150 L193,228 L107,228 Z" fill="var(--surface-1)" stroke="var(--border)" stroke-width="2"></path>
+            <ellipse cx="150" cy="150" rx="55" ry="8" fill="none" stroke="var(--border)" stroke-width="2"></ellipse>
+            <rect id="ccCard" x="90" y="138" width="120" height="7" fill="var(--chip)" stroke="var(--text-secondary)" stroke-width="1.5"></rect>
+            <circle id="ccCoin" cx="150" cy="130" r="13" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Flick speed, v<sub>card</sub></span><b id="ccVVal">4.0 m/s</b></div>
+              <input type="range" id="ccVSlider" min="1" max="10" step="0.5" value="4"></div>
+            <div class="row"><div class="row-head"><span>Card/coin friction, μ</span><b id="ccMuVal">0.25</b></div>
+              <input type="range" id="ccMuSlider" min="0.1" max="0.6" step="0.05" value="0.25"></div>
+            <button class="action" id="ccFlickBtn">👆 Flick the card</button>
+            <p class="explainer" id="ccStatus" style="margin:0; min-height:1.2em;"></p>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Coin's acceleration while card slides under it, <var>a</var> = <var>μg</var></td><td class="v" id="ccAVal">—</td></tr>
+              <tr><td class="k">Contact time before card clears the coin</td><td class="v" id="ccTVal">—</td></tr>
+              <tr><td class="k">Coin's sideways drift, start to landing</td><td class="v" id="ccDriftVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why a faster flick makes the coin move <em>less</em></summary>
+        <p class="explainer">
+          While the card is still under the coin, kinetic friction is the
+          only horizontal force on the coin, giving it acceleration
+          <var>a</var> = <var>μg</var> — fixed, independent of how fast you
+          flick. What changes with flick speed is <em>time</em>: the faster
+          the card moves, the sooner its trailing edge clears the coin's
+          position, so the coin only gets to accelerate for a shorter
+          contact time <var>t</var><sub>contact</sub>. Its sideways drift
+          during contact is <var>½at²</var> — squared in a quantity that's
+          shrinking — so a faster flick reduces drift dramatically, not just
+          a little. That's the whole trick: outrun the friction, not
+          overpower it.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Passenger Lurch During Braking</h3>
+      <p class="explainer">
+        A car brakes hard. Its unbelted passenger doesn't get pushed forward
+        by any force — nothing is pushing them — they simply <em>keep moving
+        at the speed they already had</em>, per Newton's First Law, while the
+        car (which the brakes are acting on) slows down underneath them. From
+        inside the car, that looks exactly like being "thrown forward." Toggle
+        the seatbelt to see what force it takes to make the passenger
+        decelerate along with the car instead.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 480 160" id="lurchSvg">
+            <line x1="10" y1="140" x2="470" y2="140" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"></line>
+            <g id="lurchCar">
+              <rect x="60" y="80" width="200" height="55" rx="10" fill="var(--surface-1)" stroke="var(--border)" stroke-width="2"></rect>
+              <rect x="75" y="60" width="120" height="30" rx="8" fill="var(--surface-1)" stroke="var(--border)" stroke-width="2"></rect>
+              <line x1="140" y1="60" x2="140" y2="90" stroke="var(--border)" stroke-width="2"></line>
+              <circle cx="95" cy="135" r="14" fill="#333"></circle>
+              <circle cx="225" cy="135" r="14" fill="#333"></circle>
+            </g>
+            <circle id="lurchPax" cx="115" cy="75" r="10" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <line id="lurchWindshield" x1="140" y1="60" x2="140" y2="90" stroke="#e34948" stroke-width="3" stroke-dasharray="2 2" opacity="0"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Initial speed, v₀</span><b id="lurchV0Val">15 m/s</b></div>
+              <input type="range" id="lurchV0Slider" min="5" max="30" step="1" value="15"></div>
+            <div class="row"><div class="row-head"><span>Braking deceleration, a</span><b id="lurchAVal">6 m/s²</b></div>
+              <input type="range" id="lurchASlider" min="1" max="10" step="0.5" value="6"></div>
+            <label class="checkbox"><input type="checkbox" id="lurchBelt"> Seatbelt on (restrains the passenger)</label>
+            <button class="action" id="lurchGoBtn">🚗 Brake!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Time to stop, <var>t</var> = <var>v₀/a</var></td><td class="v" id="lurchTStopVal">—</td></tr>
+              <tr><td class="k">Passenger's forward drift inside the cabin</td><td class="v" id="lurchDriftVal">—</td></tr>
+              <tr><td class="k">Outcome</td><td class="v" id="lurchOutcomeVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the passenger's drift is exactly the gap between two motions</summary>
+        <p class="explainer">
+          Without a belt, the passenger has zero net horizontal force on them
+          (ignoring the small friction of a car seat), so by the First Law
+          their position is just <var>x</var><sub>pax</sub>(<var>t</var>) = <var>v₀t</var> —
+          unchanged constant-velocity motion. The car, acted on by the
+          brakes, follows <var>x</var><sub>car</sub>(<var>t</var>) = <var>v₀t</var> − <var>½at²</var>.
+          The passenger's drift <em>relative to the car's cabin</em> is the
+          difference: <var>Δx</var> = <var>x</var><sub>pax</sub> − <var>x</var><sub>car</sub> = <var>½at²</var>,
+          growing the whole time the car is still decelerating. With the
+          seatbelt on, the belt supplies exactly the extra backward force
+          needed to give the passenger the same deceleration <var>a</var> as
+          the car, so <var>Δx</var> stays at essentially zero — the belt is
+          what turns "passenger" and "car" into one connected system.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Coasting Toward the Frictionless Ideal</h3>
+      <p class="explainer">
+        Newton's First Law describes an idealized world with zero net
+        horizontal force. Real surfaces always have some friction, but you
+        can watch motion approach that ideal as friction shrinks: push two
+        identical pucks with the same speed, one on a low-friction surface
+        (ice) and one on a higher-friction one (carpet), and compare how far
+        each coasts before stopping.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 150" id="puckSvg">
+            <text x="15" y="45" class="svg-label">Ice, μ ≈ 0.03</text>
+            <line x1="15" y1="55" x2="445" y2="55" stroke="var(--gridline)" stroke-width="1.5"></line>
+            <circle id="puckIce" cx="30" cy="55" r="10" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <text x="15" y="110" class="svg-label">Carpet, μ adjustable</text>
+            <line x1="15" y1="120" x2="445" y2="120" stroke="var(--gridline)" stroke-width="1.5"></line>
+            <circle id="puckCarpet" cx="30" cy="120" r="10" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+          <svg viewBox="0 0 460 130" id="puckVtSvg">
+            <g id="puckVtGrid"></g>
+            <line x1="40" y1="110" x2="440" y2="110" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="110" class="svg-axis"></line>
+            <path id="puckIcePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <path id="puckCarpetPath" fill="none" stroke="#eb6834" stroke-width="2.5" d=""></path>
+            <text x="45" y="22" class="svg-label">velocity vs. time</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push-off speed, v₀</span><b id="puckV0Val">6 m/s</b></div>
+              <input type="range" id="puckV0Slider" min="2" max="12" step="0.5" value="6"></div>
+            <div class="row"><div class="row-head"><span>Carpet friction, μ<sub>carpet</sub></span><b id="puckMuVal">0.35</b></div>
+              <input type="range" id="puckMuSlider" min="0.1" max="0.7" step="0.05" value="0.35"></div>
+            <button class="action" id="puckGoBtn">▶ Push both</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Ice: stopping distance, <var>v₀²/2μg</var></td><td class="v" id="puckIceDistVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Carpet: stopping distance</td><td class="v" id="puckCarpetDistVal">—</td></tr>
+              <tr><td class="k">Ratio (ice coasts how much farther)</td><td class="v" id="puckRatioVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving the stopping-distance formula</summary>
+        <p class="explainer">
+          Kinetic friction gives each puck a constant deceleration
+          <var>a</var> = <var>μg</var> (friction force <var>μmg</var> divided
+          by mass <var>m</var> — the mass itself cancels out, which is why
+          heavier pucks don't inherently coast farther or shorter on the same
+          surface). Using <var>v²</var> = <var>v₀²</var> − 2<var>as</var> with
+          final velocity <var>v</var> = 0: <var>s</var> = <var>v₀² / (2μg)</var>.
+          Push twice as hard (double <var>v₀</var>) and the coasting distance
+          quadruples, not doubles — a fact drivers should find uncomfortably
+          relevant to braking distance, covered properly in the next tabs.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: card-and-coin and the tablecloth pull</h4>
+        <ol>
+          <li>Balance a coin on an index card over the mouth of a cup or
+            glass. Flick the card horizontally, fast and flat, with one
+            finger — the harder and flatter the flick, the more reliably the
+            coin drops straight in.</li>
+          <li>The full-size version is the classic tablecloth trick: a smooth
+            tablecloth, light dishware, and a fast, flat, level pull. Practice
+            with plastic cups before risking anything breakable.</li>
+          <li>Both rely on the same limit: the shorter the time friction has
+            to act on the object left behind, the smaller its sideways drift —
+            exactly the <var>½at²</var> relationship from Widget 1.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= NEWTON'S SECOND LAW (full) ================= -->
+    <div class="panel" id="panel-newtons-second-law">
+      <h2>Newton's Second Law</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you push an empty shopping
+        cart and a fully loaded one with the exact same effort. Which one
+        speeds up faster? Now push the empty cart twice as hard. Does it
+        speed up twice as fast, or by some other factor? Newton's Second Law
+        answers both questions with one equation.
+      </p>
+
+      <p class="explainer"><var>F</var> = <var>ma</var></p>
+
+      <div class="var-list">
+        <div><var>F</var> — net force acting on the object (Newtons, N)</div>
+        <div><var>m</var> — mass (kilograms, kg) — the object's resistance to acceleration</div>
+        <div><var>a</var> — acceleration (m/s²) — how quickly velocity changes</div>
+        <div><var>μ</var> — coefficient of kinetic friction</div>
+        <div><var>g</var> — gravitational acceleration ≈ 9.8 m/s²</div>
+      </div>
+
+      <p class="explainer">
+        Rearranged as <var>a</var> = <var>F/m</var>, the law says acceleration
+        is directly proportional to net force and inversely proportional to
+        mass. Double the force on the same object and it accelerates twice as
+        fast. Double the mass under the same force and it accelerates half as
+        fast. Neither relationship is obvious until you've felt both — which
+        is exactly what Widget 1 lets you compare directly.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: where "net" force comes from and why mass, not weight, sits in the equation</summary>
+        <p class="explainer">
+          <var>F</var> here is always the <em>net</em> (vector-summed) force —
+          if three forces pull an object in different directions, you add
+          them as vectors first, then apply <var>F</var> = <var>ma</var> to
+          that single resultant. Also note the equation uses <var>m</var>
+          (mass, an intrinsic property, the same on the Moon as on Earth),
+          not weight (<var>mg</var>, which depends on local gravity). A given
+          net force produces the exact same acceleration on the Moon as on
+          Earth, even though that object weighs six times less there — mass
+          is what actually resists acceleration, not weight.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Cart-and-Mass Lab</h3>
+      <p class="explainer">
+        Push a cart with a chosen force and watch it accelerate — then switch
+        which quantity you vary. In "vary mass" mode the applied force stays
+        fixed while you change the load; in "vary force" mode the mass stays
+        fixed while you change how hard you push. Either way, the live graph
+        plots exactly how <var>a</var> responds.
+      </p>
+      <div class="mode-toggle" id="cmModeToggle">
+        <button class="active" data-mode="mass"><b>Vary mass</b>hold force fixed, change the load</button>
+        <button data-mode="force"><b>Vary force</b>hold mass fixed, change the push</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <p class="pane-label">Push track</p>
+          <svg viewBox="0 0 460 90" id="cmTrackSvg">
+            <line x1="20" y1="70" x2="440" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <line id="cmForceArrow" x1="10" y1="52" x2="30" y2="52" stroke="#e34948" stroke-width="3" marker-end="url(#cmArrowHead)"></line>
+            <rect id="cmCart" x="20" y="40" width="40" height="25" rx="4" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <defs>
+              <marker id="cmArrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path>
+              </marker>
+            </defs>
+          </svg>
+          <p class="pane-label"><var>a</var> vs. <var id="cmAxisLabel">m</var></p>
+          <svg viewBox="0 0 460 160" id="cmGraphSvg">
+            <line x1="40" y1="140" x2="440" y2="140" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="140" class="svg-axis"></line>
+            <path id="cmCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="cmCurveMarker" cx="40" cy="140" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Applied force, F</span><b id="cmFVal">20 N</b></div>
+              <input type="range" id="cmFSlider" min="5" max="50" step="5" value="20"></div>
+            <div class="row"><div class="row-head"><span>Cart + load mass, m</span><b id="cmMVal">10 kg</b></div>
+              <input type="range" id="cmMSlider" min="2" max="20" step="1" value="10"></div>
+            <button class="action" id="cmPushBtn">👉 Push!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Acceleration, <var>a</var> = <var>F/m</var></td><td class="v" id="cmAVal">2.0 m/s²</td></tr>
+              <tr><td class="k">Time to reach 5 m/s</td><td class="v" id="cmTVal">2.5 s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the mass curve bends and the force line doesn't</summary>
+        <p class="explainer">
+          Holding <var>F</var> fixed, <var>a</var>(<var>m</var>) = <var>F/m</var>
+          is an inverse relationship — its graph is a hyperbola that drops
+          steeply at first and then flattens, because doubling an already-large
+          mass matters less in absolute terms than doubling a small one.
+          Holding <var>m</var> fixed, <var>a</var>(<var>F</var>) = <var>F/m</var>
+          is directly proportional — a straight line through the origin with
+          slope <var>1/m</var>. Same equation, two very differently shaped
+          graphs, purely because of which variable is doing the varying.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Sled Simulator: Force, Mass, and Friction</h3>
+      <p class="explainer">
+        Real pushes and pulls also fight friction. Increase the pull force
+        past the sled's friction resistance and it accelerates; stay below
+        that threshold and it doesn't move at all — friction isn't a
+        "slowing-down tax," it's a real force that can cancel your entire
+        push.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 90" id="sledSvg">
+            <line x1="20" y1="70" x2="440" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <line id="sledPullArrow" x1="5" y1="52" x2="30" y2="52" stroke="#1baf7a" stroke-width="3" marker-end="url(#sledArrowHead)"></line>
+            <rect id="sledBody" x="30" y="45" width="55" height="20" rx="3" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+            <defs>
+              <marker id="sledArrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path>
+              </marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Pull force, F<sub>pull</sub></span><b id="sledFVal">40 N</b></div>
+              <input type="range" id="sledFSlider" min="0" max="100" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Sled + load mass, m</span><b id="sledMVal">15 kg</b></div>
+              <input type="range" id="sledMSlider" min="5" max="40" step="5" value="15"></div>
+            <div class="row"><div class="row-head"><span>Friction coefficient, μ</span><b id="sledMuVal">0.30</b></div>
+              <input type="range" id="sledMuSlider" min="0.05" max="0.60" step="0.05" value="0.30"></div>
+            <button class="action" id="sledGoBtn">🛷 Pull!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Friction force, <var>μmg</var></td><td class="v" id="sledFrictionVal">44.1 N</td></tr>
+              <tr><td class="k">Net force, <var>F<sub>pull</sub></var> − friction</td><td class="v" id="sledNetVal">−4.1 N</td></tr>
+              <tr><td class="k">Acceleration</td><td class="v" id="sledAVal">0 m/s²</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="sledVerdictVal">Doesn't move</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Interactive Force Balance</h3>
+      <p class="explainer">
+        Drag the tips of the two force vectors below to change their size and
+        direction. The dashed green arrow is their vector sum — the single
+        net force that actually determines how the object accelerates. Press
+        release to see the object move in that direction.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 300" id="fbSvg">
+            <g id="fbGrid"></g>
+            <line x1="20" y1="150" x2="280" y2="150" class="svg-axis"></line>
+            <line x1="150" y1="20" x2="150" y2="280" class="svg-axis"></line>
+            <rect id="fbBlock" x="140" y="140" width="20" height="20" fill="var(--text-primary)"></rect>
+            <line id="fbNetLine" x1="150" y1="150" x2="150" y2="150" stroke="var(--text-primary)" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#fbNetHead)"></line>
+            <line id="fbF1Line" x1="150" y1="150" x2="210" y2="150" stroke="#2a78d6" stroke-width="3" marker-end="url(#fbF1Head)"></line>
+            <line id="fbF2Line" x1="150" y1="150" x2="150" y2="90" stroke="#eb6834" stroke-width="3" marker-end="url(#fbF2Head)"></line>
+            <circle id="fbF1Handle" cx="210" cy="150" r="9" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <circle id="fbF2Handle" cx="150" cy="90" r="9" fill="#eb6834" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <defs>
+              <marker id="fbF1Head" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker>
+              <marker id="fbF2Head" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#eb6834"></path></marker>
+              <marker id="fbNetHead" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="var(--text-primary)"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Object's mass, m</span><b id="fbMVal">5 kg</b></div>
+              <input type="range" id="fbMSlider" min="1" max="20" step="1" value="5"></div>
+            <button class="action" id="fbReleaseBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span><var>F₁</var></td><td class="v" id="fbF1Val">20.0, 0.0 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span><var>F₂</var></td><td class="v" id="fbF2Val">0.0, 20.0 N</td></tr>
+              <tr><td class="k">Net force, <var>ΣF</var></td><td class="v" id="fbSumVal">28.3 N @ 45°</td></tr>
+              <tr><td class="k">Acceleration, <var>ΣF/m</var></td><td class="v" id="fbAVal">5.66 m/s²</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: adding forces is exactly like adding the displacement vectors from Section 0</summary>
+        <p class="explainer">
+          Force vectors add component-by-component just like the displacement
+          and velocity vectors from the Toolkit: <var>ΣF</var> = (<var>F₁ₓ</var> + <var>F₂ₓ</var>,
+          <var>F₁ᵥ</var> + <var>F₂ᵥ</var>). The block only cares about that
+          single resultant — it has no way to "know" it's being pulled by two
+          separate forces instead of one equivalent force, which is exactly
+          why free-body diagrams are drawn as one summed arrow when you only
+          need the resulting motion.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: loaded vs. empty cart</h4>
+        <ol>
+          <li>Find a shopping cart, wagon, or wheeled office chair. Give it a
+            push with roughly the same effort, empty and then loaded with
+            something heavy, and compare how quickly each picks up speed.</li>
+          <li>Try pushing the empty one twice as hard (a firmer shove) and
+            see whether it visibly picks up speed roughly twice as fast —
+            that's <var>F</var> = <var>ma</var> holding mass fixed and
+            doubling force.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= NEWTON'S THIRD LAW (stub) ================= -->
+    <div class="panel" id="panel-newtons-third-law">
+      <h2>Newton's Third Law</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> two ice skaters of very
+        different sizes push off from each other, each using exactly the
+        same push. Does the lighter skater feel a bigger shove than the
+        heavier one? Or do they experience the same force, and just respond
+        to it differently?
+      </p>
+
+      <p class="explainer">
+        For every force one object exerts on a second object, the second
+        exerts a force <strong>equal in magnitude and opposite in
+        direction</strong> back on the first.
+      </p>
+
+      <div class="var-list">
+        <div><var>F<sub>A on B</sub></var> — force object A exerts on object B</div>
+        <div><var>F<sub>B on A</sub></var> — force object B exerts on object A; always <var>F<sub>B on A</sub></var> = −<var>F<sub>A on B</sub></var></div>
+        <div><var>m</var> — mass; <var>v</var> — velocity gained; <var>Δt</var> — contact/push duration</div>
+      </div>
+
+      <p class="explainer">
+        <strong>Common misconception:</strong> action-reaction pairs do
+        <em>not</em> cancel out, because they act on two <em>different</em>
+        objects. A force only cancels another force acting on the
+        <em>same</em> object. The push you feel and the push you give are a
+        real pair of equal-and-opposite forces that never cancel — they just
+        act on you and on whatever you pushed, separately.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: equal forces, unequal accelerations</summary>
+        <p class="explainer">
+          The forces are always equal (<var>F<sub>A on B</sub></var> = −<var>F<sub>B on A</sub></var>),
+          but Newton's Second Law (<var>a</var> = <var>F/m</var>) still
+          applies separately to each object with its <em>own</em> mass. Equal
+          force, different mass, therefore different acceleration — the
+          lighter skater always flies off faster than the heavier one, even
+          though the push between them was perfectly equal in both
+          directions the entire time.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Push-Off Simulator</h3>
+      <p class="explainer">
+        Pick a scenario, set the two masses, and push off. Both objects feel
+        the exact same force (shown in the readout) for the exact same
+        instant — watch how differently they end up moving anyway.
+      </p>
+      <div class="preset-row" id="poPresetRow">
+        <button data-preset="skaters">⛸️ Two skaters</button>
+        <button data-preset="boat">🚣 Jumping from a boat</button>
+        <button data-preset="wall">🧱 Pushing on a wall</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 110" id="poSvg">
+            <line x1="10" y1="90" x2="450" y2="90" stroke="var(--muted)" stroke-width="2" stroke-dasharray="6 4"></line>
+            <circle id="poA" cx="230" cy="65" r="16" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
+            <circle id="poB" cx="230" cy="65" r="16" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <text id="poALabel" x="230" y="45" class="svg-label" text-anchor="middle">A</text>
+            <text id="poBLabel" x="230" y="45" class="svg-label" text-anchor="middle">B</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push force, F (for time Δt = 0.3 s)</span><b id="poFVal">200 N</b></div>
+              <input type="range" id="poFSlider" min="50" max="400" step="10" value="200"></div>
+            <div class="row"><div class="row-head"><span>Mass of A</span><b id="poMAVal">50 kg</b></div>
+              <input type="range" id="poMASlider" min="20" max="150" step="5" value="50"></div>
+            <div class="row"><div class="row-head"><span>Mass of B</span><b id="poMBVal">70 kg</b></div>
+              <input type="range" id="poMBSlider" min="20" max="150" step="5" value="70"></div>
+            <button class="action" id="poGoBtn">💥 Push off!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Force on A (from B)</td><td class="v" id="poFAVal">200.0 N</td></tr>
+              <tr><td class="k">Force on B (from A)</td><td class="v" id="poFBVal">−200.0 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>A's resulting speed</td><td class="v" id="poVAVal">1.20 m/s</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>B's resulting speed</td><td class="v" id="poVBVal">0.86 m/s</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why pushing on a wall doesn't visibly move the Earth</summary>
+        <p class="explainer">
+          Swap "skater B" for "the entire Earth" (via the wall you're
+          pushing, bolted to the ground) and the force pair is still exactly
+          equal: you push the wall with some force, the wall pushes back on
+          you with the same force, which is why you feel resistance at all.
+          But Earth's mass is on the order of 10²⁴ kg, so its resulting
+          acceleration <var>a</var> = <var>F/m</var> is immeasurably tiny —
+          not zero, just far too small to ever notice. The law doesn't stop
+          applying; the effect just becomes invisible at extreme mass ratios.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Force-Sensor Pair</h3>
+      <p class="explainer">
+        Try to make the two forces unequal. Slide "how hard you push" as far
+        as you like — the sensor reading for "how hard it pushes back" won't
+        budge from matching it. That's not a limitation of this widget; it's
+        the law itself.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 300 140" id="fsSvg">
+            <rect x="30" y="50" width="70" height="40" rx="6" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <rect x="200" y="50" width="70" height="40" rx="6" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+            <rect x="100" y="60" width="100" height="20" rx="4" fill="var(--chip)" stroke="var(--border)" stroke-width="1.5"></rect>
+            <text x="65" y="45" class="svg-label" text-anchor="middle">You</text>
+            <text x="235" y="45" class="svg-label" text-anchor="middle">Wall / object</text>
+            <line id="fsArrowRight" x1="100" y1="70" x2="140" y2="70" stroke="#2a78d6" stroke-width="4" marker-end="url(#fsHeadR)"></line>
+            <line id="fsArrowLeft" x1="200" y1="90" x2="160" y2="90" stroke="#eb6834" stroke-width="4" marker-end="url(#fsHeadL)"></line>
+            <defs>
+              <marker id="fsHeadR" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker>
+              <marker id="fsHeadL" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 Z" fill="#eb6834"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>How hard you push, F<sub>you→object</sub></span><b id="fsFVal">30 N</b></div>
+              <input type="range" id="fsFSlider" min="0" max="100" step="5" value="30"></div>
+            <div class="row"><div class="row-head"><span>Try to set how hard it pushes back</span><b id="fsCheatVal">?</b></div>
+              <input type="range" id="fsCheatSlider" min="0" max="100" step="5" value="80"></div>
+            <p class="explainer" id="fsMsg" style="margin:0; min-height:1.2em;"></p>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k"><span class="swatch" style="background:#2a78d6"></span>Force you apply</td><td class="v" id="fsReadF">30.0 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Force it applies back on you</td><td class="v" id="fsReadBack">30.0 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: balloon rocket and rolling-chair push-off</h4>
+        <ol>
+          <li>Thread a straw onto a long piece of string pulled taut between
+            two chairs. Tape an inflated (but unknotted) balloon to the
+            straw, then let go — the air rushing out one way pushes the
+            balloon the other way.</li>
+          <li>Two people on rolling chairs, facing each other with hands
+            touching, both push off at the same time. Whoever's lighter (or
+            has a lower-friction chair) travels farther in the same time,
+            even though the push each felt was identical.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= FRICTION (stub) ================= -->
+    <div class="panel" id="panel-friction">
+      <h2>Friction</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you push a heavy box that
+        doesn't budge. You push a little harder — still nothing. You push
+        just a little harder still, and suddenly it lurches forward far more
+        easily than you expected. Why does it take a bigger push to
+        <em>start</em> the box moving than it does to <em>keep</em> it
+        moving?
+      </p>
+
+      <p class="explainer">
+        Static friction: <var>f<sub>s</sub></var> ≤ <var>μ<sub>s</sub>N</var> &nbsp;(matches
+        the applied push, up to a maximum) &nbsp;·&nbsp; Kinetic friction: <var>f<sub>k</sub></var> = <var>μ<sub>k</sub>N</var> &nbsp;(roughly constant while sliding)
+      </p>
+
+      <div class="var-list">
+        <div><var>f<sub>s</sub></var>, <var>f<sub>k</sub></var> — static and kinetic friction force</div>
+        <div><var>μ<sub>s</sub></var>, <var>μ<sub>k</sub></var> — coefficients of static and kinetic friction (usually <var>μ<sub>k</sub></var> ≤ <var>μ<sub>s</sub></var>)</div>
+        <div><var>N</var> — normal force (here, on flat ground, <var>N</var> = <var>mg</var>)</div>
+        <div><var>m</var> — mass; <var>g</var> — gravitational acceleration ≈ 9.8 m/s²</div>
+      </div>
+
+      <p class="explainer">
+        Friction isn't a fixed drag that always opposes you by some constant
+        amount — <strong>static</strong> friction is more like a rubber band
+        that stretches to match whatever push you apply, up to a maximum of
+        <var>μ<sub>s</sub>N</var>. Push harder than that maximum and the object
+        breaks free; friction switches to <strong>kinetic</strong> friction,
+        which is usually a bit smaller. That drop is exactly why a stuck box
+        suddenly "lurches" the instant it starts moving.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why friction depends on normal force, not on contact area or speed</summary>
+        <p class="explainer">
+          Both friction laws are empirical (not derived from something
+          deeper) but they fit real surfaces surprisingly well: friction
+          force is proportional to how hard the two surfaces are pressed
+          together (<var>N</var>), essentially independent of the visible
+          contact area and, for kinetic friction, roughly independent of
+          sliding speed too. A heavier box needs a bigger push to start
+          sliding, not because it has more surface area, but purely because
+          its weight increases <var>N</var>.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Static vs. Kinetic Friction</h3>
+      <p class="explainer">
+        Increase the push force gradually and watch the friction force track
+        it exactly — until it hits the static maximum and the box breaks
+        free. The graph shows this exact handoff.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 90" id="frBoxSvg">
+            <line x1="15" y1="70" x2="285" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <rect id="frBox" x="120" y="40" width="45" height="30" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <line id="frPushArrow" x1="80" y1="55" x2="118" y2="55" stroke="#e34948" stroke-width="3" marker-end="url(#frPushHead)"></line>
+            <line id="frFrictionArrow" x1="167" y1="55" x2="185" y2="55" stroke="#1baf7a" stroke-width="3" marker-end="url(#frFricHead)"></line>
+            <defs>
+              <marker id="frPushHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker>
+              <marker id="frFricHead" markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 Z" fill="#1baf7a"></path></marker>
+            </defs>
+          </svg>
+          <p class="pane-label">Friction force vs. push force</p>
+          <svg viewBox="0 0 300 160" id="frGraphSvg">
+            <line x1="35" y1="140" x2="285" y2="140" class="svg-axis"></line>
+            <line x1="35" y1="10" x2="35" y2="140" class="svg-axis"></line>
+            <path id="frGraphPath" fill="none" stroke="#1baf7a" stroke-width="2.5" d=""></path>
+            <circle id="frGraphMarker" cx="35" cy="140" r="6" fill="#e34948" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push force, F</span><b id="frFVal">30 N</b></div>
+              <input type="range" id="frFSlider" min="0" max="100" step="2" value="30"></div>
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="frMVal">8 kg</b></div>
+              <input type="range" id="frMSlider" min="2" max="20" step="1" value="8"></div>
+            <div class="row"><div class="row-head"><span>Static coefficient, μₛ</span><b id="frMuSVal">0.50</b></div>
+              <input type="range" id="frMuSSlider" min="0.1" max="0.8" step="0.05" value="0.50"></div>
+            <div class="row"><div class="row-head"><span>Kinetic coefficient, μₖ</span><b id="frMuKVal">0.35</b></div>
+              <input type="range" id="frMuKSlider" min="0.05" max="0.8" step="0.05" value="0.35"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Max static friction, <var>μₛN</var></td><td class="v" id="frFsMaxVal">39.2 N</td></tr>
+              <tr><td class="k">Current friction force</td><td class="v" id="frFrictionVal">30.0 N</td></tr>
+              <tr><td class="k">State</td><td class="v" id="frStateVal">Holding still</td></tr>
+              <tr><td class="k">Resulting acceleration</td><td class="v" id="frAVal">0.00 m/s²</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Surface Comparison</h3>
+      <p class="explainer">
+        The same push, the same box, four different surfaces. Coefficients
+        below are typical real-world values — notice how much of the
+        difference between "impossible to budge" and "slides at the
+        slightest touch" comes down to one number.
+      </p>
+      <div class="preset-row" id="surfPresetRow">
+        <button data-mus="0.9" data-muk="0.7" class="active">🧱 Rubber on dry concrete</button>
+        <button data-mus="0.5" data-muk="0.35">🪵 Wood on wood</button>
+        <button data-mus="0.3" data-muk="0.2">💧 Rubber on wet asphalt</button>
+        <button data-mus="0.1" data-muk="0.03">🧊 Steel on ice</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 100" id="surfSvg">
+            <line x1="10" y1="80" x2="250" y2="80" stroke="var(--text-primary)" stroke-width="2"></line>
+            <rect id="surfBox" x="90" y="50" width="45" height="30" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Push force (same for every surface), F</span><b id="surfFVal">25 N</b></div>
+              <input type="range" id="surfFSlider" min="5" max="60" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Box mass, m</span><b id="surfMVal">5 kg</b></div>
+              <input type="range" id="surfMSlider" min="2" max="15" step="1" value="5"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">μₛ / μₖ for this surface</td><td class="v" id="surfMuVal">0.90 / 0.70</td></tr>
+              <tr><td class="k">Max static friction</td><td class="v" id="surfFsMaxVal">44.1 N</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="surfVerdictVal">Doesn't move</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: friction as both a helpful and a resistive force</summary>
+        <p class="explainer">
+          Friction resists your push on this box — but it's also the
+          <em>only</em> reason walking, climbing a slope, or a car's tires
+          gripping the road work at all. Your foot pushes backward on the
+          ground; without friction, the ground couldn't push forward on you
+          in return (that's Newton's Third Law again), and you'd simply slip
+          in place. "Friction is bad" and "friction is necessary" are both
+          true depending entirely on whether you're trying to prevent
+          sliding or trying to cause it.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Traction Limit: Braking and Turning</h3>
+      <p class="explainer">
+        Braking distance and how sharply you can turn are governed by
+        exactly the same number: how much friction the tires can supply.
+        (Reaction time and raw stopping distance for a chosen deceleration
+        were covered back in <a href="../01-kinematics/index.html#constant-acceleration">Kinematics → Constant Acceleration</a>;
+        here, the deceleration itself comes directly from road friction.)
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 200" id="tractionSvg">
+            <circle cx="130" cy="100" r="80" fill="none" stroke="var(--gridline)" stroke-width="1.5"></circle>
+            <line x1="130" y1="20" x2="130" y2="180" class="svg-axis"></line>
+            <line x1="50" y1="100" x2="210" y2="100" class="svg-axis"></line>
+            <circle id="tractionDot" cx="130" cy="20" r="7" fill="#e34948" stroke="white" stroke-width="2"></circle>
+            <text x="130" y="14" class="svg-label" text-anchor="middle">brake</text>
+            <text x="215" y="103" class="svg-label">turn</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Speed, v</span><b id="tracVVal">20 m/s</b></div>
+              <input type="range" id="tracVSlider" min="5" max="40" step="1" value="20"></div>
+            <div class="row"><div class="row-head"><span>Road friction, μ</span><b id="tracMuVal">0.80</b></div>
+              <input type="range" id="tracMuSlider" min="0.05" max="1.0" step="0.05" value="0.80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Max deceleration / turn acceleration, <var>μg</var></td><td class="v" id="tracAVal">7.84 m/s²</td></tr>
+              <tr><td class="k">Minimum braking distance, <var>v²/2μg</var></td><td class="v" id="tracBrakeVal">25.5 m</td></tr>
+              <tr><td class="k">Minimum turning radius, <var>v²/μg</var></td><td class="v" id="tracTurnVal">51.0 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the "traction circle" idea</summary>
+        <p class="explainer">
+          A tire can only supply so much total friction force before it
+          slides, no matter which direction that force points — braking,
+          turning, or (realistically) some mix of both at once. That's why
+          racing drivers brake in a straight line before a turn rather than
+          mid-corner: braking friction and cornering friction draw from the
+          same limited budget, roughly <var>μmg</var> total, in any
+          direction. This "budget" idea is developed further, with real
+          circular motion, in <a href="../06-circular-motion/index.html#uniform-circular-motion">Circular Motion → Banked Curves</a>.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: starting friction vs. sliding friction</h4>
+        <ol>
+          <li>Push a heavy book across a table, starting from rest each
+            time. Notice the little "catch" right before it starts moving —
+            that's static friction at its maximum, just before it lets go.</li>
+          <li>Once it's sliding, try to keep pushing with steady, gentle
+            force — it usually takes noticeably less effort to keep it going
+            than it took to start it.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= INCLINED PLANES (stub) ================= -->
+    <div class="panel" id="panel-inclined-planes">
+      <h2>Inclined Planes</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a box sits on a ramp. As
+        you slowly tilt the ramp steeper, at some angle it suddenly starts
+        sliding. Does that critical angle depend on how heavy the box is?
+      </p>
+
+      <p class="explainer">
+        On a slope, gravity splits into two components: <var>mg</var> sinθ
+        (pulling the box <em>down the slope</em>) and <var>mg</var> cosθ
+        (pressing the box <em>into the slope</em>, which is exactly what the
+        normal force <var>N</var> has to balance).
+      </p>
+
+      <div class="var-list">
+        <div><var>θ</var> — the ramp's angle above horizontal</div>
+        <div><var>N</var> — normal force, perpendicular to the slope; here <var>N</var> = <var>mg</var> cosθ</div>
+        <div><var>μ<sub>s</sub></var>, <var>μ<sub>k</sub></var> — static and kinetic friction coefficients</div>
+        <div><var>m</var> — mass; <var>g</var> — gravitational acceleration ≈ 9.8 m/s²</div>
+      </div>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: decomposing gravity along tilted axes</summary>
+        <p class="explainer">
+          Gravity itself never changes — it's always <var>mg</var> straight
+          down. What changes is which directions are convenient to measure
+          it in. Tilting your axes to match the slope (one axis along the
+          surface, one perpendicular to it) turns a single vector into two
+          components, <var>mg</var> sinθ and <var>mg</var> cosθ, using the
+          same right-triangle trigonometry as the vector components in the
+          Toolkit — just with gravity playing the role of the vector being
+          split, and the slope's tilt playing the role of the angle.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Incline Force-Component Explorer</h3>
+      <p class="explainer">
+        Tilt the ramp and watch gravity's two components change — sinθ grows
+        as the ramp steepens while cosθ shrinks, and they always trade off
+        so that the two components' squares still add up to <var>mg</var>.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="incSvg">
+            <line x1="20" y1="200" x2="280" y2="200" class="svg-axis"></line>
+            <path id="incRampFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <rect id="incBlock" x="0" y="0" width="26" height="18" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <line id="incGravity" stroke="var(--text-primary)" stroke-width="2.5" marker-end="url(#incHeadDark)"></line>
+            <line id="incParArrow" stroke="#e34948" stroke-width="3" marker-end="url(#incHeadRed)"></line>
+            <line id="incNormalArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#incHeadGreen)"></line>
+            <line id="incFrictionArrow" stroke="#eb6834" stroke-width="3" marker-end="url(#incHeadOrange)"></line>
+            <defs>
+              <marker id="incHeadDark" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="var(--text-primary)"></path></marker>
+              <marker id="incHeadRed" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker>
+              <marker id="incHeadGreen" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path></marker>
+              <marker id="incHeadOrange" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#eb6834"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp angle, θ</span><b id="incThetaVal">30°</b></div>
+              <input type="range" id="incThetaSlider" min="0" max="80" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>Mass, m</span><b id="incMVal">10 kg</b></div>
+              <input type="range" id="incMSlider" min="2" max="30" step="1" value="10"></div>
+            <div class="row"><div class="row-head"><span>Static friction, μₛ</span><b id="incMuSVal">0.40</b></div>
+              <input type="range" id="incMuSSlider" min="0" max="1.0" step="0.05" value="0.40"></div>
+            <div class="row"><div class="row-head"><span>Kinetic friction, μₖ</span><b id="incMuKVal">0.30</b></div>
+              <input type="range" id="incMuKSlider" min="0" max="1.0" step="0.05" value="0.30"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Weight, <var>mg</var></td><td class="v" id="incMgVal">98.0 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#e34948"></span>Down-slope pull, <var>mg</var>sinθ</td><td class="v" id="incParVal">49.0 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Normal force, <var>N</var> = <var>mg</var>cosθ</td><td class="v" id="incNVal">84.9 N</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#eb6834"></span>Friction</td><td class="v" id="incFrictionVal">34.0 N (static)</td></tr>
+              <tr><td class="k">State</td><td class="v" id="incStateVal">Holds</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Critical Angle Experiment</h3>
+      <p class="explainer">
+        The box starts sliding exactly when the down-slope pull outgrows the
+        maximum static friction available — that crossing point defines the
+        critical angle, and it has a surprisingly clean formula.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 160" id="critGraphSvg">
+            <line x1="35" y1="140" x2="285" y2="140" class="svg-axis"></line>
+            <line x1="35" y1="10" x2="35" y2="140" class="svg-axis"></line>
+            <path id="critCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <line id="critMuLine" x1="35" y1="70" x2="285" y2="70" stroke="#1baf7a" stroke-width="2" stroke-dasharray="4 3"></line>
+            <circle id="critMarker" cx="35" cy="140" r="6" fill="#e34948" stroke="white" stroke-width="1.5"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Current angle, θ</span><b id="critThetaVal">30°</b></div>
+              <input type="range" id="critThetaSlider" min="0" max="80" step="1" value="30"></div>
+            <div class="row"><div class="row-head"><span>Static friction, μₛ</span><b id="critMuVal">0.40</b></div>
+              <input type="range" id="critMuSlider" min="0" max="1.2" step="0.05" value="0.40"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">tanθ (required μₛ to hold, right at this angle)</td><td class="v" id="critTanVal">0.577</td></tr>
+              <tr><td class="k">Critical angle, θ꜀ = atan(μₛ)</td><td class="v" id="critAngleVal">21.8°</td></tr>
+              <tr><td class="k">Verdict at current angle</td><td class="v" id="critVerdictVal">Slides</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: deriving θ꜀ = atan(μₛ)</summary>
+        <p class="explainer">
+          Sliding begins exactly when <var>mg</var>sinθ = <var>μₛN</var> = <var>μₛmg</var>cosθ.
+          The mass <var>m</var> and <var>g</var> cancel from both sides —
+          which is the answer to the prediction question: the critical angle
+          <em>never</em> depends on the box's weight. What's left is
+          sinθ = <var>μₛ</var>cosθ, or tanθ = <var>μₛ</var>, so θ꜀ = atan(<var>μₛ</var>).
+          A rougher surface (larger <var>μₛ</var>) tolerates a steeper ramp
+          before sliding starts.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Ladder-Balance Explorer</h3>
+      <p class="explainer">
+        A ladder leans against a frictionless wall, held in place purely by
+        floor friction. Move a person up the ladder and watch how much
+        harder the floor has to grip to keep it from slipping — this is the
+        same balance-of-turning-effects idea ("torque") that gets its own
+        full section later, in <a href="../07-rotation-and-rolling/index.html#torque">Rotational Mechanics → Torque</a>.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 260 220" id="ladderSvg">
+            <line x1="15" y1="200" x2="245" y2="200" stroke="var(--text-primary)" stroke-width="2"></line>
+            <line x1="15" y1="20" x2="15" y2="200" stroke="var(--muted)" stroke-width="4"></line>
+            <line id="ladderLine" x1="15" y1="200" x2="200" y2="60" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"></line>
+            <circle id="ladderPerson" cx="150" cy="100" r="10" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ladder angle from floor, θ</span><b id="ladThetaVal">60°</b></div>
+              <input type="range" id="ladThetaSlider" min="20" max="80" step="1" value="60"></div>
+            <div class="row"><div class="row-head"><span>Person's position up the ladder</span><b id="ladDVal">70%</b></div>
+              <input type="range" id="ladDSlider" min="0" max="100" step="5" value="70"></div>
+            <div class="row"><div class="row-head"><span>Person's mass, m</span><b id="ladMVal">70 kg</b></div>
+              <input type="range" id="ladMSlider" min="40" max="100" step="5" value="70"></div>
+            <div class="row"><div class="row-head"><span>Floor friction, μ<sub>floor</sub></span><b id="ladMuVal">0.40</b></div>
+              <input type="range" id="ladMuSlider" min="0.1" max="0.8" step="0.05" value="0.40"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required floor friction (from torque balance)</td><td class="v" id="ladReqVal">—</td></tr>
+              <tr><td class="k">Maximum available floor friction, <var>μN</var></td><td class="v" id="ladMaxVal">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="ladVerdictVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the torque balance behind the ladder</summary>
+        <p class="explainer">
+          Taking torques about the ladder's foot (the point where it touches
+          the floor) cancels out both the unknown floor normal force and the
+          unknown floor friction, leaving one equation in the wall's push-back
+          force <var>N<sub>wall</sub></var>: <var>N<sub>wall</sub>L</var>sinθ = <var>g</var>cosθ(<var>M<sub>ladder</sub>L/2</var> + <var>m·d</var>),
+          where <var>d</var> is the person's distance up the ladder. Horizontal
+          equilibrium then forces the floor friction to exactly equal
+          <var>N<sub>wall</sub></var>. If that required friction ever exceeds
+          <var>μ<sub>floor</sub></var> times the floor's normal force, the
+          ladder slips — which is exactly why climbing higher on a leaning
+          ladder (increasing <var>d</var>) makes it progressively less
+          stable, even though your weight itself hasn't changed.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: find your own critical angle</h4>
+        <ol>
+          <li>Rest a coin or small object on a book. Slowly lift one end
+            until the object just starts to slide, and note the angle (a
+            phone's level/angle app works well for this).</li>
+          <li>Compute <var>μₛ</var> = tanθ from that critical angle, then try
+            a different object (rubber eraser vs. coin) on the same book —
+            the rougher object should tolerate a noticeably steeper tilt.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= TENSION AND CONNECTED OBJECTS (stub) ================= -->
+    <div class="panel" id="panel-tension-and-connected-objects">
+      <h2>Tension and Connected Objects</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a heavy block and a light
+        block hang from opposite ends of a rope over a pulley. Does the
+        heavier one accelerate downward as fast as it would falling freely,
+        slower, or not at all?
+      </p>
+
+      <p class="explainer">
+        A rope is treated as <strong>massless</strong> (its own weight is
+        negligible) and <strong>inextensible</strong> (it doesn't stretch),
+        which forces two objects tied together to share exactly the same
+        speed and the same magnitude of acceleration at every instant — they
+        move as a single connected system, even though the rope pulls on
+        each one from a different direction.
+      </p>
+
+      <div class="var-list">
+        <div><var>T</var> — tension: the pulling force a rope transmits, the same magnitude throughout an ideal massless rope</div>
+        <div><var>a</var> — the common acceleration shared by every object tied into the system</div>
+        <div><var>m₁</var>, <var>m₂</var> — the masses of the two connected objects</div>
+      </div>
+
+      <p class="explainer">
+        The general strategy: draw a separate free-body diagram for
+        <em>each</em> object, write <var>F</var> = <var>ma</var> for each one
+        with the same unknown <var>a</var> and the same unknown <var>T</var>
+        appearing in both equations (pulling in opposite, connected
+        directions), then solve the two equations together.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: why tension isn't just "half the weight" or some other shortcut</summary>
+        <p class="explainer">
+          A common guess is that the tension in a hanging system just equals
+          one of the weights, or their average. It doesn't, in general —
+          tension is whatever value makes both connected objects share the
+          exact same acceleration, and that value comes out of solving the
+          system, not from either mass alone. Widget 2 below lets you check
+          this directly: set the two hanging masses equal and the system
+          sits in perfect balance with <var>T</var> = <var>mg</var> exactly;
+          make them unequal and <var>T</var> lands somewhere between the two
+          weights, but never exactly at their average.
+        </p>
+      </details>
+
+      <p class="explainer">
+        One more thing a rope <em>can't</em> do: push. It only ever pulls,
+        along its own length. (If you swapped the rope in Widget 1 for a
+        spring instead, pulling it and letting go wouldn't give one clean
+        acceleration — it would set up a back-and-forth <strong>oscillation</strong>,
+        the subject of its own full section later: <a href="../08-oscillations/index.html#simple-harmonic-motion">Oscillations → Simple Harmonic Motion</a>.)
+      </p>
+
+      <h3 class="subhead">Widget 1 — Two Blocks Connected on a Table</h3>
+      <p class="explainer">
+        Pull the front block with force <var>F</var>; the rope drags the back
+        block along at the exact same acceleration. Notice that the tension
+        is <em>not</em> equal to <var>F</var> — it's only the share of the
+        pull that block 2 actually needs.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 90" id="tcTableSvg">
+            <line x1="10" y1="70" x2="450" y2="70" stroke="var(--text-primary)" stroke-width="2"></line>
+            <line id="tcRope" x1="0" y1="52" x2="0" y2="52" stroke="var(--muted)" stroke-width="3"></line>
+            <rect id="tcBlock2" x="0" y="40" width="35" height="25" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+            <rect id="tcBlock1" x="0" y="40" width="35" height="25" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <line id="tcForceArrow" stroke="#e34948" stroke-width="3" marker-end="url(#tcHead)"></line>
+            <defs><marker id="tcHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Pull force, F</span><b id="tcFVal">60 N</b></div>
+              <input type="range" id="tcFSlider" min="10" max="150" step="5" value="60"></div>
+            <div class="row"><div class="row-head"><span>Front block mass, m₁</span><b id="tcM1Val">5 kg</b></div>
+              <input type="range" id="tcM1Slider" min="1" max="20" step="1" value="5"></div>
+            <div class="row"><div class="row-head"><span>Back block mass, m₂</span><b id="tcM2Val">8 kg</b></div>
+              <input type="range" id="tcM2Slider" min="1" max="20" step="1" value="8"></div>
+            <button class="action" id="tcGoBtn">▶ Pull!</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Shared acceleration, <var>a</var> = <var>F/(m₁+m₂)</var></td><td class="v" id="tcAVal">4.62 m/s²</td></tr>
+              <tr><td class="k">Rope tension, <var>T</var> = <var>m₂a</var></td><td class="v" id="tcTVal">36.9 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Atwood Machine (Two Hanging Masses)</h3>
+      <p class="explainer">
+        Two masses hang from a rope over a pulley. If they're equal, nothing
+        moves. Make one heavier and the whole system accelerates — but
+        (answering the prediction above) always <em>slower</em> than free
+        fall, because the rope is also busy lifting the lighter mass.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 260 220" id="atwSvg">
+            <circle cx="130" cy="30" r="16" fill="none" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <line id="atwRopeLeft" x1="114" y1="30" x2="114" y2="100" stroke="var(--muted)" stroke-width="3"></line>
+            <line id="atwRopeRight" x1="146" y1="30" x2="146" y2="100" stroke="var(--muted)" stroke-width="3"></line>
+            <rect id="atwMassA" x="99" y="100" width="30" height="30" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <rect id="atwMassB" x="131" y="100" width="30" height="30" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass A</span><b id="atwMAVal">6 kg</b></div>
+              <input type="range" id="atwMASlider" min="1" max="20" step="1" value="6"></div>
+            <div class="row"><div class="row-head"><span>Mass B</span><b id="atwMBVal">4 kg</b></div>
+              <input type="range" id="atwMBSlider" min="1" max="20" step="1" value="4"></div>
+            <button class="action" id="atwGoBtn">▶ Release</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Acceleration, <var>a</var> = <var>(m<sub>A</sub>−m<sub>B</sub>)g/(m<sub>A</sub>+m<sub>B</sub>)</var></td><td class="v" id="atwAVal">1.96 m/s²</td></tr>
+              <tr><td class="k">Rope tension, <var>T</var></td><td class="v" id="atwTVal">47.0 N</td></tr>
+              <tr><td class="k">Compare: free-fall acceleration would be</td><td class="v" id="atwGVal">9.8 m/s²</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: solving the Atwood machine</summary>
+        <p class="explainer">
+          Taking "A descending" as positive: for A, <var>m<sub>A</sub>g</var> − <var>T</var> = <var>m<sub>A</sub>a</var>;
+          for B (moving up), <var>T</var> − <var>m<sub>B</sub>g</var> = <var>m<sub>B</sub>a</var>. Adding
+          the two equations cancels <var>T</var> entirely, giving
+          <var>a</var> = (<var>m<sub>A</sub></var>−<var>m<sub>B</sub></var>)<var>g</var> / (<var>m<sub>A</sub></var>+<var>m<sub>B</sub></var>).
+          Substituting back gives <var>T</var> = 2<var>m<sub>A</sub>m<sub>B</sub>g</var> / (<var>m<sub>A</sub></var>+<var>m<sub>B</sub></var>) —
+          notice this is always less than either individual weight, which is
+          exactly why the heavier side never falls as fast as it would in
+          free fall: the rope is holding it back precisely as much as it's
+          lifting the other side.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 3 — Incline Connected to a Hanging Mass</h3>
+      <p class="explainer">
+        A block on a ramp is tied over a pulley to a hanging mass. Whether
+        the hanging mass wins (pulling the block up the slope) depends on a
+        three-way tug between its own weight, the block's down-slope pull,
+        and friction.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="itSvg">
+            <line x1="20" y1="200" x2="280" y2="200" class="svg-axis"></line>
+            <path id="itRampFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <circle cx="240" cy="20" r="14" fill="none" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <rect id="itBlock" x="0" y="0" width="26" height="18" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+            <line id="itRopeUp" stroke="var(--muted)" stroke-width="3"></line>
+            <line id="itRopeDown" x1="240" y1="34" x2="240" y2="120" stroke="var(--muted)" stroke-width="3"></line>
+            <rect id="itHang" x="225" y="120" width="30" height="30" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Ramp angle, θ</span><b id="itThetaVal">25°</b></div>
+              <input type="range" id="itThetaSlider" min="5" max="70" step="1" value="25"></div>
+            <div class="row"><div class="row-head"><span>Block mass on ramp, m₁</span><b id="itM1Val">4 kg</b></div>
+              <input type="range" id="itM1Slider" min="1" max="15" step="1" value="4"></div>
+            <div class="row"><div class="row-head"><span>Hanging mass, m₂</span><b id="itM2Val">5 kg</b></div>
+              <input type="range" id="itM2Slider" min="1" max="15" step="1" value="5"></div>
+            <div class="row"><div class="row-head"><span>Friction, μ</span><b id="itMuVal">0.20</b></div>
+              <input type="range" id="itMuSlider" min="0" max="0.6" step="0.05" value="0.20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Acceleration</td><td class="v" id="itAVal">—</td></tr>
+              <tr><td class="k">Rope tension</td><td class="v" id="itTVal">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="itVerdictVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: two-book tug</h4>
+        <ol>
+          <li>Tie a string between two small, different-weight objects
+            (books, bags of rice) and drape it over a pencil balanced between
+            two chair backs, one object hanging on each side.</li>
+          <li>Let go and watch: the heavier one falls, but noticeably slower
+            than it would falling on its own — exactly what the Atwood
+            machine formula predicts.</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/newtons-laws.js"></script>
 </body>
 </html>

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>5. Constraints and Simple Machines — Exploring Mechanics</title>
 <link rel="stylesheet" href="../assets/css/site.css">
+<link rel="stylesheet" href="../assets/css/toolkit.css">
+<link rel="stylesheet" href="../assets/css/kinematics.css">
+<link rel="stylesheet" href="../assets/css/machines.css">
 </head>
 <body data-section="05-simple-machines">
 <div class="wrap">
@@ -15,10 +18,801 @@
       <p class="sub">Mechanical advantage and the principle that ideal machines trade force for distance.</p>
     </div>
   </header>
-  <nav class="tabbar" id="tabbar"></nav>
-  <div class="panels" id="panels"></div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="active" data-target="mechanical-advantage">Mechanical Advantage</button>
+    <button data-target="levers">Levers</button>
+    <button data-target="pulleys">Pulleys</button>
+    <button data-target="inclined-planes-and-wedges">Inclined Planes, Wedges, Screws, Wheel-and-Axle</button>
+    <button data-target="screws-and-wheel-axles">Screws and Wheel-and-Axle Systems</button>
+    <button data-target="gears">Gears</button>
+  </nav>
+
+  <div class="panels" id="panels">
+
+    <!-- ================= MECHANICAL ADVANTAGE (full) ================= -->
+    <div class="panel active" id="panel-mechanical-advantage">
+      <h2>Mechanical Advantage</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a machine lets you lift a
+        200 kg load using only 40 kg worth of push. Does that mean the
+        machine created extra energy from nowhere?
+      </p>
+
+      <p class="explainer">Input work = output work, for an ideal (frictionless) machine.</p>
+
+      <div class="var-list">
+        <div><var>MA</var> — mechanical advantage: output force ÷ input (effort) force</div>
+        <div><var>F<sub>in</sub></var>, <var>F<sub>out</sub></var> — the effort force you apply and the load force delivered</div>
+        <div><var>d<sub>in</sub></var>, <var>d<sub>out</sub></var> — the distance your effort moves and the distance the load moves</div>
+      </div>
+
+      <p class="explainer">
+        No machine creates energy. A machine with mechanical advantage
+        <var>MA</var> lets you push with <var>1/MA</var> of the force the
+        load actually needs — but only by having your effort move
+        <var>MA</var> times <em>farther</em> than the load does. Multiply
+        force by distance on both sides and the two products (the input and
+        output work) always come out equal, in the ideal case. This is the
+        "no free lunch" of mechanics: every simple machine in this section
+        is really just a different way of packaging that same trade.
+      </p>
+
+      <details class="math-details">
+        <summary>For math enthusiasts: where the ideal-machine equation comes from</summary>
+        <p class="explainer">
+          Starting from energy conservation with no losses:
+          <var>F<sub>in</sub>d<sub>in</sub></var> = <var>F<sub>out</sub>d<sub>out</sub></var>.
+          Rearranged, <var>F<sub>out</sub>/F<sub>in</sub></var> = <var>d<sub>in</sub>/d<sub>out</sub></var> —
+          mechanical advantage (the force ratio) and velocity ratio (the
+          distance/speed ratio) are the exact same number, just measured two
+          different ways. That's why, in every widget in this section,
+          computing one automatically tells you the other.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 1 — Force-Distance Tradeoff Explorer</h3>
+      <p class="explainer">
+        Set a mechanical advantage and an effort force, then watch the
+        required effort distance and the resulting load distance move in
+        exactly opposite proportion, keeping the work bars equal.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 140" id="maSvg">
+            <rect x="30" y="20" width="60" height="50" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="60" y="50" class="svg-label" text-anchor="middle">Effort</text>
+            <rect x="370" y="20" width="60" height="50" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="400" y="50" class="svg-label" text-anchor="middle">Load</text>
+            <rect x="150" y="10" width="160" height="70" rx="10" fill="#2a78d6" opacity="0.15" stroke="#2a78d6" stroke-width="2"></rect>
+            <text id="maBoxLabel" x="230" y="50" class="svg-label" text-anchor="middle">MA = 4</text>
+            <line x1="90" y1="45" x2="150" y2="45" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#maArrow)"></line>
+            <line x1="310" y1="45" x2="370" y2="45" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#maArrow)"></line>
+            <defs><marker id="maArrow" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="var(--text-primary)"></path></marker></defs>
+            <rect id="maInBar" x="30" y="120" width="60" height="0" fill="#e34948"></rect>
+            <rect id="maOutBar" x="370" y="120" width="60" height="0" fill="#1baf7a"></rect>
+            <text x="60" y="134" class="svg-label" text-anchor="middle" font-size="8">input work</text>
+            <text x="400" y="134" class="svg-label" text-anchor="middle" font-size="8">output work</text>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mechanical advantage, MA</span><b id="maMAVal">4</b></div>
+              <input type="range" id="maMASlider" min="1" max="10" step="0.5" value="4"></div>
+            <div class="row"><div class="row-head"><span>Effort force, F<sub>in</sub></span><b id="maFInVal">50 N</b></div>
+              <input type="range" id="maFInSlider" min="10" max="200" step="10" value="50"></div>
+            <div class="row"><div class="row-head"><span>Effort distance, d<sub>in</sub></span><b id="maDInVal">2 m</b></div>
+              <input type="range" id="maDInSlider" min="0.5" max="5" step="0.5" value="2"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Load force, <var>F<sub>out</sub></var> = <var>MA·F<sub>in</sub></var></td><td class="v" id="maFOutVal">200 N</td></tr>
+              <tr><td class="k">Load distance, <var>d<sub>out</sub></var> = <var>d<sub>in</sub>/MA</var></td><td class="v" id="maDOutVal">0.50 m</td></tr>
+              <tr><td class="k">Input / output work</td><td class="v" id="maWorkVal">100 / 100 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Ideal vs. Real Machines</h3>
+      <p class="explainer">
+        Real machines lose some input work to friction and heat. To deliver
+        the <em>same</em> useful output work, a less efficient machine
+        demands more input than the ideal case — mechanical advantage
+        doesn't disappear, but you stop getting it for free.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 120" id="maEffSvg">
+            <rect x="20" y="30" width="60" height="50" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="50" y="60" class="svg-label" text-anchor="middle">In</text>
+            <rect x="180" y="30" width="60" height="50" rx="6" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <text x="210" y="60" class="svg-label" text-anchor="middle">Out</text>
+            <rect x="100" y="20" width="60" height="70" rx="8" fill="#2a78d6" opacity="0.15" stroke="#2a78d6" stroke-width="2"></rect>
+            <text x="130" y="20" class="svg-label" text-anchor="middle" font-size="16">🔥</text>
+            <line x1="80" y1="55" x2="100" y2="55" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#maArrow)"></line>
+            <line x1="160" y1="55" x2="180" y2="55" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#maArrow)"></line>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Desired output work</span><b id="maEffOutVal">100 J</b></div>
+              <input type="range" id="maEffOutSlider" min="20" max="500" step="10" value="100"></div>
+            <div class="row"><div class="row-head"><span>Machine efficiency</span><b id="maEffPctVal">80%</b></div>
+              <input type="range" id="maEffSlider" min="20" max="100" step="5" value="80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required input work</td><td class="v" id="maEffInVal">125.0 J</td></tr>
+              <tr><td class="k">Wasted as heat/friction</td><td class="v" id="maEffLostVal">25.0 J</td></tr>
+              <tr><td class="k">Ideal-machine input (100% efficient)</td><td class="v" id="maEffIdealVal">100.0 J</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: efficiency and mechanical advantage are independent</summary>
+        <p class="explainer">
+          Mechanical advantage compares force in to force out;
+          <strong>efficiency</strong> compares work out to work in. A
+          machine can have a huge mechanical advantage and still be quite
+          inefficient (a rusty pulley system), or a small mechanical
+          advantage and be nearly perfectly efficient (a smooth, direct
+          lever). The two numbers describe different things and neither one
+          determines the other.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= LEVERS (stub) ================= -->
+    <div class="panel" id="panel-levers">
+      <h2>Levers</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a crowbar, a wheelbarrow,
+        and your own forearm are all levers, but they don't feel similar to
+        use at all — a wheelbarrow multiplies your lifting force, while your
+        forearm curling a dumbbell clearly does <em>not</em>. Are these
+        really the same kind of machine?
+      </p>
+
+      <p class="explainer"><var>τ</var> = <var>F</var>·<var>r</var> &nbsp;(torque = force × lever arm) &nbsp;·&nbsp; Balance: <var>τ<sub>effort</sub></var> = <var>τ<sub>load</sub></var></p>
+
+      <div class="var-list">
+        <div><var>τ</var> — torque, the turning effect of a force about a pivot</div>
+        <div><var>r</var> — the lever arm: perpendicular distance from the pivot (fulcrum) to where the force acts</div>
+        <div>Fulcrum — the pivot point the lever rotates around</div>
+      </div>
+
+      <p class="explainer">
+        All three levers in the prediction above obey the exact same
+        balance rule; what differs is only <strong>where the fulcrum sits
+        relative to the effort and the load</strong>. That single
+        arrangement choice is what decides whether a lever multiplies
+        force (like the wheelbarrow) or sacrifices force for speed and reach
+        (like your forearm).
+      </p>
+
+      <h3 class="subhead">Widget 1 — Lever Class Explorer</h3>
+      <p class="explainer">
+        Switch between the three lever classes and watch the fulcrum jump to
+        a different spot on the beam — that's the entire difference between
+        them.
+      </p>
+      <div class="preset-row" id="levClassRow">
+        <button data-class="1" class="active">1st class — fulcrum in the middle (seesaw, crowbar)</button>
+        <button data-class="2">2nd class — load in the middle (wheelbarrow)</button>
+        <button data-class="3">3rd class — effort in the middle (forearm, tweezers)</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 140" id="levSvg">
+            <line id="levBeam" x1="40" y1="80" x2="420" y2="80" stroke="#8a5a2b" stroke-width="8" stroke-linecap="round"></line>
+            <path id="levFulcrum" fill="var(--text-primary)"></path>
+            <line id="levEffortArrow" stroke="#2a78d6" stroke-width="3" marker-end="url(#levHeadBlue)"></line>
+            <line id="levLoadArrow" stroke="#eb6834" stroke-width="3" marker-end="url(#levHeadOrange)"></line>
+            <text id="levEffortLabel" class="svg-label" text-anchor="middle">Effort</text>
+            <text id="levLoadLabel" class="svg-label" text-anchor="middle">Load</text>
+            <defs>
+              <marker id="levHeadBlue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker>
+              <marker id="levHeadOrange" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#eb6834"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Load force, F<sub>load</sub></span><b id="levFLoadVal">200 N</b></div>
+              <input type="range" id="levFLoadSlider" min="20" max="500" step="10" value="200"></div>
+            <div class="row"><div class="row-head"><span>Effort arm, r<sub>effort</sub></span><b id="levEffortArmVal">3.0 m</b></div>
+              <input type="range" id="levEffortArmSlider" min="0.2" max="5" step="0.1" value="3"></div>
+            <div class="row"><div class="row-head"><span>Load arm, r<sub>load</sub></span><b id="levLoadArmVal">0.5 m</b></div>
+              <input type="range" id="levLoadArmSlider" min="0.2" max="5" step="0.1" value="0.5"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required effort force, <var>F<sub>load</sub>·r<sub>load</sub>/r<sub>effort</sub></var></td><td class="v" id="levFEffortVal">33.3 N</td></tr>
+              <tr><td class="k">Mechanical advantage, <var>r<sub>effort</sub>/r<sub>load</sub></var></td><td class="v" id="levMAVal">6.00</td></tr>
+              <tr><td class="k">Trade-off</td><td class="v" id="levTradeVal">Less force, more effort travel</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the forearm's "disadvantage" is the whole point</summary>
+        <p class="explainer">
+          A third-class lever always has <var>r<sub>effort</sub></var> &lt; <var>r<sub>load</sub></var>,
+          so mechanical advantage <var>r<sub>effort</sub>/r<sub>load</sub></var>
+          is always less than 1 — it takes <em>more</em> force than the load
+          itself to operate. What you get in exchange is exactly what the
+          "no free lunch" rule promises: the load end moves through a much
+          larger distance (and speed) than the effort end. Your forearm
+          muscle contracts only a little, but your hand sweeps through a
+          wide, fast arc — precisely why arms and legs are built as
+          third-class levers, trading force for speed and reach.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Seesaw Balance</h3>
+      <p class="explainer">
+        Drag either person along the seesaw. It balances only when both
+        torques exactly match — not when both people have the same weight,
+        and not when they sit at the same distance.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 160" id="seesawSvg">
+            <path d="M 210,150 L 250,150 L 230,110 Z" fill="var(--text-primary)"></path>
+            <line id="seesawBeam" x1="60" y1="110" x2="400" y2="110" stroke="#8a5a2b" stroke-width="10" stroke-linecap="round"></line>
+            <circle id="seesawP1" cx="90" cy="103" r="14" fill="#2a78d6" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+            <circle id="seesawP2" cx="370" cy="103" r="14" fill="#eb6834" stroke="white" stroke-width="2" style="cursor:grab"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Mass 1 (blue)</span><b id="seesawM1Val">40 kg</b></div>
+              <input type="range" id="seesawM1Slider" min="10" max="100" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Mass 2 (orange)</span><b id="seesawM2Val">40 kg</b></div>
+              <input type="range" id="seesawM2Slider" min="10" max="100" step="5" value="40"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Torque 1 / Torque 2</td><td class="v" id="seesawTVal">—</td></tr>
+              <tr><td class="k">Verdict</td><td class="v" id="seesawVerdictVal">—</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 3 — Why a Longer Wrench Needs Less Force</h3>
+      <p class="explainer">
+        A stuck bolt needs a fixed amount of torque to turn, no matter what
+        tool you use. A longer handle lets you supply that same torque with
+        dramatically less force.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 260 100" id="wrenchSvg">
+            <circle cx="40" cy="50" r="16" fill="none" stroke="var(--text-primary)" stroke-width="4"></circle>
+            <line id="wrenchHandle" x1="40" y1="50" x2="200" y2="50" stroke="var(--muted)" stroke-width="6" stroke-linecap="round"></line>
+            <line id="wrenchForceArrow" stroke="#e34948" stroke-width="3" marker-end="url(#wrenchHead)"></line>
+            <defs><marker id="wrenchHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Torque needed to turn the bolt, τ</span><b id="wrenchTauVal">40 N·m</b></div>
+              <input type="range" id="wrenchTauSlider" min="10" max="100" step="5" value="40"></div>
+            <div class="row"><div class="row-head"><span>Wrench handle length, L</span><b id="wrenchLVal">0.20 m</b></div>
+              <input type="range" id="wrenchLSlider" min="0.1" max="0.6" step="0.02" value="0.2"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required force, <var>F</var> = <var>τ/L</var></td><td class="v" id="wrenchFVal">200 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: two-finger seesaw</h4>
+        <ol>
+          <li>Balance a ruler on a pencil (fulcrum), then place two identical
+            coins at different distances from the pencil. Find the
+            distances that balance it, and check that (mass × distance)
+            matches on both sides.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= PULLEYS (stub) ================= -->
+    <div class="panel" id="panel-pulleys">
+      <h2>Pulleys</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a pulley bolted to the
+        ceiling lets you pull a rope down to lift a load up. Does that
+        single pulley make the load any easier to lift, or does it only
+        change which direction you pull?
+      </p>
+
+      <p class="explainer">
+        <var>MA</var> = number of rope segments directly supporting the
+        load &nbsp;·&nbsp; Effort force = load / <var>MA</var> &nbsp;·&nbsp; Rope pulled = <var>MA</var> × load's rise
+      </p>
+
+      <div class="var-list">
+        <div>Fixed pulley — anchored in place; changes the direction of the pull, but <var>MA</var> = 1</div>
+        <div>Movable pulley — attached to the load itself and rises with it; each rope segment touching it shares the load's weight</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Fixed vs. Movable Pulley</h3>
+      <p class="explainer">
+        The prediction above resolves right here: a single fixed pulley
+        changes direction only. Attach that pulley to the load instead — a
+        movable pulley — and two rope segments now share the load, cutting
+        the needed force in half (at the cost of pulling twice the rope).
+      </p>
+      <div class="mode-toggle" id="pulModeToggle">
+        <button class="active" data-mode="fixed"><b>Fixed pulley</b>redirects force only, MA = 1</button>
+        <button data-mode="movable"><b>Single movable pulley</b>MA = 2</button>
+      </div>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 220" id="pulSingleSvg">
+            <circle id="pulWheel1" cx="110" cy="30" r="14" fill="none" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <circle id="pulWheel2" cx="110" cy="110" r="14" fill="none" stroke="var(--text-primary)" stroke-width="3" opacity="0"></circle>
+            <path id="pulRope" fill="none" stroke="var(--muted)" stroke-width="3"></path>
+            <rect id="pulLoad" x="95" y="150" width="30" height="30" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Load weight</span><b id="pulLoadVal">200 N</b></div>
+              <input type="range" id="pulLoadSlider" min="20" max="500" step="10" value="200"></div>
+            <div class="row"><div class="row-head"><span>Height to lift the load</span><b id="pulHVal">2 m</b></div>
+              <input type="range" id="pulHSlider" min="0.5" max="5" step="0.5" value="2"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Required pull force</td><td class="v" id="pulFVal">200 N</td></tr>
+              <tr><td class="k">Rope you must pull in</td><td class="v" id="pulRopeVal">2.0 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="subhead">Widget 2 — Block and Tackle Builder</h3>
+      <p class="explainer">
+        Add more rope segments between a fixed block and a movable block and
+        the mechanical advantage climbs directly with the segment count —
+        this is exactly how cranes and sailing-ship rigging lift enormous
+        loads with modest hand force.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 220" id="pulTackleSvg">
+            <rect x="80" y="10" width="140" height="20" rx="4" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <g id="pulTackleWheelsTop"></g>
+            <g id="pulTackleRopes"></g>
+            <rect id="pulTackleBlock" x="110" y="120" width="80" height="20" rx="4" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></rect>
+            <rect id="pulTackleLoad" x="130" y="140" width="40" height="30" fill="#eb6834" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Rope segments supporting the load, n</span><b id="pulNVal">3</b></div>
+              <input type="range" id="pulNSlider" min="1" max="6" step="1" value="3"></div>
+            <div class="row"><div class="row-head"><span>Load weight</span><b id="pulTLoadVal">600 N</b></div>
+              <input type="range" id="pulTLoadSlider" min="100" max="2000" step="50" value="600"></div>
+            <div class="row"><div class="row-head"><span>Height to lift the load</span><b id="pulTHVal">1.5 m</b></div>
+              <input type="range" id="pulTHSlider" min="0.5" max="4" step="0.5" value="1.5"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Mechanical advantage, <var>MA</var> = <var>n</var></td><td class="v" id="pulTMAVal">3</td></tr>
+              <tr><td class="k">Required pull force, load/<var>n</var></td><td class="v" id="pulTFVal">200.0 N</td></tr>
+              <tr><td class="k">Rope pulled, <var>n</var> × height</td><td class="v" id="pulTRopeVal">4.5 m</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: rope-length constraints and the Atwood machine</summary>
+        <p class="explainer">
+          Every rope segment supporting the movable block shortens by the
+          same amount when you pull — that's the "rope-length constraint,"
+          and it's the real reason pulling in <var>n</var> times the rope
+          only raises the load 1/<var>n</var> as far: the total rope is
+          fixed, so it has to be divided among all <var>n</var> supporting
+          segments equally. The two-hanging-masses version of a pulley
+          system (no mechanical advantage, just redirected tension) was
+          already built as the Atwood Machine in
+          <a href="../02-newtons-laws/index.html#tension-and-connected-objects">Newton's Laws → Tension and Connected Objects</a>.
+        </p>
+      </details>
+
+      <div class="try-at-home">
+        <h4>Try it for real: shoelace pulley</h4>
+        <ol>
+          <li>Loop a shoelace or string around two pens (acting as pulleys)
+            multiple times before attaching a small weight, and feel how
+            much less force it takes to lift compared to pulling it
+            directly — at the cost of pulling far more string.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= INCLINED PLANES, WEDGES, SCREWS, WHEEL-AND-AXLE (stub) ================= -->
+    <div class="panel" id="panel-inclined-planes-and-wedges">
+      <h2>Inclined Planes, Wedges, Screws, and Wheel-and-Axle</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a long, gently sloped
+        ramp and a short, steep one both get a heavy crate up to the same
+        loading-dock height. Which ramp needs less pushing force — and does
+        either one save you any actual work?
+      </p>
+
+      <p class="explainer">
+        A ramp is a simple machine with <var>MA</var> = 1/sinθ (frictionless
+        case) — the same "no free lunch" trade from Mechanical Advantage,
+        with the ramp's length standing in for the effort distance. This
+        tab covers ramps and wedges; screws and the wheel-and-axle — both
+        built from the exact same wrapped or spinning inclined plane — get
+        their own dedicated tab next.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Ramp Force Calculator</h3>
+      <p class="explainer">
+        Compare lifting a crate straight up against pushing it up a ramp to
+        the same height. The friction-by-friction force breakdown for a
+        single incline was already covered in
+        <a href="../02-newtons-laws/index.html#inclined-planes">Newton's Laws → Inclined Planes</a>;
+        here, the focus is purely the mechanical-advantage trade between the
+        two methods.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 300 200" id="rampCalcSvg">
+            <line x1="20" y1="180" x2="280" y2="180" class="svg-axis"></line>
+            <path id="rampCalcFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <rect id="rampCalcBlock" x="0" y="0" width="26" height="18" fill="#2a78d6" stroke="white" stroke-width="2"></rect>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Crate weight</span><b id="rampWVal">400 N</b></div>
+              <input type="range" id="rampWSlider" min="50" max="1000" step="25" value="400"></div>
+            <div class="row"><div class="row-head"><span>Dock height, h</span><b id="rampHVal">1.2 m</b></div>
+              <input type="range" id="rampHSlider" min="0.5" max="3" step="0.1" value="1.2"></div>
+            <div class="row"><div class="row-head"><span>Ramp angle, θ</span><b id="rampThetaVal">20°</b></div>
+              <input type="range" id="rampThetaSlider" min="5" max="80" step="1" value="20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Force lifting straight up</td><td class="v" id="rampDirectFVal">400 N</td></tr>
+              <tr><td class="k">Force pushing up the ramp (frictionless), <var>W</var>sinθ</td><td class="v" id="rampRampFVal">137 N</td></tr>
+              <tr><td class="k">Ramp length needed, <var>h</var>/sinθ</td><td class="v" id="rampLenVal">3.51 m</td></tr>
+              <tr><td class="k">Mechanical advantage, 1/sinθ</td><td class="v" id="rampMAVal">2.92</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: the ramp saves force, never work</summary>
+        <p class="explainer">
+          Direct lift work: <var>Wh</var>. Ramp work (frictionless):
+          (<var>W</var>sinθ)×(<var>h</var>/sinθ) = <var>Wh</var> — identical.
+          The gentler ramp needs less force but a proportionally longer
+          push, exactly canceling out. Any force savings you actually
+          measure on a <em>real</em> ramp beyond that trade is really
+          friction working in your favor in an unusual way, or more often,
+          friction working against you and costing extra — never a genuine
+          reduction in total work.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Wedge: Splitting Force</h3>
+      <p class="explainer">
+        A wedge is just two inclined planes back to back. Driving it
+        straight down converts a modest downward force into a much larger
+        sideways splitting force — the thinner the wedge angle, the bigger
+        that multiplication.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 140" id="wedgeSvg">
+            <path id="wedgeShape" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+            <line id="wedgeDownArrow" x1="110" y1="0" x2="110" y2="30" stroke="#e34948" stroke-width="3" marker-end="url(#wedgeHeadDown)"></line>
+            <line id="wedgeLeftArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#wedgeHeadLeft)"></line>
+            <line id="wedgeRightArrow" stroke="#1baf7a" stroke-width="3" marker-end="url(#wedgeHeadRight)"></line>
+            <defs>
+              <marker id="wedgeHeadDown" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#e34948"></path></marker>
+              <marker id="wedgeHeadLeft" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 Z" fill="#1baf7a"></path></marker>
+              <marker id="wedgeHeadRight" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#1baf7a"></path></marker>
+            </defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Driving force (downward)</span><b id="wedgeFVal">80 N</b></div>
+              <input type="range" id="wedgeFSlider" min="10" max="300" step="10" value="80"></div>
+            <div class="row"><div class="row-head"><span>Wedge half-angle, φ</span><b id="wedgePhiVal">10°</b></div>
+              <input type="range" id="wedgePhiSlider" min="2" max="40" step="1" value="10"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Splitting force (each side), <var>F</var>/tanφ</td><td class="v" id="wedgeOutVal">454 N</td></tr>
+              <tr><td class="k">Mechanical advantage, 1/tanφ</td><td class="v" id="wedgeMAVal">5.67</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why axes are ground thin</summary>
+        <p class="explainer">
+          As the half-angle φ shrinks toward zero, tanφ shrinks even faster
+          (proportionally to φ itself, in radians, for small angles), so
+          1/tanφ grows without bound. That's why a thin axe blade splits
+          wood so effectively compared to a blunt wedge — and also why an
+          extremely thin blade requires an impractically long, precise taper
+          to manufacture, a real engineering trade-off this idealized
+          formula doesn't capture.
+        </p>
+      </details>
+    </div>
+
+    <!-- ================= SCREWS AND WHEEL-AND-AXLE SYSTEMS (stub) ================= -->
+    <div class="panel" id="panel-screws-and-wheel-axles">
+      <h2>Screws and Wheel-and-Axle Systems</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a car jack lets one person
+        lift an entire car by turning a small handle over and over. Is the
+        jack's screw doing something fundamentally different from the ramp
+        in the last tab, or is it secretly the exact same trick in disguise?
+      </p>
+
+      <p class="explainer">
+        A screw is an inclined plane <strong>wrapped around a cylinder</strong>;
+        a wheel-and-axle is really a lever that <strong>spins in a full
+        circle</strong> instead of swinging back and forth. Both still
+        reduce to force × distance staying constant.
+      </p>
+
+      <div class="var-list">
+        <div><var>p</var> — thread pitch: how far a screw advances in one full turn</div>
+        <div><var>r</var> — radius at which you apply the turning force (wrench, handle, wheel rim)</div>
+        <div><var>R</var> — wheel radius; <var>r<sub>axle</sub></var> — axle radius</div>
+      </div>
+
+      <h3 class="subhead">Widget 1 — Screw Mechanics Visualizer</h3>
+      <p class="explainer">
+        Turn the handle once and it sweeps out a full circle of
+        circumference 2π<var>r</var> — while the screw itself only advances
+        one pitch-length, <var>p</var>. "Unwrapped," that's exactly a ramp
+        of length 2π<var>r</var> rising a height <var>p</var>, which is
+        where the mechanical advantage formula below comes from directly.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="screwSvg">
+            <g id="screwGroup">
+              <line x1="60" y1="20" x2="60" y2="160" stroke="var(--muted)" stroke-width="10"></line>
+              <g id="screwThreads"></g>
+            </g>
+            <circle cx="60" cy="20" r="6" fill="var(--text-primary)"></circle>
+            <line id="screwHandle" x1="60" y1="20" x2="140" y2="20" stroke="var(--text-primary)" stroke-width="3"></line>
+            <text x="230" y="150" class="svg-label">Unwrapped (one turn):</text>
+            <line x1="230" y1="130" x2="440" y2="130" class="svg-axis"></line>
+            <path id="screwRampFill" fill="var(--chip)" stroke="var(--border)" stroke-width="2"></path>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Handle/wrench radius, r</span><b id="screwRVal">0.15 m</b></div>
+              <input type="range" id="screwRSlider" min="0.05" max="0.4" step="0.01" value="0.15"></div>
+            <div class="row"><div class="row-head"><span>Thread pitch, p</span><b id="screwPVal">0.005 m</b></div>
+              <input type="range" id="screwPSlider" min="0.001" max="0.02" step="0.001" value="0.005"></div>
+            <div class="row"><div class="row-head"><span>Axial load to overcome, W</span><b id="screwWVal">2000 N</b></div>
+              <input type="range" id="screwWSlider" min="200" max="10000" step="100" value="2000"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Mechanical advantage, <var>2πr/p</var></td><td class="v" id="screwMAVal">188.5</td></tr>
+              <tr><td class="k">Required turning force, <var>Wp/(2πr)</var></td><td class="v" id="screwFVal">10.6 N</td></tr>
+              <tr><td class="k">"Unwrapped" ramp angle, atan(<var>p/2πr</var>)</td><td class="v" id="screwAngleVal">0.30°</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why a finer thread multiplies force more</summary>
+        <p class="explainer">
+          Halving the pitch <var>p</var> without changing <var>r</var>
+          doubles the mechanical advantage <var>2πr/p</var> — the "ramp" the
+          thread unwraps into gets twice as shallow for the same
+          circumference. That's exactly why fine-threaded screws and bolts
+          (many turns per inch) can clamp with enormous force from modest
+          hand torque, at the cost of needing far more turns to travel any
+          given distance.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Wheel-and-Axle Simulation</h3>
+      <p class="explainer">
+        A steering wheel, doorknob, and winch handle are all the same
+        machine: a large wheel turning a much smaller axle multiplies the
+        torque you apply into a much larger force (or, run the other way,
+        turns a small effort at the rim into fast rotation at the axle).
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 220" id="wheelAxleSvg">
+            <circle id="wheelOuter" cx="110" cy="110" r="90" fill="none" stroke="var(--border)" stroke-width="4"></circle>
+            <circle id="wheelAxle" cx="110" cy="110" r="20" fill="var(--chip)" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <line id="wheelEffortArrow" stroke="#2a78d6" stroke-width="3" marker-end="url(#wheelHead)"></line>
+            <defs><marker id="wheelHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker></defs>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Wheel radius, R</span><b id="wheelRVal">0.20 m</b></div>
+              <input type="range" id="wheelRSlider" min="0.05" max="0.4" step="0.01" value="0.2"></div>
+            <div class="row"><div class="row-head"><span>Axle radius, r<sub>axle</sub></span><b id="wheelRAxleVal">0.03 m</b></div>
+              <input type="range" id="wheelRAxleSlider" min="0.01" max="0.1" step="0.005" value="0.03"></div>
+            <div class="row"><div class="row-head"><span>Effort force at the rim</span><b id="wheelFVal">20 N</b></div>
+              <input type="range" id="wheelFSlider" min="5" max="100" step="5" value="20"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Mechanical advantage, <var>R/r<sub>axle</sub></var></td><td class="v" id="wheelMAVal">6.67</td></tr>
+              <tr><td class="k">Force delivered at the axle</td><td class="v" id="wheelFOutVal">133.3 N</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="try-at-home">
+        <h4>Try it for real: doorknob vs. bare spindle</h4>
+        <ol>
+          <li>Compare turning a doorknob normally to (carefully, if
+            possible) turning just the thin square spindle inside it
+            directly — the knob's larger radius is doing exactly the
+            <var>R/r</var> multiplication from this widget.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ================= GEARS (stub) ================= -->
+    <div class="panel" id="panel-gears">
+      <h2>Gears</h2>
+
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> you insert a third gear
+        (an "idler") between two meshing gears, without changing either
+        original gear's tooth count. Does the overall speed ratio between
+        the first and last gear change?
+      </p>
+
+      <p class="explainer">
+        <var>ω₁N₁</var> = <var>ω₂N₂</var> for any two meshing gears &nbsp;·&nbsp; Every mesh reverses rotation direction
+      </p>
+
+      <div class="var-list">
+        <div><var>N</var> — number of teeth on a gear</div>
+        <div><var>ω</var> — angular speed</div>
+        <div>Idler gear — a gear inserted between two others purely to change direction or bridge a gap</div>
+      </div>
+
+      <p class="explainer">
+        Gear teeth must mesh at the same linear (tangential) speed where
+        they touch, which forces <var>ω₁N₁</var> = <var>ω₂N₂</var> — a
+        smaller gear spins proportionally faster than a larger one it's
+        meshed with. Torque works the opposite way: the smaller, faster
+        gear delivers proportionally <em>less</em> torque, same trade-off
+        as every other simple machine in this section.
+      </p>
+
+      <h3 class="subhead">Widget 1 — Gear Train and the Idler Puzzle</h3>
+      <p class="explainer">
+        Toggle the idler gear in and out. The overall ratio between the
+        first and last gear never changes — only the final direction of
+        rotation does.
+      </p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="gearTrainSvg">
+            <g id="gearA"></g>
+            <g id="gearB"></g>
+            <g id="gearC"></g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <label class="checkbox"><input type="checkbox" id="gearIdlerBox" checked> Include the idler gear (B)</label>
+            <div class="row"><div class="row-head"><span>Gear A teeth, N<sub>A</sub></span><b id="gearNAVal">12</b></div>
+              <input type="range" id="gearNASlider" min="6" max="30" step="1" value="12"></div>
+            <div class="row"><div class="row-head"><span>Idler gear B teeth, N<sub>B</sub></span><b id="gearNBVal">18</b></div>
+              <input type="range" id="gearNBSlider" min="6" max="30" step="1" value="18"></div>
+            <div class="row"><div class="row-head"><span>Gear C teeth, N<sub>C</sub></span><b id="gearNCVal">24</b></div>
+              <input type="range" id="gearNCSlider" min="6" max="30" step="1" value="24"></div>
+            <div class="row"><div class="row-head"><span>Gear A speed, ω<sub>A</sub></span><b id="gearWAVal">60 RPM</b></div>
+              <input type="range" id="gearWASlider" min="10" max="200" step="10" value="60"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Gear C speed, <var>ω<sub>A</sub>N<sub>A</sub>/N<sub>C</sub></var></td><td class="v" id="gearWCVal">30.0 RPM</td></tr>
+              <tr><td class="k">Overall ratio A→C (with or without idler)</td><td class="v" id="gearRatioVal">0.50</td></tr>
+              <tr><td class="k">Gear C's direction, relative to A</td><td class="v" id="gearDirVal">Same direction</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why the idler drops out of the ratio</summary>
+        <p class="explainer">
+          With the idler: <var>ω<sub>B</sub></var> = <var>ω<sub>A</sub>N<sub>A</sub>/N<sub>B</sub></var>,
+          then <var>ω<sub>C</sub></var> = <var>ω<sub>B</sub>N<sub>B</sub>/N<sub>C</sub></var> = (<var>ω<sub>A</sub>N<sub>A</sub>/N<sub>B</sub></var>)(<var>N<sub>B</sub>/N<sub>C</sub></var>) = <var>ω<sub>A</sub>N<sub>A</sub>/N<sub>C</sub></var> —
+          <var>N<sub>B</sub></var> cancels algebraically no matter what value
+          it has. But each mesh (A–B, then B–C) reverses direction once, for
+          two reversals total — back to A's original direction. Remove the
+          idler and mesh A directly with C: exactly one reversal, so C spins
+          opposite to A, even though its <em>speed</em> is identical either
+          way.
+        </p>
+      </details>
+
+      <h3 class="subhead">Widget 2 — Bicycle Gears</h3>
+      <p class="explainer">
+        A bicycle's chainring-and-cog pair is a gear train connected by a
+        chain instead of meshing teeth directly, but the same ratio math
+        applies — and it's the whole reason low gears help on hills while
+        high gears help on flats.
+      </p>
+      <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 160" id="bikeGearSvg">
+            <circle id="bikeChainring" cx="70" cy="110" r="45" fill="none" stroke="#2a78d6" stroke-width="4"></circle>
+            <circle id="bikeCog" cx="170" cy="110" r="18" fill="none" stroke="#eb6834" stroke-width="4"></circle>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Chainring (front) teeth</span><b id="bikeFrontVal">40</b></div>
+              <input type="range" id="bikeFrontSlider" min="20" max="52" step="1" value="40"></div>
+            <div class="row"><div class="row-head"><span>Cog (rear) teeth</span><b id="bikeRearVal">16</b></div>
+              <input type="range" id="bikeRearSlider" min="10" max="36" step="1" value="16"></div>
+            <div class="row"><div class="row-head"><span>Pedaling cadence</span><b id="bikeCadenceVal">80 RPM</b></div>
+              <input type="range" id="bikeCadenceSlider" min="40" max="120" step="5" value="80"></div>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Gear ratio, front/rear</td><td class="v" id="bikeRatioVal">2.50</td></tr>
+              <tr><td class="k">Rear wheel speed</td><td class="v" id="bikeWheelRPMVal">200.0 RPM</td></tr>
+              <tr><td class="k">Road speed (0.34 m wheel radius)</td><td class="v" id="bikeSpeedVal">7.13 m/s</td></tr>
+              <tr><td class="k">Torque multiplier at the wheel</td><td class="v" id="bikeTorqueVal">0.40×</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <details class="math-details">
+        <summary>For math enthusiasts: why low gears feel "easier" but not free</summary>
+        <p class="explainer">
+          A small chainring-to-cog ratio multiplies your pedaling torque at
+          the wheel (helpful for hills), but proportionally reduces wheel
+          speed for the same cadence — you pedal the same effort, spin your
+          legs the same speed, but travel slower per pedal stroke. As
+          always, nothing here creates or destroys energy; it only reshapes
+          the force/speed trade at the wheel.
+        </p>
+      </details>
+    </div>
+
+  </div>
 </div>
-<script src="../assets/js/section-data.js"></script>
-<script src="../assets/js/render-section.js"></script>
+<script src="../assets/js/toolkit.js"></script>
+<script src="../assets/js/machines.js"></script>
 </body>
 </html>

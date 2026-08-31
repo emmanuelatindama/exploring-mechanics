@@ -9,6 +9,26 @@
     return el;
   }
   const D2R = Math.PI / 180;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  function clientToSvg(svg, evt) {
+    const rect = svg.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    const sx = vb.width / rect.width, sy = vb.height / rect.height;
+    return { x: (evt.clientX - rect.left) * sx + vb.x, y: (evt.clientY - rect.top) * sy + vb.y };
+  }
+
+  function makeDraggable(handle, svg, onMove) {
+    handle.addEventListener("pointerdown", (e) => {
+      handle.setPointerCapture(e.pointerId);
+      handle.style.cursor = "grabbing";
+    });
+    handle.addEventListener("pointermove", (e) => {
+      if (e.buttons !== 1) return;
+      onMove(clientToSvg(svg, e));
+    });
+    handle.addEventListener("pointerup", () => { handle.style.cursor = "grab"; });
+  }
 
   /* ---- shared projectile math (no drag): used by widgets 1, 2, 3, 4 ---- */
   function computeIdealTrajectory(v0, thDeg, y0, g, numPoints) {
@@ -134,7 +154,7 @@
       animating = true;
       const start = performance.now(), duration = 1400;
       function step(now) {
-        const frac = Math.min(1, (now - start) / duration);
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
         const idx = Math.floor(frac * (currentPoints.length - 1));
         const p = currentPoints[idx];
         ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
@@ -215,7 +235,7 @@
       animating = true; solid.style.display = ""; solid.setAttribute("d", preview.getAttribute("d"));
       const start = performance.now(), duration = 1200;
       function step(now) {
-        const frac = Math.min(1, (now - start) / duration);
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
         const idx = Math.floor(frac * (currentPoints.length - 1));
         const p = currentPoints[idx];
         ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
@@ -332,7 +352,7 @@
         const tMax = Math.max(c.tStar * 1.4, 4);
         const start = performance.now(), duration = 2200;
         function step(now) {
-          const frac = Math.min(1, (now - start) / duration);
+          const frac = Math.max(0, Math.min(1, (now - start) / duration));
           const t = frac * tMax;
           const aAt = { x: c.posA0.x + c.velA.x * t, y: c.posA0.y + c.velA.y * t };
           const bAt = { x: c.posB0.x + c.velB.x * t, y: c.posB0.y + c.velB.y * t };
@@ -398,7 +418,7 @@
         const T = computeIdealTrajectory(v0, th, 0, G).T;
         const start = performance.now(), duration = 1500;
         function step(now) {
-          const frac = Math.min(1, (now - start) / duration);
+          const frac = Math.max(0, Math.min(1, (now - start) / duration));
           const idx = Math.floor(frac * (currentPoints.length - 1));
           const p = currentPoints[idx];
           ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
@@ -499,7 +519,7 @@
       const c = computeAll();
       const start = performance.now(), duration = 1800;
       function step(now) {
-        const frac = Math.min(1, (now - start) / duration);
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
         const t = frac * c.Tc;
         const tgt = c.target(t), inter = c.interceptor(t);
         topTargetDot.setAttribute("cx", topToX(tgt.x)); topTargetDot.setAttribute("cy", topToZ(tgt.z));
@@ -514,6 +534,942 @@
 
     [x0tSlider, z0tSlider, y0tSlider, vtSlider, headSlider, v0Slider, thSlider, phSlider, tcSlider].forEach((el) => el.addEventListener("input", render));
     render();
+  }
+
+  /* ===================== CONSTANT VELOCITY: WIDGET 1 (motion graphs) ===================== */
+  function initMotionGraphLab() {
+    const x0Slider = document.getElementById("cvX0Slider");
+    if (!x0Slider) return;
+    const vSlider = document.getElementById("cvVSlider");
+    const x0Val = document.getElementById("cvX0Val"), vVal = document.getElementById("cvVVal");
+    const playBtn = document.getElementById("cvPlayBtn");
+    const tVal = document.getElementById("cvTVal"), xVal = document.getElementById("cvXVal"), dispVal = document.getElementById("cvDispVal");
+    const ticks = document.getElementById("cvTrackTicks"), dot = document.getElementById("cvDot");
+    const xtGrid = document.getElementById("cvXtGrid"), xtLine = document.getElementById("cvXtLine"), xtMarker = document.getElementById("cvXtMarker");
+    const vtGrid = document.getElementById("cvVtGrid"), vtLine = document.getElementById("cvVtLine"), vtMarker = document.getElementById("cvVtMarker"), vtArea = document.getElementById("cvVtArea");
+
+    const toXTrack = (xm) => 250 + xm * 11.5;
+    for (let i = -20; i <= 20; i += 5) {
+      ticks.appendChild(svgEl("line", { x1: toXTrack(i), y1: 28, x2: toXTrack(i), y2: 42, class: "svg-grid" }));
+    }
+
+    const toXt = (t) => 40 + t * 44, toYpos = (x) => 80 - x * 3;
+    const toYv = (v) => 60 - v * 5;
+    for (let x = -20; x <= 20; x += 10) xtGrid.appendChild(svgEl("line", { x1: 40, y1: toYpos(x), x2: 480, y2: toYpos(x), class: "svg-grid" }));
+    for (let t = 0; t <= 10; t += 2) xtGrid.appendChild(svgEl("line", { x1: toXt(t), y1: 20, x2: toXt(t), y2: 140, class: "svg-grid" }));
+    for (let v = -10; v <= 10; v += 5) vtGrid.appendChild(svgEl("line", { x1: 40, y1: toYv(v), x2: 480, y2: toYv(v), class: "svg-grid" }));
+    for (let t = 0; t <= 10; t += 2) vtGrid.appendChild(svgEl("line", { x1: toXt(t), y1: 10, x2: toXt(t), y2: 110, class: "svg-grid" }));
+
+    let animating = false;
+
+    function render() {
+      const x0 = +x0Slider.value, v = +vSlider.value;
+      x0Val.textContent = x0.toFixed(0) + " m"; vVal.textContent = v.toFixed(1) + " m/s";
+
+      xtLine.setAttribute("x1", toXt(0)); xtLine.setAttribute("y1", toYpos(x0));
+      let texit = v > 0 ? (20 - x0) / v : v < 0 ? (-20 - x0) / v : Infinity;
+      const tEnd = Math.min(10, texit > 0 ? texit : 10);
+      xtLine.setAttribute("x2", toXt(tEnd)); xtLine.setAttribute("y2", toYpos(x0 + v * tEnd));
+
+      vtLine.setAttribute("x1", toXt(0)); vtLine.setAttribute("y1", toYv(v));
+      vtLine.setAttribute("x2", toXt(10)); vtLine.setAttribute("y2", toYv(v));
+
+      if (!animating) {
+        dot.setAttribute("cx", toXTrack(x0));
+        xtMarker.setAttribute("cx", toXt(0)); xtMarker.setAttribute("cy", toYpos(x0));
+        vtMarker.setAttribute("cx", toXt(0)); vtMarker.setAttribute("cy", toYv(v));
+        vtArea.setAttribute("d", "");
+        tVal.textContent = "0.0 s"; xVal.textContent = x0.toFixed(1) + " m"; dispVal.textContent = "0.0 m";
+      }
+      return { x0, v, tEnd };
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (animating) return;
+      const { x0, v, tEnd } = render();
+      animating = true;
+      const duration = Math.max(300, tEnd * 400);
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * tEnd;
+        const x = x0 + v * simT;
+        dot.setAttribute("cx", toXTrack(x));
+        xtMarker.setAttribute("cx", toXt(simT)); xtMarker.setAttribute("cy", toYpos(x));
+        vtMarker.setAttribute("cx", toXt(simT)); vtMarker.setAttribute("cy", toYv(v));
+        vtArea.setAttribute("d", `M ${toXt(0)} ${toYv(0)} L ${toXt(0)} ${toYv(v)} L ${toXt(simT)} ${toYv(v)} L ${toXt(simT)} ${toYv(0)} Z`);
+        tVal.textContent = simT.toFixed(1) + " s"; xVal.textContent = x.toFixed(1) + " m"; dispVal.textContent = (x - x0).toFixed(1) + " m";
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    [x0Slider, vSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== CONSTANT VELOCITY: WIDGET 2 (catch-up) ===================== */
+  function initTwoRunner() {
+    const vASlider = document.getElementById("raceVASlider");
+    if (!vASlider) return;
+    const gapSlider = document.getElementById("raceGapSlider"), vBSlider = document.getElementById("raceVBSlider");
+    const vAVal = document.getElementById("raceVAVal"), gapVal = document.getElementById("raceGapVal"), vBVal = document.getElementById("raceVBVal");
+    const runBtn = document.getElementById("raceRunBtn");
+    const meetT = document.getElementById("raceMeetT"), meetX = document.getElementById("raceMeetX"), verdict = document.getElementById("raceVerdict");
+    const ticks = document.getElementById("raceTicks"), dotA = document.getElementById("raceDotA"), dotB = document.getElementById("raceDotB"), catchMark = document.getElementById("raceCatchMark");
+
+    const toXRace = (xm) => 20 + (xm + 10) * 6.571;
+    for (let i = -10; i <= 60; i += 10) {
+      ticks.appendChild(svgEl("line", { x1: toXRace(i), y1: 49, x2: toXRace(i), y2: 61, class: "svg-grid" }));
+    }
+
+    let animating = false;
+
+    function compute() {
+      const vA = +vASlider.value, gap = +gapSlider.value, vB = +vBSlider.value;
+      const xA0 = 0, xB0 = -gap;
+      const tStar = vB > vA ? gap / (vB - vA) : null;
+      return { vA, gap, vB, xA0, xB0, tStar };
+    }
+
+    function render() {
+      const c = compute();
+      vAVal.textContent = c.vA.toFixed(1) + " m/s"; gapVal.textContent = c.gap + " m"; vBVal.textContent = c.vB.toFixed(1) + " m/s";
+
+      let tDisplayMax = c.tStar ? Math.min(c.tStar * 1.3, 15) : 8;
+      tDisplayMax = Math.min(tDisplayMax, 58 / c.vA);
+
+      if (c.tStar && c.tStar <= tDisplayMax) {
+        catchMark.style.display = "";
+        catchMark.setAttribute("cx", toXRace(c.xA0 + c.vA * c.tStar));
+        meetT.textContent = c.tStar.toFixed(1) + " s";
+        meetX.textContent = (c.xA0 + c.vA * c.tStar).toFixed(1) + " m";
+        verdict.innerHTML = '<span class="verdict-badge good">B catches up</span>';
+      } else {
+        catchMark.style.display = "none";
+        meetT.textContent = "—"; meetX.textContent = "—";
+        verdict.innerHTML = '<span class="verdict-badge bad">B never catches up</span>';
+      }
+
+      if (!animating) {
+        dotA.setAttribute("cx", toXRace(c.xA0));
+        dotB.setAttribute("cx", toXRace(c.xB0));
+      }
+      return { ...c, tDisplayMax };
+    }
+
+    runBtn.addEventListener("click", () => {
+      if (animating) return;
+      const c = render();
+      animating = true;
+      const duration = 3000;
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const t = frac * c.tDisplayMax;
+        dotA.setAttribute("cx", toXRace(c.xA0 + c.vA * t));
+        dotB.setAttribute("cx", toXRace(c.xB0 + c.vB * t));
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    [vASlider, gapSlider, vBSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== CONSTANT VELOCITY: WIDGET 3 (relative velocity) ===================== */
+  function initRelativeVelocity() {
+    const toggle = document.getElementById("cvRelToggle");
+    if (!toggle) return;
+    const riverMode = document.getElementById("cvRiverMode"), windMode = document.getElementById("cvWindMode");
+    toggle.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-mode]");
+      if (!btn) return;
+      Array.from(toggle.children).forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      riverMode.style.display = btn.dataset.mode === "river" ? "" : "none";
+      windMode.style.display = btn.dataset.mode === "wind" ? "" : "none";
+    });
+
+    /* ---- River crossing ---- */
+    (function () {
+      const widthSlider = document.getElementById("riverWidthSlider"), currentSlider = document.getElementById("riverCurrentSlider");
+      const boatSpeedSlider = document.getElementById("riverBoatSpeedSlider"), headingSlider = document.getElementById("riverHeadingSlider");
+      const widthVal = document.getElementById("riverWidthVal"), currentVal = document.getElementById("riverCurrentVal"), boatSpeedVal = document.getElementById("riverBoatSpeedVal"), headingVal = document.getElementById("riverHeadingVal");
+      const runBtn = document.getElementById("riverRunBtn");
+      const boatVecEl = document.getElementById("riverBoatVec"), currentVecEl = document.getElementById("riverCurrentVec"), resultVecEl = document.getElementById("riverResultVec");
+      const crossTimeEl = document.getElementById("riverCrossTime"), driftEl = document.getElementById("riverDrift");
+      const targetLine = document.getElementById("riverTargetLine"), pathLine = document.getElementById("riverPathLine");
+      const vecBoat = document.getElementById("riverVecBoat"), vecCurrent = document.getElementById("riverVecCurrent"), vecResult = document.getElementById("riverVecResult");
+      const boatDot = document.getElementById("riverBoatDot");
+
+      const START_X = 230, START_Y = 280, FAR_Y = 20, PXPER_DOWN = 5.25, PXPER_MS = 15;
+      const toXDown = (dx) => START_X + dx * PXPER_DOWN;
+      let animating = false;
+
+      function compute() {
+        const W = +widthSlider.value, vCurrent = +currentSlider.value, vBoat = +boatSpeedSlider.value, headDeg = +headingSlider.value;
+        const th = headDeg * D2R;
+        const acrossComp = vBoat * Math.cos(th);
+        const boatDownComp = vBoat * Math.sin(th);
+        const resultDown = boatDownComp + vCurrent;
+        const crossTime = acrossComp > 0.01 ? W / acrossComp : Infinity;
+        const drift = resultDown * crossTime;
+        return { W, vCurrent, vBoat, headDeg, acrossComp, boatDownComp, resultDown, crossTime, drift };
+      }
+
+      function render() {
+        const c = compute();
+        widthVal.textContent = c.W + " m"; currentVal.textContent = c.vCurrent.toFixed(1) + " m/s";
+        boatSpeedVal.textContent = c.vBoat.toFixed(1) + " m/s"; headingVal.textContent = c.headDeg + "°";
+
+        boatVecEl.textContent = `(${c.boatDownComp.toFixed(1)}, ${c.acrossComp.toFixed(1)}) m/s`;
+        currentVecEl.textContent = `(${c.vCurrent.toFixed(1)}, 0.0) m/s`;
+        resultVecEl.textContent = `(${c.resultDown.toFixed(1)}, ${c.acrossComp.toFixed(1)}) m/s`;
+        crossTimeEl.textContent = isFinite(c.crossTime) ? c.crossTime.toFixed(1) + " s" : "never crosses";
+        const driftAbs = Math.abs(c.drift);
+        driftEl.innerHTML = driftAbs < 0.5
+          ? '<span class="verdict-badge good">🎯 Landed straight across!</span>'
+          : `${driftAbs.toFixed(1)} m ${c.drift >= 0 ? "downstream" : "upstream"}`;
+
+        targetLine.setAttribute("d", `M ${START_X} ${START_Y} L ${START_X} ${FAR_Y}`);
+        const landX = toXDown(isFinite(c.drift) ? c.drift : 0);
+        pathLine.setAttribute("d", `M ${START_X} ${START_Y} L ${landX} ${FAR_Y}`);
+
+        if (!animating) {
+          boatDot.setAttribute("cx", START_X); boatDot.setAttribute("cy", START_Y);
+          setVecFrom(vecBoat, START_X, START_Y, c.boatDownComp, c.acrossComp);
+          setVecFrom(vecCurrent, START_X, START_Y, c.vCurrent, 0);
+          setVecFrom(vecResult, START_X, START_Y, c.resultDown, c.acrossComp);
+        }
+        return c;
+      }
+
+      function setVecFrom(line, x, y, downComp, acrossComp) {
+        line.setAttribute("x1", x); line.setAttribute("y1", y);
+        line.setAttribute("x2", x + downComp * PXPER_MS); line.setAttribute("y2", y - acrossComp * PXPER_MS);
+      }
+
+      runBtn.addEventListener("click", () => {
+        if (animating || !isFinite(compute().crossTime)) return;
+        const c = render();
+        animating = true;
+        const duration = 2200;
+        const start = performance.now();
+        function step(now) {
+          const frac = Math.max(0, Math.min(1, (now - start) / duration));
+          const simT = frac * c.crossTime;
+          const curX = toXDown(c.resultDown * simT);
+          const acrossPx = (c.acrossComp * simT) * ((START_Y - FAR_Y) / c.W);
+          const curY = START_Y - acrossPx;
+          boatDot.setAttribute("cx", curX); boatDot.setAttribute("cy", curY);
+          setVecFrom(vecBoat, curX, curY, c.boatDownComp, c.acrossComp);
+          setVecFrom(vecCurrent, curX, curY, c.vCurrent, 0);
+          setVecFrom(vecResult, curX, curY, c.resultDown, c.acrossComp);
+          pathLine.setAttribute("d", `M ${START_X} ${START_Y} L ${curX} ${curY}`);
+          if (frac < 1) requestAnimationFrame(step);
+          else animating = false;
+        }
+        requestAnimationFrame(step);
+      });
+
+      [widthSlider, currentSlider, boatSpeedSlider, headingSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+      render();
+    })();
+
+    /* ---- Headwind / tailwind ---- */
+    (function () {
+      const airSlider = document.getElementById("windAirSlider"), windSlider = document.getElementById("windSpeedSlider"), distSlider = document.getElementById("windDistSlider");
+      const airVal = document.getElementById("windAirVal"), windVal = document.getElementById("windSpeedVal"), distVal = document.getElementById("windDistVal");
+      const groundSpeedEl = document.getElementById("windGroundSpeed"), timeEl = document.getElementById("windTime"), timeNoWindEl = document.getElementById("windTimeNoWind"), deltaEl = document.getElementById("windDelta");
+      const runBtn = document.getElementById("windRunBtn");
+      const planeDot = document.getElementById("windPlaneDot");
+      if (!airSlider) return;
+
+      const TRACK_MID = 250, PXPER_MS_WIND = 0.6;
+      let animating = false;
+
+      function compute() {
+        const air = +airSlider.value, wind = +windSlider.value, distKm = +distSlider.value;
+        const ground = air + wind;
+        const timeHr = (distKm * 1000) / ground / 3600;
+        const timeNoWindHr = (distKm * 1000) / air / 3600;
+        return { air, wind, distKm, ground, timeHr, timeNoWindHr };
+      }
+
+      function render() {
+        const c = compute();
+        airVal.textContent = c.air + " m/s"; windVal.textContent = (c.wind >= 0 ? "+" : "") + c.wind + " m/s"; distVal.textContent = c.distKm + " km";
+        groundSpeedEl.textContent = c.ground.toFixed(0) + " m/s";
+        timeEl.textContent = c.timeHr.toFixed(2) + " h";
+        timeNoWindEl.textContent = c.timeNoWindHr.toFixed(2) + " h";
+        const delta = c.timeNoWindHr - c.timeHr;
+        deltaEl.innerHTML = delta >= 0
+          ? `<span class="verdict-badge good">${delta.toFixed(2)} h saved</span>`
+          : `<span class="verdict-badge bad">${Math.abs(delta).toFixed(2)} h lost</span>`;
+        if (!animating) { planeDot.setAttribute("cx", TRACK_MID); planeDot.setAttribute("cy", 35); }
+        return c;
+      }
+
+      runBtn.addEventListener("click", () => {
+        if (animating) return;
+        const c = render();
+        animating = true;
+        const duration = 2000;
+        const start = performance.now();
+        const endCx = Math.max(30, Math.min(470, TRACK_MID + c.ground * PXPER_MS_WIND));
+        function step(now) {
+          const frac = Math.max(0, Math.min(1, (now - start) / duration));
+          planeDot.setAttribute("cx", TRACK_MID + (endCx - TRACK_MID) * frac);
+          if (frac < 1) requestAnimationFrame(step);
+          else animating = false;
+        }
+        requestAnimationFrame(step);
+      });
+
+      [airSlider, windSlider, distSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+      render();
+    })();
+  }
+
+  /* ===================== CONSTANT ACCELERATION: WIDGET 1 (motion graphs) ===================== */
+  function computeAccelSeries(u, a, domain, capT, dt) {
+    domain = domain || 30; capT = capT || 12; dt = dt || 0.05;
+    let t = 0, v = u, x = 0;
+    const points = [{ t, x, v }];
+    while (t < capT) {
+      const tNext = t + dt;
+      const vNext = u + a * tNext;
+      const xNext = u * tNext + 0.5 * a * tNext * tNext;
+      if (a !== 0 && u !== 0 && Math.sign(a) !== Math.sign(u) && v * vNext <= 0) {
+        const tStop = -u / a;
+        const xStop = u * tStop + 0.5 * a * tStop * tStop;
+        points.push({ t: tStop, x: xStop, v: 0 });
+        return { points, tEnd: Math.max(tStop, 0.3), stopped: true };
+      }
+      if (Math.abs(xNext) > domain) {
+        const frac = (domain * Math.sign(xNext) - x) / (xNext - x);
+        const tCross = t + frac * dt;
+        const vCross = u + a * tCross;
+        points.push({ t: tCross, x: domain * Math.sign(xNext), v: vCross });
+        return { points, tEnd: Math.max(tCross, 0.3), stopped: false };
+      }
+      points.push({ t: tNext, x: xNext, v: vNext });
+      t = tNext; x = xNext; v = vNext;
+    }
+    return { points, tEnd: capT, stopped: false };
+  }
+
+  function initAccelMotionGraph() {
+    const uSlider = document.getElementById("caUSlider");
+    if (!uSlider) return;
+    const aSlider = document.getElementById("caASlider");
+    const uVal = document.getElementById("caUVal"), aVal = document.getElementById("caAVal");
+    const playBtn = document.getElementById("caPlayBtn");
+    const tVal = document.getElementById("caTVal"), vVal = document.getElementById("caVVal"), sVal = document.getElementById("caSVal");
+    const ticks = document.getElementById("caTrackTicks"), dot = document.getElementById("caDot");
+    const xtGrid = document.getElementById("caXtGrid"), xtPath = document.getElementById("caXtPath"), xtMarker = document.getElementById("caXtMarker");
+    const vtGrid = document.getElementById("caVtGrid"), vtLine = document.getElementById("caVtLine"), vtMarker = document.getElementById("caVtMarker"), vtArea = document.getElementById("caVtArea");
+    const presetRow = document.getElementById("caPresetRow");
+
+    const DOMAIN = 30;
+    const toXTrack = (xm) => 250 + xm * 7.667;
+    for (let i = -30; i <= 30; i += 10) ticks.appendChild(svgEl("line", { x1: toXTrack(i), y1: 28, x2: toXTrack(i), y2: 42, class: "svg-grid" }));
+
+    const toYpos = (x) => 80 - x * 2, toYv = (v) => 60 - v * 1.25;
+    for (let x = -DOMAIN; x <= DOMAIN; x += 15) xtGrid.appendChild(svgEl("line", { x1: 40, y1: toYpos(x), x2: 480, y2: toYpos(x), class: "svg-grid" }));
+    for (let v = -40; v <= 40; v += 20) vtGrid.appendChild(svgEl("line", { x1: 40, y1: toYv(v), x2: 480, y2: toYv(v), class: "svg-grid" }));
+
+    let animating = false;
+
+    function render() {
+      const u = +uSlider.value, a = +aSlider.value;
+      uVal.textContent = u.toFixed(1) + " m/s"; aVal.textContent = a.toFixed(1) + " m/s²";
+      const series = computeAccelSeries(u, a, DOMAIN);
+      const toXt = (t) => 40 + (t / series.tEnd) * 440;
+
+      xtPath.setAttribute("d", "M " + series.points.map((p) => toXt(p.t) + " " + toYpos(p.x)).join(" L "));
+      const vFinal = series.points[series.points.length - 1].v;
+      vtLine.setAttribute("x1", toXt(0)); vtLine.setAttribute("y1", toYv(u));
+      vtLine.setAttribute("x2", toXt(series.tEnd)); vtLine.setAttribute("y2", toYv(vFinal));
+
+      if (!animating) {
+        dot.setAttribute("cx", toXTrack(0));
+        xtMarker.setAttribute("cx", toXt(0)); xtMarker.setAttribute("cy", toYpos(0));
+        vtMarker.setAttribute("cx", toXt(0)); vtMarker.setAttribute("cy", toYv(u));
+        vtArea.setAttribute("d", "");
+        tVal.textContent = "0.0 s"; vVal.textContent = u.toFixed(1) + " m/s"; sVal.textContent = "0.0 m";
+      }
+      return { u, a, series, toXt };
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (animating) return;
+      const { u, a, series, toXt } = render();
+      animating = true;
+      const duration = Math.max(300, series.tEnd * 400);
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * series.tEnd;
+        const v = u + a * simT, x = u * simT + 0.5 * a * simT * simT;
+        dot.setAttribute("cx", toXTrack(x));
+        xtMarker.setAttribute("cx", toXt(simT)); xtMarker.setAttribute("cy", toYpos(x));
+        vtMarker.setAttribute("cx", toXt(simT)); vtMarker.setAttribute("cy", toYv(v));
+        vtArea.setAttribute("d", `M ${toXt(0)} ${toYv(0)} L ${toXt(0)} ${toYv(u)} L ${toXt(simT)} ${toYv(v)} L ${toXt(simT)} ${toYv(0)} Z`);
+        tVal.textContent = simT.toFixed(1) + " s"; vVal.textContent = v.toFixed(1) + " m/s"; sVal.textContent = x.toFixed(1) + " m";
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    const presets = {
+      car: { u: 0, a: 3 }, train: { u: 0, a: 1 }, elevator: { u: 0, a: 1.2 },
+      sprinter: { u: 0, a: 4 }, brake: { u: 8, a: -5 },
+    };
+    presetRow.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-preset]");
+      if (!btn) return;
+      Array.from(presetRow.children).forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const p = presets[btn.dataset.preset];
+      uSlider.value = p.u; aSlider.value = p.a;
+      render();
+    });
+
+    [uSlider, aSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== CONSTANT ACCELERATION: WIDGET 2 (braking) ===================== */
+  function initBraking() {
+    const v0Slider = document.getElementById("brakeV0Slider");
+    if (!v0Slider) return;
+    const tRSlider = document.getElementById("brakeTRSlider"), aSlider = document.getElementById("brakeASlider");
+    const v0Val = document.getElementById("brakeV0Val"), tRVal = document.getElementById("brakeTRVal"), aVal = document.getElementById("brakeAVal");
+    const hazardToggle = document.getElementById("brakeHazardToggle"), hazardRow = document.getElementById("brakeHazardRow"), hazardSlider = document.getElementById("brakeHazardSlider"), hazardVal = document.getElementById("brakeHazardVal");
+    const testBtn = document.getElementById("brakeTestBtn"), testStatus = document.getElementById("brakeTestStatus");
+    const runBtn = document.getElementById("brakeRunBtn");
+    const reactVal = document.getElementById("brakeReactVal"), brakeVal = document.getElementById("brakeBrakeVal"), totalVal = document.getElementById("brakeTotalVal");
+    const verdictRow = document.getElementById("brakeVerdictRow"), verdict = document.getElementById("brakeVerdict");
+    const ticks = document.getElementById("brakeTicks"), reactSeg = document.getElementById("brakeReactionSeg"), brakeSeg = document.getElementById("brakeBrakingSeg");
+    const hazardLine = document.getElementById("brakeHazard"), carDot = document.getElementById("brakeCarDot");
+    const roadPresets = document.querySelectorAll('#panel-constant-acceleration .preset-row button[data-brake]');
+
+    const toXBrake = (d) => 20 + d * 2.875;
+    for (let d = 0; d <= 160; d += 20) ticks.appendChild(svgEl("line", { x1: toXBrake(d), y1: 49, x2: toXBrake(d), y2: 61, class: "svg-grid" }));
+
+    let animating = false;
+
+    function compute() {
+      const v0 = +v0Slider.value, tR = +tRSlider.value, a = +aSlider.value;
+      const reactDist = v0 * tR;
+      const brakeDist = (v0 * v0) / (2 * a);
+      const totalDist = reactDist + brakeDist;
+      const hazardOn = hazardToggle.checked, hazardDist = +hazardSlider.value;
+      return { v0, tR, a, reactDist, brakeDist, totalDist, hazardOn, hazardDist };
+    }
+
+    function render() {
+      const c = compute();
+      v0Val.textContent = c.v0 + " m/s"; tRVal.textContent = c.tR.toFixed(1) + " s"; aVal.textContent = c.a.toFixed(1) + " m/s²";
+      reactVal.textContent = c.reactDist.toFixed(1) + " m"; brakeVal.textContent = c.brakeDist.toFixed(1) + " m"; totalVal.textContent = c.totalDist.toFixed(1) + " m";
+
+      reactSeg.setAttribute("d", `M ${toXBrake(0)} 35 L ${toXBrake(c.reactDist)} 35`);
+      brakeSeg.setAttribute("d", `M ${toXBrake(c.reactDist)} 35 L ${toXBrake(c.totalDist)} 35`);
+
+      if (c.hazardOn) {
+        hazardLine.style.display = ""; hazardLine.setAttribute("x1", toXBrake(c.hazardDist)); hazardLine.setAttribute("x2", toXBrake(c.hazardDist));
+        verdictRow.style.display = "";
+        verdict.innerHTML = c.totalDist <= c.hazardDist
+          ? '<span class="verdict-badge good">Stops in time ✓</span>'
+          : '<span class="verdict-badge bad">Hits the hazard ✕</span>';
+      } else {
+        hazardLine.style.display = "none"; verdictRow.style.display = "none";
+      }
+
+      if (!animating) { carDot.setAttribute("cx", toXBrake(0)); }
+      return c;
+    }
+
+    runBtn.addEventListener("click", () => {
+      if (animating) return;
+      const c = render();
+      animating = true;
+      const t2 = c.a > 0 ? c.v0 / c.a : 0;
+      const simDuration = Math.max(0.2, c.tR + t2);
+      const duration = 2500;
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * simDuration;
+        let pos;
+        if (simT <= c.tR) pos = c.v0 * simT;
+        else {
+          const te = simT - c.tR;
+          pos = c.reactDist + c.v0 * te - 0.5 * c.a * te * te;
+        }
+        carDot.setAttribute("cx", toXBrake(Math.min(pos, c.totalDist)));
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    hazardToggle.addEventListener("change", () => { hazardRow.style.display = hazardToggle.checked ? "" : "none"; render(); });
+    roadPresets.forEach((btn) => btn.addEventListener("click", () => {
+      roadPresets.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      aSlider.value = btn.dataset.brake;
+      render();
+    }));
+
+    let testState = "idle", readyTime = 0;
+    testBtn.addEventListener("click", () => {
+      if (testState === "idle") {
+        testState = "waiting";
+        testStatus.textContent = "Wait for it to turn green...";
+        testBtn.textContent = "…";
+        const delay = 1000 + Math.random() * 2000;
+        setTimeout(() => {
+          if (testState !== "waiting") return;
+          testState = "ready";
+          readyTime = performance.now();
+          testBtn.textContent = "CLICK NOW!";
+          testStatus.textContent = "";
+        }, delay);
+      } else if (testState === "ready") {
+        const rt = (performance.now() - readyTime) / 1000;
+        testState = "idle";
+        testBtn.textContent = "⏱ Test your reaction time";
+        testStatus.innerHTML = `Your reaction time: <strong>${rt.toFixed(2)} s</strong> — <a href="#" id="useRtLink">use this value</a>`;
+        const link = document.getElementById("useRtLink");
+        if (link) link.addEventListener("click", (e) => {
+          e.preventDefault();
+          tRSlider.value = Math.max(0.1, Math.min(3, rt));
+          render();
+        });
+      } else {
+        testState = "idle";
+        testBtn.textContent = "⏱ Test your reaction time";
+        testStatus.textContent = "Too soon! Try again.";
+      }
+    });
+
+    [v0Slider, tRSlider, aSlider, hazardSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== CONSTANT ACCELERATION: WIDGET 3 (ramp) ===================== */
+  function initRamp() {
+    const angleSlider = document.getElementById("rampAngleSlider");
+    if (!angleSlider) return;
+    const lenSlider = document.getElementById("rampLenSlider");
+    const angleVal = document.getElementById("rampAngleVal"), lenVal = document.getElementById("rampLenVal");
+    const releaseBtn = document.getElementById("rampReleaseBtn"), timerBtn = document.getElementById("rampTimerBtn");
+    const aVal = document.getElementById("rampAVal"), trueTVal = document.getElementById("rampTrueTVal"), measuredTVal = document.getElementById("rampMeasuredTVal"), measuredAVal = document.getElementById("rampMeasuredAVal");
+    const surface = document.getElementById("rampSurface"), cart = document.getElementById("rampCart");
+
+    const G = 9.8, TOPX = 40, TOPY = 40, PXPER_M = 75;
+    let animating = false, timerRunning = false, timerStart = 0;
+
+    function compute() {
+      const angleDeg = +angleSlider.value, L = +lenSlider.value;
+      const th = angleDeg * D2R;
+      const a = G * Math.sin(th);
+      const trueT = Math.sqrt((2 * L) / a);
+      const bottomX = TOPX + L * Math.cos(th) * PXPER_M;
+      const bottomY = TOPY + L * Math.sin(th) * PXPER_M;
+      return { angleDeg, L, a, trueT, bottomX, bottomY };
+    }
+
+    function render() {
+      const c = compute();
+      angleVal.textContent = c.angleDeg + "°"; lenVal.textContent = c.L.toFixed(1) + " m";
+      aVal.textContent = c.a.toFixed(2) + " m/s²"; trueTVal.textContent = c.trueT.toFixed(2) + " s";
+      surface.setAttribute("d", `M ${TOPX} ${TOPY} L ${c.bottomX} ${c.bottomY}`);
+      if (!animating) { cart.setAttribute("cx", TOPX); cart.setAttribute("cy", TOPY); }
+      return c;
+    }
+
+    releaseBtn.addEventListener("click", () => {
+      if (animating) return;
+      const c = render();
+      animating = true;
+      const duration = Math.max(400, c.trueT * 1000);
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * c.trueT;
+        const dist = 0.5 * c.a * simT * simT;
+        const f = c.L > 0 ? Math.min(1, dist / c.L) : 1;
+        cart.setAttribute("cx", TOPX + f * (c.bottomX - TOPX));
+        cart.setAttribute("cy", TOPY + f * (c.bottomY - TOPY));
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    timerBtn.addEventListener("click", () => {
+      if (!timerRunning) {
+        timerRunning = true; timerStart = performance.now();
+        timerBtn.textContent = "⏱ Stop timer";
+      } else {
+        timerRunning = false;
+        const measured = (performance.now() - timerStart) / 1000;
+        timerBtn.textContent = "⏱ Start / stop your timer";
+        measuredTVal.textContent = measured.toFixed(2) + " s";
+        const L = +lenSlider.value;
+        const measuredA = (2 * L) / (measured * measured);
+        measuredAVal.textContent = measuredA.toFixed(2) + " m/s²";
+      }
+    });
+
+    [angleSlider, lenSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== FREE FALL: WIDGET 1 (graphs) ===================== */
+  function initFreeFallGraphs() {
+    const y0Slider = document.getElementById("ffY0Slider");
+    if (!y0Slider) return;
+    const v0Slider = document.getElementById("ffV0Slider"), gSlider = document.getElementById("ffGSlider");
+    const y0Val = document.getElementById("ffY0Val"), v0Val = document.getElementById("ffV0Val"), gVal = document.getElementById("ffGVal");
+    const playBtn = document.getElementById("ffPlayBtn");
+    const tVal = document.getElementById("ffTVal"), yVal = document.getElementById("ffYVal"), vVal = document.getElementById("ffVVal"), landVal = document.getElementById("ffLandVal");
+    const ticks = document.getElementById("ffTrackTicks"), dot = document.getElementById("ffDot");
+    const ytGrid = document.getElementById("ffYtGrid"), ytPath = document.getElementById("ffYtPath"), ytMarker = document.getElementById("ffYtMarker");
+    const vtGrid = document.getElementById("ffVtGrid"), vtLine = document.getElementById("ffVtLine"), vtMarker = document.getElementById("ffVtMarker");
+    const atLine = document.getElementById("ffAtLine");
+    const presetRow = document.getElementById("ffPresetRow");
+
+    const toYTrack = (y) => 280 - y * 2.364;
+    for (let y = 0; y <= 100; y += 20) ticks.appendChild(svgEl("line", { x1: 25, y1: toYTrack(y), x2: 40, y2: toYTrack(y), class: "svg-grid" }));
+
+    const toYposGraph = (y) => 140 - y * 1.091, toYv = (v) => 60 - v * 1.25, toYa = (a) => 10 - a * 2;
+    for (let y = 0; y <= 100; y += 25) ytGrid.appendChild(svgEl("line", { x1: 40, y1: toYposGraph(y), x2: 480, y2: toYposGraph(y), class: "svg-grid" }));
+    for (let v = -40; v <= 40; v += 20) vtGrid.appendChild(svgEl("line", { x1: 40, y1: toYv(v), x2: 480, y2: toYv(v), class: "svg-grid" }));
+
+    let animating = false;
+
+    function render() {
+      const y0 = +y0Slider.value, v0 = +v0Slider.value, g = +gSlider.value;
+      y0Val.textContent = y0 + " m"; v0Val.textContent = v0.toFixed(1) + " m/s"; gVal.textContent = g.toFixed(1) + " m/s²";
+      const series = computeIdealTrajectory(v0, 90, y0, g);
+      const toXt = (t) => 40 + (t / Math.max(series.T, 0.05)) * 440;
+
+      ytPath.setAttribute("d", "M " + series.points.map((p) => toXt(p.t) + " " + toYposGraph(p.y)).join(" L "));
+      const vFinal = v0 - g * series.T;
+      vtLine.setAttribute("x1", toXt(0)); vtLine.setAttribute("y1", toYv(v0));
+      vtLine.setAttribute("x2", toXt(series.T)); vtLine.setAttribute("y2", toYv(vFinal));
+      atLine.setAttribute("y1", toYa(-g)); atLine.setAttribute("y2", toYa(-g));
+      landVal.textContent = series.T.toFixed(2) + " s";
+
+      if (!animating) {
+        dot.setAttribute("cy", toYTrack(y0));
+        ytMarker.setAttribute("cx", toXt(0)); ytMarker.setAttribute("cy", toYposGraph(y0));
+        vtMarker.setAttribute("cx", toXt(0)); vtMarker.setAttribute("cy", toYv(v0));
+        tVal.textContent = "0.0 s"; yVal.textContent = y0.toFixed(1) + " m"; vVal.textContent = v0.toFixed(1) + " m/s";
+      }
+      return { y0, v0, g, series, toXt };
+    }
+
+    playBtn.addEventListener("click", () => {
+      if (animating) return;
+      const { v0, g, series, toXt } = render();
+      animating = true;
+      const duration = Math.max(300, series.T * 400);
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * series.T;
+        const y = Math.max(0, series.points[0].y + v0 * simT - 0.5 * g * simT * simT);
+        const v = v0 - g * simT;
+        dot.setAttribute("cy", toYTrack(y));
+        ytMarker.setAttribute("cx", toXt(simT)); ytMarker.setAttribute("cy", toYposGraph(y));
+        vtMarker.setAttribute("cx", toXt(simT)); vtMarker.setAttribute("cy", toYv(v));
+        tVal.textContent = simT.toFixed(1) + " s"; yVal.textContent = y.toFixed(1) + " m"; vVal.textContent = v.toFixed(1) + " m/s";
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    const presets = { drop: { y0: 20, v0: 0 }, up: { y0: 0, v0: 10 }, down: { y0: 20, v0: -5 } };
+    presetRow.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-preset]");
+      if (!btn) return;
+      Array.from(presetRow.children).forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const p = presets[btn.dataset.preset];
+      y0Slider.value = p.y0; v0Slider.value = p.v0;
+      render();
+    });
+
+    [y0Slider, v0Slider, gSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== FREE FALL: WIDGET 2 (drop comparison) ===================== */
+  function integrateFallSeries(height, b, g) {
+    if (b <= 0) {
+      const T = Math.sqrt((2 * height) / g);
+      const points = [];
+      for (let i = 0; i <= 60; i++) { const t = (i / 60) * T; points.push({ t, d: 0.5 * g * t * t }); }
+      return { points, T };
+    }
+    const dt = 0.02;
+    let s = 0, d = 0, t = 0;
+    const points = [{ t, d }];
+    for (let i = 0; i < 3000; i++) {
+      const a = g - b * s * s;
+      s += a * dt; const dNext = d + s * dt; t += dt;
+      if (dNext >= height) { points.push({ t, d: height }); return { points, T: t }; }
+      d = dNext;
+      points.push({ t, d });
+    }
+    return { points, T: t };
+  }
+
+  function dAtTime(series, simT) {
+    const pts = series.points;
+    if (simT <= 0) return 0;
+    if (simT >= series.T) return pts[pts.length - 1].d;
+    for (let i = 1; i < pts.length; i++) {
+      if (pts[i].t >= simT) {
+        const p0 = pts[i - 1], p1 = pts[i];
+        const f = (simT - p0.t) / (p1.t - p0.t || 1);
+        return p0.d + f * (p1.d - p0.d);
+      }
+    }
+    return pts[pts.length - 1].d;
+  }
+
+  function initDropComparison() {
+    const heightSlider = document.getElementById("dropHeightSlider");
+    if (!heightSlider) return;
+    const bSlider = document.getElementById("dropBSlider"), vacuum = document.getElementById("dropVacuum");
+    const heightVal = document.getElementById("dropHeightVal"), bVal = document.getElementById("dropBVal");
+    const runBtn = document.getElementById("dropRunBtn");
+    const compactTEl = document.getElementById("dropCompactT"), dragTEl = document.getElementById("dropDragT"), terminalVEl = document.getElementById("dropTerminalV");
+    const ticks = document.getElementById("dropTicks"), ballCompact = document.getElementById("dropBallCompact"), ballDrag = document.getElementById("dropBallDrag");
+
+    const G = 9.8, B_COMPACT = 0.01, TOP_Y = 30, PXM = 2.0;
+    for (let d = 0; d <= 120; d += 20) ticks.appendChild(svgEl("line", { x1: 10, y1: TOP_Y + d * PXM, x2: 25, y2: TOP_Y + d * PXM, class: "svg-grid" }));
+
+    let animating = false;
+
+    function render() {
+      const height = +heightSlider.value, b2 = +bSlider.value, isVacuum = vacuum.checked;
+      heightVal.textContent = height + " m"; bVal.textContent = b2.toFixed(3);
+      const seriesCompact = integrateFallSeries(height, isVacuum ? 0 : B_COMPACT, G);
+      const seriesDrag = integrateFallSeries(height, isVacuum ? 0 : b2, G);
+      compactTEl.textContent = seriesCompact.T.toFixed(2) + " s";
+      dragTEl.textContent = seriesDrag.T.toFixed(2) + " s";
+      terminalVEl.textContent = isVacuum ? "n/a (vacuum)" : Math.sqrt(G / b2).toFixed(1) + " m/s";
+      if (!animating) {
+        ballCompact.setAttribute("cy", TOP_Y); ballDrag.setAttribute("cy", TOP_Y);
+      }
+      return { height, seriesCompact, seriesDrag };
+    }
+
+    runBtn.addEventListener("click", () => {
+      if (animating) return;
+      const c = render();
+      animating = true;
+      const simTMax = Math.max(c.seriesCompact.T, c.seriesDrag.T);
+      const duration = Math.min(6000, simTMax * 350);
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * simTMax;
+        const dCompact = Math.min(c.height, dAtTime(c.seriesCompact, simT));
+        const dDrag = Math.min(c.height, dAtTime(c.seriesDrag, simT));
+        ballCompact.setAttribute("cy", TOP_Y + dCompact * PXM);
+        ballDrag.setAttribute("cy", TOP_Y + dDrag * PXM);
+        if (frac < 1) requestAnimationFrame(step);
+        else animating = false;
+      }
+      requestAnimationFrame(step);
+    });
+
+    vacuum.addEventListener("change", render);
+    [heightSlider, bSlider].forEach((el) => el.addEventListener("input", () => { if (!animating) render(); }));
+    render();
+  }
+
+  /* ===================== FREE FALL: WIDGET 3 (ruler drop) ===================== */
+  function initRulerDrop() {
+    const testBtn = document.getElementById("rulerTestBtn");
+    if (!testBtn) return;
+    const status = document.getElementById("rulerStatus");
+    const distVal = document.getElementById("rulerDistVal"), timeVal = document.getElementById("rulerTimeVal");
+    const rulerRect = document.getElementById("rulerRect"), ticks = document.getElementById("rulerTicks");
+
+    for (let cm = 0; cm <= 30; cm += 5) ticks.appendChild(svgEl("line", { x1: 85, y1: 10 + cm * 6, x2: 92, y2: 10 + cm * 6, class: "svg-grid" }));
+
+    const BASE_Y = 10, PXM = 6, G = 9.8;
+    let state = "idle", dropStartTime = 0;
+
+    function fallLoop() {
+      if (state !== "ready") return;
+      const elapsed = (performance.now() - dropStartTime) / 1000;
+      const fallPx = 0.5 * G * elapsed * elapsed * PXM;
+      rulerRect.setAttribute("y", BASE_Y + Math.min(fallPx, 260));
+      requestAnimationFrame(fallLoop);
+    }
+
+    testBtn.addEventListener("click", () => {
+      if (state === "idle") {
+        state = "waiting";
+        status.textContent = "Get ready...";
+        testBtn.textContent = "…";
+        rulerRect.setAttribute("y", BASE_Y);
+        const delay = 1000 + Math.random() * 2000;
+        setTimeout(() => {
+          if (state !== "waiting") return;
+          state = "ready";
+          dropStartTime = performance.now();
+          testBtn.textContent = "🖐 Catch it!";
+          status.textContent = "Catch it NOW!";
+          requestAnimationFrame(fallLoop);
+        }, delay);
+      } else if (state === "ready") {
+        const reactionTime = (performance.now() - dropStartTime) / 1000;
+        state = "idle";
+        testBtn.textContent = "🎯 Drop the ruler";
+        status.textContent = "";
+        const distM = 0.5 * G * reactionTime * reactionTime;
+        distVal.textContent = (distM * 100).toFixed(1) + " cm";
+        timeVal.textContent = (reactionTime * 1000).toFixed(0) + " ms";
+      } else {
+        state = "idle";
+        testBtn.textContent = "🎯 Drop the ruler";
+        status.textContent = "Too soon! Wait for it to actually fall.";
+      }
+    });
+  }
+
+  /* ===================== RELATIVE MOTION: WIDGET (vectors + dual frame) ===================== */
+  function initRelMotionExplorer() {
+    const svg = document.getElementById("relVecSvg");
+    if (!svg) return;
+    const grid = document.getElementById("relGrid");
+    for (let i = 0; i <= 400; i += 40) {
+      grid.appendChild(svgEl("line", { x1: i, y1: 0, x2: i, y2: 400, class: "svg-grid" }));
+      grid.appendChild(svgEl("line", { x1: 0, y1: i, x2: 400, y2: i, class: "svg-grid" }));
+    }
+
+    const handleA = document.getElementById("relHandleA"), vecA = document.getElementById("relVecA");
+    const handleB = document.getElementById("relHandleB"), vecB = document.getElementById("relVecB");
+    const vecR = document.getElementById("relVecR"), tailBtoR = document.getElementById("relTailBtoR");
+    const aVal = document.getElementById("relAVal"), bVal = document.getElementById("relBVal"), rVal = document.getElementById("relRVal");
+    const resetBtn = document.getElementById("relResetBtn");
+    const presetRow = document.getElementById("relPresetRow");
+
+    const SCALE = 20, ORIGIN = 200, LIMIT = 9.4;
+    const toScreen = (x, y) => ({ sx: ORIGIN + x * SCALE, sy: ORIGIN - y * SCALE });
+    const toWorld = (sx, sy) => ({ x: (sx - ORIGIN) / SCALE, y: (ORIGIN - sy) / SCALE });
+
+    let A = { x: 4, y: 2 }, B = { x: -4, y: 5 };
+
+    function fmt(v) {
+      const mag = Math.hypot(v.x, v.y);
+      let ang = (Math.atan2(v.y, v.x) * 180) / Math.PI;
+      if (ang < 0) ang += 360;
+      return `(${v.x.toFixed(1)}, ${v.y.toFixed(1)}) | ${mag.toFixed(1)} @ ${ang.toFixed(0)}°`;
+    }
+
+    function render() {
+      const sA = toScreen(A.x, A.y), sB = toScreen(B.x, B.y);
+      vecA.setAttribute("x2", sA.sx); vecA.setAttribute("y2", sA.sy);
+      handleA.setAttribute("cx", sA.sx); handleA.setAttribute("cy", sA.sy);
+      vecB.setAttribute("x2", sB.sx); vecB.setAttribute("y2", sB.sy);
+      handleB.setAttribute("cx", sB.sx); handleB.setAttribute("cy", sB.sy);
+
+      const R = { x: B.x - A.x, y: B.y - A.y };
+      const sR = toScreen(R.x, R.y);
+      vecR.setAttribute("x2", sR.sx); vecR.setAttribute("y2", sR.sy);
+      tailBtoR.setAttribute("x1", sA.sx); tailBtoR.setAttribute("y1", sA.sy);
+      tailBtoR.setAttribute("x2", sB.sx); tailBtoR.setAttribute("y2", sB.sy);
+
+      aVal.textContent = fmt(A); bVal.textContent = fmt(B); rVal.textContent = fmt(R);
+      return { A, B, R };
+    }
+
+    makeDraggable(handleA, svg, (pt) => {
+      const w = toWorld(pt.x, pt.y);
+      A = { x: clamp(w.x, -LIMIT, LIMIT), y: clamp(w.y, -LIMIT, LIMIT) };
+      render();
+    });
+    makeDraggable(handleB, svg, (pt) => {
+      const w = toWorld(pt.x, pt.y);
+      B = { x: clamp(w.x, -LIMIT, LIMIT), y: clamp(w.y, -LIMIT, LIMIT) };
+      render();
+    });
+    resetBtn.addEventListener("click", () => { A = { x: 4, y: 2 }; B = { x: -4, y: 5 }; render(); });
+
+    const presets = {
+      passing: { A: { x: 8, y: 0 }, B: { x: -8, y: 0 } },
+      overtake: { A: { x: 5, y: 0 }, B: { x: 8, y: 0 } },
+      cross: { A: { x: 6, y: 2 }, B: { x: -2, y: 7 } },
+    };
+    if (presetRow) {
+      presetRow.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-preset]");
+        if (!btn) return;
+        Array.from(presetRow.children).forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const p = presets[btn.dataset.preset];
+        A = { ...p.A }; B = { ...p.B };
+        render();
+      });
+    }
+
+    render();
+
+    /* dual-frame track */
+    const playBtn = document.getElementById("relPlayBtn"), tVal = document.getElementById("relTVal");
+    const groundA = document.getElementById("relGroundA"), groundB = document.getElementById("relGroundB");
+    const aFrameB = document.getElementById("relAFrameB");
+    if (!playBtn) return;
+    const CX = 250, PXPER = 8, SIM_T_MAX = 3;
+    let trackAnimating = false;
+
+    playBtn.addEventListener("click", () => {
+      if (trackAnimating) return;
+      trackAnimating = true;
+      const { A: a0, B: b0 } = render();
+      const duration = 3000;
+      const start = performance.now();
+      function step(now) {
+        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const simT = frac * SIM_T_MAX;
+        groundA.setAttribute("cx", clamp(CX + a0.x * simT * PXPER, 30, 470));
+        groundB.setAttribute("cx", clamp(CX + b0.x * simT * PXPER, 30, 470));
+        aFrameB.setAttribute("cx", clamp(CX + (b0.x - a0.x) * simT * PXPER, 30, 470));
+        tVal.textContent = simT.toFixed(1) + " s";
+        if (frac < 1) requestAnimationFrame(step);
+        else trackAnimating = false;
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  /* ===================== CROSS-TAB LINKS ===================== */
+  function initJumpLinks() {
+    document.querySelectorAll("[data-jump-tab]").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const btn = document.querySelector('#tabbar button[data-target="' + a.dataset.jumpTab + '"]');
+        if (btn) btn.click();
+      });
+    });
   }
 
   /* ===================== TABS ===================== */
@@ -536,9 +1492,20 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initTabs();
+    initJumpLinks();
+    initMotionGraphLab();
+    initTwoRunner();
+    initRelativeVelocity();
+    initAccelMotionGraph();
+    initBraking();
+    initRamp();
     initExplorer();
     initTargetChallenge();
     initInterceptionLab();
     init3DIntercept();
+    initFreeFallGraphs();
+    initDropComparison();
+    initRulerDrop();
+    initRelMotionExplorer();
   });
 })();
