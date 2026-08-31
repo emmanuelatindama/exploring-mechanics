@@ -87,6 +87,8 @@
             <line x1="40" y1="20" x2="40" y2="140" class="svg-axis"></line>
             <line id="cvXtLine" x1="40" y1="80" x2="40" y2="80" stroke="#2a78d6" stroke-width="2.5"></line>
             <circle id="cvXtMarker" cx="40" cy="80" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text x="475" y="153" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="28" class="svg-label">x (m)</text>
           </svg>
           <p class="pane-label">Velocity vs. time — flat line at <var>v</var></p>
           <svg viewBox="0 0 500 120" id="cvVtSvg">
@@ -96,6 +98,8 @@
             <line id="cvVtLine" x1="40" y1="60" x2="40" y2="60" stroke="#1baf7a" stroke-width="2.5"></line>
             <circle id="cvVtMarker" cx="40" cy="60" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
             <path id="cvVtArea" fill="rgba(27,175,122,0.18)" stroke="none" d=""></path>
+            <text x="475" y="106" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">v (m/s)</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -439,6 +443,8 @@
             <line x1="40" y1="20" x2="40" y2="140" class="svg-axis"></line>
             <path id="caXtPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
             <circle id="caXtMarker" cx="40" cy="140" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text x="475" y="153" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="28" class="svg-label">s (m)</text>
           </svg>
           <p class="pane-label">Velocity vs. time — slope = <var>a</var>, shaded area = <var>s</var></p>
           <svg viewBox="0 0 500 120" id="caVtSvg">
@@ -448,6 +454,8 @@
             <path id="caVtArea" fill="rgba(27,175,122,0.18)" stroke="none" d=""></path>
             <line id="caVtLine" x1="40" y1="60" x2="40" y2="60" stroke="#1baf7a" stroke-width="2.5"></line>
             <circle id="caVtMarker" cx="40" cy="60" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text x="475" y="106" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">v (m/s)</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -1115,7 +1123,7 @@
       <!-- Mode: cars -->
       <div id="interceptCarsMode">
         <div class="widget">
-          <div class="widget-visual">
+          <div class="widget-visual compact">
             <svg viewBox="0 0 460 460" id="carsSvg">
               <g id="carsGrid"></g>
               <line class="svg-axis" x1="10" y1="230" x2="450" y2="230"></line>
@@ -1301,7 +1309,7 @@
       <div class="dual-pane">
         <div>
           <p class="pane-label">Top-down view (downrange × crossrange)</p>
-          <div class="widget-visual">
+          <div class="widget-visual compact">
             <svg viewBox="0 0 300 300" id="topSvg">
               <line class="svg-axis" x1="20" y1="150" x2="280" y2="150"></line>
               <line class="svg-axis" x1="20" y1="20" x2="20" y2="280"></line>
@@ -1314,7 +1322,7 @@
         </div>
         <div>
           <p class="pane-label">Side view (downrange × altitude)</p>
-          <div class="widget-visual">
+          <div class="widget-visual compact">
             <svg viewBox="0 0 300 300" id="sideSvg">
               <line class="svg-axis" x1="20" y1="280" x2="280" y2="280"></line>
               <line class="svg-axis" x1="20" y1="20" x2="20" y2="280"></line>

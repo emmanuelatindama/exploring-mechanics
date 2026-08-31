@@ -5,3 +5,7 @@
 .impact-flash {
   transition: opacity 0.15s ease;
 }
+
+#surfBox {
+  transition: x 0.5s ease;
+}

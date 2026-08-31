@@ -830,6 +830,7 @@
     const svg = document.getElementById("surfSvg");
     if (!svg) return;
     const box = document.getElementById("surfBox");
+    const pushArrow = document.getElementById("surfPushArrow");
     const fSlider = document.getElementById("surfFSlider");
     const fVal = document.getElementById("surfFVal");
     const mSlider = document.getElementById("surfMSlider");
@@ -840,17 +841,24 @@
     const presetButtons = Array.from(document.querySelectorAll("#surfPresetRow button"));
 
     let muS = 0.9, muK = 0.7;
+    const BOX_REST_X = 90, BOX_SLIDE_X = 175;
 
     function redraw() {
       const F = parseFloat(fSlider.value);
       const m = parseFloat(mSlider.value);
       const N = m * G;
       const fsMax = muS * N;
+      const slides = F > fsMax;
       fVal.textContent = F + " N";
       mVal.textContent = m + " kg";
       muVal.textContent = muS.toFixed(2) + " / " + muK.toFixed(2);
       fsMaxVal.textContent = fsMax.toFixed(1) + " N";
-      verdictVal.textContent = F > fsMax ? "Slides!" : "Doesn't move";
+      verdictVal.textContent = slides ? "Slides!" : "Doesn't move";
+      box.setAttribute("x", slides ? BOX_SLIDE_X : BOX_REST_X);
+      const arrowLen = 10 + Math.min(F, 60) * 0.55;
+      const boxX = slides ? BOX_SLIDE_X : BOX_REST_X;
+      pushArrow.setAttribute("x1", boxX - 5 - arrowLen);
+      pushArrow.setAttribute("x2", boxX - 3);
     }
     presetButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -873,6 +881,7 @@
     const svg = document.getElementById("tractionSvg");
     if (!svg) return;
     const dot = document.getElementById("tractionDot");
+    const circle = document.getElementById("tractionCircle");
     const vSlider = document.getElementById("tracVSlider");
     const vVal = document.getElementById("tracVVal");
     const muSlider = document.getElementById("tracMuSlider");
@@ -880,6 +889,7 @@
     const aVal = document.getElementById("tracAVal");
     const brakeVal = document.getElementById("tracBrakeVal");
     const turnVal = document.getElementById("tracTurnVal");
+    const PX_PER_MS2 = 80 / 9.8;
 
     function redraw() {
       const v = parseFloat(vSlider.value);
@@ -892,7 +902,9 @@
       aVal.textContent = a.toFixed(2) + " m/s²";
       brakeVal.textContent = brake.toFixed(1) + " m";
       turnVal.textContent = turn.toFixed(1) + " m";
-      dot.setAttribute("cy", 100 - 80);
+      const r = a * PX_PER_MS2;
+      circle.setAttribute("r", r);
+      dot.setAttribute("cy", 100 - r);
       dot.setAttribute("cx", 130);
     }
     vSlider.addEventListener("input", redraw);

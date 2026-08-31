@@ -1,6 +1,5 @@
-// docs/01-kinematics/index.html widgets. Only the Projectile Motion tab is
-// fully built out for now (see mechanics-section-writer skill) -- the other
-// four tabs are plain outline stubs until they get the same treatment.
+// docs/01-kinematics/index.html widgets: constant velocity, constant
+// acceleration, free fall, projectile motion, and relative motion.
 (function () {
   const SVGNS = "http://www.w3.org/2000/svg";
   function svgEl(tag, attrs) {
@@ -97,7 +96,7 @@
 
     for (let x = 45; x <= 495; x += 20) hatch.appendChild(svgEl("line", { x1: x, y1: 220, x2: x - 7, y2: 232, class: "svg-grid" }));
 
-    const MARGIN_L = 40, DOMAIN_X = 80, DOMAIN_Y = 45, GROUND = 220, TOP = 20;
+    const MARGIN_L = 40, DOMAIN_X = 50, DOMAIN_Y = 26, GROUND = 220, TOP = 20;
     const PXM_X = (470 - MARGIN_L) / DOMAIN_X, PXM_Y = (GROUND - TOP) / DOMAIN_Y;
     const toX = (xm) => MARGIN_L + xm * PXM_X;
     const toY = (ym) => GROUND - ym * PXM_Y;
@@ -202,7 +201,7 @@
     const ball = document.getElementById("targetBall");
     const mark = document.getElementById("targetMark");
 
-    const MARGIN_L = 20, DOMAIN_X = 60, DOMAIN_Y = 30, GROUND = 220, TOP = 20, G = 9.8;
+    const MARGIN_L = 20, DOMAIN_X = 48, DOMAIN_Y = 24, GROUND = 220, TOP = 20, G = 9.8;
     const PXM_X = (440 - MARGIN_L) / DOMAIN_X, PXM_Y = (GROUND - TOP) / DOMAIN_Y;
     const toX = (xm) => MARGIN_L + xm * PXM_X;
     const toY = (ym) => GROUND - ym * PXM_Y;

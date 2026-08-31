@@ -158,7 +158,7 @@
       if (animating) return;
       box.setAttribute("x", BOX_X0);
       const { vFinal, d } = current();
-      const pxpm = 380 / Math.max(d, 0.1);
+      const pxpm = 380 / 15; // 15 = dSlider's max, so travel distance scales with d
 
       animating = true;
       goBtn.disabled = true;
@@ -343,7 +343,11 @@
           ball1.setAttribute("cx", BALL1_X0 + v1 * t * pxpm);
         } else {
           const t2 = t - 0.5;
-          ball1.setAttribute("cx", BALL2_X0 + v1f * t2 * pxpm);
+          // In the stuck-together (inelastic) case v1f === v2f, which would
+          // place both circles at the exact same point -- offset ball1
+          // slightly so it stays visible instead of vanishing behind ball2.
+          const stickOffset = mode === "inelastic" ? -20 : 0;
+          ball1.setAttribute("cx", BALL2_X0 + v1f * t2 * pxpm + stickOffset);
           ball2.setAttribute("cx", BALL2_X0 + v2f * t2 * pxpm);
         }
         if (t >= ANIM_SECONDS) {
@@ -612,10 +616,10 @@
 
     goBtn.addEventListener("click", () => {
       if (animating) return;
-      const { theta } = current();
+      const { theta, L } = current();
       animating = true;
       goBtn.disabled = true;
-      const PERIOD = 1.8;
+      const PERIOD = 2 * Math.PI * Math.sqrt(L / G);
       const start = performance.now();
       function frame(now) {
         const t = Math.max(0, (now - start) / 1000);
@@ -873,6 +877,10 @@
   function initBikePower() {
     const svg = document.getElementById("pwrBikeSvg");
     if (!svg) return;
+    const wheel = document.getElementById("pwrBikeWheel");
+    const barGrav = document.getElementById("pwrBikeBarGrav");
+    const barRoll = document.getElementById("pwrBikeBarRoll");
+    const barDrag = document.getElementById("pwrBikeBarDrag");
     const vSlider = document.getElementById("pwrVSlider");
     const vVal = document.getElementById("pwrVVal");
     const slopeSlider = document.getElementById("pwrSlopeSlider");
@@ -885,6 +893,13 @@
     const totalPVal = document.getElementById("pwrTotalPVal");
 
     const CRR = 0.005, K_DRAG = 0.054;
+    const BAR_MAX_H = 85, BAR_BASE_Y = 105;
+
+    function setBar(bar, val, scale) {
+      const h = clamp(Math.abs(val) * scale, 0, BAR_MAX_H);
+      bar.setAttribute("height", h);
+      bar.setAttribute("y", BAR_BASE_Y - h);
+    }
 
     function redraw() {
       const v = parseFloat(vSlider.value);
@@ -904,6 +919,12 @@
       rollPVal.textContent = rollP.toFixed(1) + " W";
       dragPVal.textContent = dragP.toFixed(1) + " W";
       totalPVal.textContent = totalP.toFixed(1) + " W";
+
+      const scale = BAR_MAX_H / Math.max(totalP, 1);
+      setBar(barGrav, gravP, scale);
+      setBar(barRoll, rollP, scale);
+      setBar(barDrag, dragP, scale);
+      wheel.style.animationDuration = v > 0.05 ? Math.max(0.1, 2 / v) + "s" : "999s";
     }
     [vSlider, slopeSlider, mSlider].forEach((s) => s.addEventListener("input", redraw));
     redraw();
@@ -915,6 +936,9 @@
   function initMachineEfficiency() {
     const svg = document.getElementById("pwrEffSvg");
     if (!svg) return;
+    const inArrow = document.getElementById("pwrEffInArrow");
+    const outArrow = document.getElementById("pwrEffOutArrow");
+    const heatArrow = document.getElementById("pwrEffHeatArrow");
     const inSlider = document.getElementById("pwrEffInSlider");
     const inVal = document.getElementById("pwrEffInVal");
     const effSlider = document.getElementById("pwrEffSlider");
@@ -932,6 +956,12 @@
       effVal.textContent = eff + "%";
       outVal.textContent = pout.toFixed(0) + " W";
       lostVal.textContent = plost.toFixed(0) + " W";
+
+      const scale = 6 / Math.sqrt(Math.max(pin, 1));
+      inArrow.setAttribute("stroke-width", clamp(2 + Math.sqrt(pin) * scale, 2, 10));
+      outArrow.setAttribute("stroke-width", clamp(2 + Math.sqrt(pout) * scale, 2, 10));
+      heatArrow.setAttribute("stroke-width", clamp(1 + Math.sqrt(plost) * scale, 1, 10));
+      heatArrow.setAttribute("y2", 96 + clamp(Math.sqrt(plost) * scale, 0, 14));
     }
     inSlider.addEventListener("input", redraw);
     effSlider.addEventListener("input", redraw);
