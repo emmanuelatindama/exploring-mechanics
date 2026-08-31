@@ -105,6 +105,7 @@
     const spoke = document.getElementById("amSpoke");
     const thetaPath = document.getElementById("amThetaPath");
     const omegaLine = document.getElementById("amOmegaLine");
+    const alphaLine = document.getElementById("amAlphaLine");
     const w0Slider = document.getElementById("amW0Slider");
     const w0Val = document.getElementById("amW0Val");
     const aSlider = document.getElementById("amASlider");
@@ -137,6 +138,10 @@
       place(0, w0, a);
       thetaPath.setAttribute("d", "");
       omegaLine.setAttribute("x2", 40); omegaLine.setAttribute("y2", 45);
+      const alphaScale = 20 / Math.max(Math.abs(parseFloat(aSlider.min)), Math.abs(parseFloat(aSlider.max)));
+      const alphaY = 30 - a * alphaScale;
+      alphaLine.setAttribute("y1", alphaY);
+      alphaLine.setAttribute("y2", alphaY);
     }
     [w0Slider, aSlider].forEach((s) => s.addEventListener("input", redrawStatic));
     redrawStatic();
@@ -427,14 +432,30 @@
     const diskVal = document.getElementById("raceDiskVal");
     const hoopVal = document.getElementById("raceHoopVal");
     const blockVal = document.getElementById("raceBlockVal");
+    const barSphere = document.getElementById("raceBarSphere");
+    const barDisk = document.getElementById("raceBarDisk");
+    const barHoop = document.getElementById("raceBarHoop");
+    const barBlock = document.getElementById("raceBarBlock");
+    const BAR_MAX = 100;
 
     function redraw() {
       const h = parseFloat(hSlider.value);
       hVal.textContent = h.toFixed(1) + " m";
-      sphereVal.textContent = Math.sqrt((10 * G * h) / 7).toFixed(2) + " m/s";
-      diskVal.textContent = Math.sqrt((4 * G * h) / 3).toFixed(2) + " m/s";
-      hoopVal.textContent = Math.sqrt(G * h).toFixed(2) + " m/s";
-      blockVal.textContent = Math.sqrt(2 * G * h).toFixed(2) + " m/s";
+      const vSphere = Math.sqrt((10 * G * h) / 7);
+      const vDisk = Math.sqrt((4 * G * h) / 3);
+      const vHoop = Math.sqrt(G * h);
+      const vBlock = Math.sqrt(2 * G * h);
+      sphereVal.textContent = vSphere.toFixed(2) + " m/s";
+      diskVal.textContent = vDisk.toFixed(2) + " m/s";
+      hoopVal.textContent = vHoop.toFixed(2) + " m/s";
+      blockVal.textContent = vBlock.toFixed(2) + " m/s";
+
+      const scale = BAR_MAX / vBlock;
+      [[barSphere, vSphere], [barDisk, vDisk], [barHoop, vHoop], [barBlock, vBlock]].forEach(([bar, v]) => {
+        const hpx = v * scale;
+        bar.setAttribute("y", 120 - hpx);
+        bar.setAttribute("height", hpx);
+      });
     }
     hSlider.addEventListener("input", redraw);
     redraw();
@@ -606,8 +627,10 @@
     const w0Val = document.getElementById("bowlW0Val");
     const vfVal = document.getElementById("bowlVfVal");
     const lostVal = document.getElementById("bowlLostVal");
+    const barV0 = document.getElementById("bowlBarV0");
+    const barVf = document.getElementById("bowlBarVf");
 
-    const BALL_R = 0.108;
+    const BALL_R = 0.108, BAR_MAX = 60;
 
     function redraw() {
       const v0 = parseFloat(v0Slider.value);
@@ -617,6 +640,12 @@
       w0Val.textContent = w0 + " rad/s";
       vfVal.textContent = vf.toFixed(2) + " m/s";
       lostVal.textContent = (v0 - vf).toFixed(2) + " m/s";
+
+      const scale = BAR_MAX / 15;
+      const h0 = clamp(v0 * scale, 0, BAR_MAX);
+      const hf = clamp(vf * scale, 0, BAR_MAX);
+      barV0.setAttribute("y", 80 - h0); barV0.setAttribute("height", h0);
+      barVf.setAttribute("y", 80 - hf); barVf.setAttribute("height", hf);
     }
     v0Slider.addEventListener("input", redraw);
     w0Slider.addEventListener("input", redraw);
@@ -717,12 +746,22 @@
     const iVal = document.getElementById("bikeWheelIVal");
     const dLVal = document.getElementById("bikeWheelDLVal");
     const wVal = document.getElementById("bikeWheelWVal");
+    const lArrow = document.getElementById("bikeWheelLArrow");
+    const personArm = document.getElementById("bikeWheelPersonArm");
+    const flipBtn = document.getElementById("bikeWheelFlipBtn");
 
-    function redraw() {
+    let flipped = false, animating = false, personAngle = 0;
+
+    function current() {
       const L = parseFloat(lSlider.value);
       const iPerson = parseFloat(iSlider.value);
       const dL = 2 * L;
       const w = dL / iPerson;
+      return { L, iPerson, dL, w };
+    }
+
+    function redraw() {
+      const { L, iPerson, dL, w } = current();
       lVal.textContent = L.toFixed(1) + " kg·m²/s";
       iVal.textContent = iPerson.toFixed(1) + " kg·m²";
       dLVal.textContent = dL.toFixed(1) + " kg·m²/s";
@@ -731,6 +770,37 @@
     lSlider.addEventListener("input", redraw);
     iSlider.addEventListener("input", redraw);
     redraw();
+
+    flipBtn.addEventListener("click", () => {
+      if (animating) return;
+      animating = true;
+      flipBtn.disabled = true;
+      flipped = !flipped;
+      const targetY = flipped ? 110 : 30;
+      const startY = flipped ? 30 : 110;
+      const { w } = current();
+      const FLIP_T = 0.8, SPIN_T = 2.0;
+      const start = performance.now();
+      function frame(now) {
+        const t = (now - start) / 1000;
+        if (t <= FLIP_T) {
+          const f = t / FLIP_T;
+          lArrow.setAttribute("y2", startY + (targetY - startY) * f);
+        } else {
+          lArrow.setAttribute("y2", targetY);
+          const t2 = t - FLIP_T;
+          personAngle += w * 0.03;
+          personArm.setAttribute("transform", "rotate(" + (personAngle * 180) / Math.PI + " 150 70)");
+          if (t2 >= SPIN_T) {
+            animating = false;
+            flipBtn.disabled = false;
+            return;
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    });
   }
 
   // ---------------------------------------------------------------

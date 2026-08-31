@@ -128,12 +128,24 @@
             <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
             <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
             <path id="amThetaPath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <text x="475" y="106" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">θ (rad)</text>
           </svg>
           <p class="pane-label">Angular velocity, ω(t)</p>
           <svg viewBox="0 0 500 90" id="amOmegaSvg">
             <line x1="40" y1="45" x2="480" y2="45" class="svg-axis"></line>
             <line x1="40" y1="10" x2="40" y2="80" class="svg-axis"></line>
             <line id="amOmegaLine" x1="40" y1="45" x2="40" y2="45" stroke="#1baf7a" stroke-width="2.5"></line>
+            <text x="475" y="76" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">ω (rad/s)</text>
+          </svg>
+          <p class="pane-label">Angular acceleration, α(t) — flat, since α is constant here</p>
+          <svg viewBox="0 0 500 60" id="amAlphaSvg">
+            <line x1="40" y1="10" x2="480" y2="10" class="svg-grid"></line>
+            <line x1="40" y1="50" x2="480" y2="50" class="svg-axis"></line>
+            <line x1="40" y1="5" x2="40" y2="55" class="svg-axis"></line>
+            <line id="amAlphaLine" x1="40" y1="30" x2="480" y2="30" stroke="#e34948" stroke-width="2.5"></line>
+            <text x="4" y="20" class="svg-label">α (rad/s²)</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -478,6 +490,19 @@
         predict the finishing order before you ever build the ramp.
       </p>
       <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 140 140" id="raceBarSvg">
+            <line x1="10" y1="120" x2="130" y2="120" class="svg-axis"></line>
+            <rect id="raceBarSphere" x="10" y="120" width="20" height="0" fill="#1baf7a"></rect>
+            <rect id="raceBarDisk" x="40" y="120" width="20" height="0" fill="#eb6834"></rect>
+            <rect id="raceBarHoop" x="70" y="120" width="20" height="0" fill="#2a78d6"></rect>
+            <rect id="raceBarBlock" x="100" y="120" width="20" height="0" fill="var(--muted)"></rect>
+            <text x="20" y="132" class="svg-label" text-anchor="middle" font-size="6">sphere</text>
+            <text x="50" y="132" class="svg-label" text-anchor="middle" font-size="6">disk</text>
+            <text x="80" y="132" class="svg-label" text-anchor="middle" font-size="6">hoop</text>
+            <text x="110" y="132" class="svg-label" text-anchor="middle" font-size="6">block</text>
+          </svg>
+        </div>
         <div class="widget-side" style="max-width:560px">
           <div class="controls">
             <div class="row"><div class="row-head"><span>Ramp height, h</span><b id="raceHVal">1.5 m</b></div>
@@ -606,6 +631,15 @@
         the ball switches to true rolling and friction's job is done.
       </p>
       <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 100" id="bowlBarSvg">
+            <line x1="20" y1="80" x2="180" y2="80" class="svg-axis"></line>
+            <rect id="bowlBarV0" x="30" y="80" width="50" height="0" fill="#e34948"></rect>
+            <rect id="bowlBarVf" x="120" y="80" width="50" height="0" fill="#1baf7a"></rect>
+            <text x="55" y="93" class="svg-label" text-anchor="middle">v₀ (slide)</text>
+            <text x="145" y="93" class="svg-label" text-anchor="middle">v_f (roll)</text>
+          </svg>
+        </div>
         <div class="widget-side" style="max-width:560px">
           <div class="controls">
             <div class="row"><div class="row-head"><span>Initial slide speed, v₀</span><b id="bowlV0Val">8 m/s</b></div>
@@ -711,12 +745,22 @@
         keep the system's total angular momentum unchanged.
       </p>
       <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 200 140" id="bikeWheelSvg">
+            <circle cx="60" cy="70" r="30" fill="none" stroke="var(--text-primary)" stroke-width="4"></circle>
+            <line id="bikeWheelLArrow" x1="60" y1="70" x2="60" y2="30" stroke="#2a78d6" stroke-width="3" marker-end="url(#bikeWheelHead)"></line>
+            <circle cx="150" cy="70" r="10" fill="var(--text-primary)"></circle>
+            <line id="bikeWheelPersonArm" x1="150" y1="70" x2="180" y2="70" stroke="#eb6834" stroke-width="4" stroke-linecap="round"></line>
+            <defs><marker id="bikeWheelHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker></defs>
+          </svg>
+        </div>
         <div class="widget-side" style="max-width:560px">
           <div class="controls">
             <div class="row"><div class="row-head"><span>Wheel's angular momentum, L<sub>wheel</sub></span><b id="bikeWheelLVal">3.0 kg·m²/s</b></div>
               <input type="range" id="bikeWheelLSlider" min="0.5" max="10" step="0.5" value="3.0"></div>
             <div class="row"><div class="row-head"><span>Person + stool moment of inertia, I<sub>person</sub></span><b id="bikeWheelIVal">4.0 kg·m²</b></div>
               <input type="range" id="bikeWheelISlider" min="1" max="15" step="0.5" value="4.0"></div>
+            <button class="action" id="bikeWheelFlipBtn">🚲 Flip the wheel</button>
           </div>
           <div class="readout">
             <table>

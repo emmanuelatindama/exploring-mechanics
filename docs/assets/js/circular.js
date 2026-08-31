@@ -594,7 +594,11 @@
     if (!row) return;
     const vCircVal = document.getElementById("escVCircVal");
     const vEscVal = document.getElementById("escVEscVal");
+    const barCirc = document.getElementById("escBarCirc");
+    const barEsc = document.getElementById("escBarEsc");
     const buttons = Array.from(row.querySelectorAll("button"));
+
+    const V_MAX = 65, X0 = 20, BAR_PX = 190;
 
     function redraw(btn) {
       const gm = parseFloat(btn.dataset.gm);
@@ -603,6 +607,8 @@
       const vEsc = Math.sqrt((2 * gm) / r) / 1000;
       vCircVal.textContent = vCirc.toFixed(2) + " km/s";
       vEscVal.textContent = vEsc.toFixed(2) + " km/s";
+      barCirc.setAttribute("x2", X0 + clamp((vCirc / V_MAX) * BAR_PX, 0, BAR_PX));
+      barEsc.setAttribute("x2", X0 + clamp((vEsc / V_MAX) * BAR_PX, 0, BAR_PX));
     }
     buttons.forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -623,6 +629,21 @@
     const rVal = document.getElementById("keplerRVal");
     const tVal = document.getElementById("keplerTVal");
     const ratioVal = document.getElementById("keplerRatioVal");
+    const linePath = document.getElementById("keplerLinePath");
+    const marker = document.getElementById("keplerMarker");
+
+    const R_MIN = 0.3, R_MAX = 30;
+    const logMin = Math.log10(R_MIN), logMax = Math.log10(R_MAX);
+    const TLOG_MIN = 1.5 * logMin, TLOG_MAX = 1.5 * logMax;
+    const toX = (logR) => 40 + ((logR - logMin) / (logMax - logMin)) * 400;
+    const toY = (logT) => 150 - ((logT - TLOG_MIN) / (TLOG_MAX - TLOG_MIN)) * 140;
+
+    let d = "";
+    for (let i = 0; i <= 40; i++) {
+      const logR = logMin + ((logMax - logMin) * i) / 40;
+      d += (i === 0 ? "M" : "L") + toX(logR) + "," + toY(1.5 * logR) + " ";
+    }
+    linePath.setAttribute("d", d);
 
     function redraw() {
       const r = parseFloat(rSlider.value);
@@ -631,6 +652,9 @@
       rVal.textContent = r.toFixed(2) + " AU";
       tVal.textContent = T.toFixed(2) + " years";
       ratioVal.textContent = ratio.toFixed(3);
+      const logR = Math.log10(r);
+      marker.setAttribute("cx", toX(logR));
+      marker.setAttribute("cy", toY(1.5 * logR));
     }
     rSlider.addEventListener("input", redraw);
     redraw();

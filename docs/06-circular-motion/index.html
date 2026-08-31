@@ -435,6 +435,8 @@
             <line x1="40" y1="10" x2="40" y2="150" class="svg-axis"></line>
             <path id="gravCurvePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
             <circle id="gravMarker" cx="40" cy="150" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text x="435" y="146" text-anchor="end" class="svg-label">r (R⊕)</text>
+            <text x="4" y="24" class="svg-label">F (N)</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -589,6 +591,15 @@
         <button data-gm="1.267e17" data-r="6.991e7">🪐 Jupiter</button>
       </div>
       <div class="widget">
+        <div class="widget-visual compact">
+          <svg viewBox="0 0 220 120" id="escBarSvg">
+            <line x1="20" y1="30" x2="20" y2="100" class="svg-axis"></line>
+            <line id="escBarCirc" x1="20" y1="45" x2="20" y2="45" stroke="#2a78d6" stroke-width="14"></line>
+            <line id="escBarEsc" x1="20" y1="85" x2="20" y2="85" stroke="#e34948" stroke-width="14"></line>
+            <text x="20" y="33" class="svg-label">circular speed</text>
+            <text x="20" y="73" class="svg-label">escape speed</text>
+          </svg>
+        </div>
         <div class="widget-side" style="max-width:520px">
           <div class="readout">
             <table>
@@ -606,6 +617,16 @@
         the central mass, never on the orbiting object's own mass or speed.
       </p>
       <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 460 180" id="keplerGraphSvg">
+            <line x1="40" y1="150" x2="440" y2="150" class="svg-axis"></line>
+            <line x1="40" y1="10" x2="40" y2="150" class="svg-axis"></line>
+            <path id="keplerLinePath" fill="none" stroke="#2a78d6" stroke-width="2.5" d=""></path>
+            <circle id="keplerMarker" cx="40" cy="150" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
+            <text x="435" y="146" text-anchor="end" class="svg-label">log₁₀ r (AU)</text>
+            <text x="4" y="24" class="svg-label">log₁₀ T (years)</text>
+          </svg>
+        </div>
         <div class="widget-side" style="max-width:520px">
           <div class="controls">
             <div class="row"><div class="row-head"><span>Orbital radius, r (AU, around the Sun)</span><b id="keplerRVal">1.00 AU</b></div>

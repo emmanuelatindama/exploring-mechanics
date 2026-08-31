@@ -465,6 +465,9 @@
     const fdVal = document.getElementById("bridgeFdVal");
     const mismatchVal = document.getElementById("bridgeMismatchVal");
     const riskVal = document.getElementById("bridgeRiskVal");
+    const barFn = document.getElementById("bridgeBarFn");
+    const barFd = document.getElementById("bridgeBarFd");
+    const F_MAX = 3, X0 = 20, BAR_PX = 190;
 
     function redraw() {
       const fn = parseFloat(fnSlider.value);
@@ -475,6 +478,9 @@
       mismatchVal.textContent = mismatch.toFixed(1) + "%";
       riskVal.textContent =
         mismatch < 5 ? "🔴 High — near-perfect resonance match" : mismatch < 20 ? "🟡 Moderate — noticeably amplified response" : "🟢 Low — frequencies well separated";
+      barFn.setAttribute("x2", X0 + (fn / F_MAX) * BAR_PX);
+      barFd.setAttribute("x2", X0 + (fd / F_MAX) * BAR_PX);
+      barFd.setAttribute("stroke", mismatch < 5 ? "#e34948" : mismatch < 20 ? "#eb6834" : "#1baf7a");
     }
     fnSlider.addEventListener("input", redraw);
     fdSlider.addEventListener("input", redraw);

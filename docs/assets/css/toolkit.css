@@ -22,22 +22,25 @@
   width: 100%;
   max-width: 100%;
   height: auto;
-  max-height: 110px;
+  max-height: 170px;
   display: block;
   margin: 0 auto;
   touch-action: none;
 }
-/* Multiple stacked panes (track + graphs) in one widget-visual should sit
-   close together rather than each carrying its own full gap, so the whole
-   stack (and the play button beside it) stays visible without scrolling. */
+/* A widget-visual with several stacked panes (track + two or three graphs,
+   as in kinematics) needs a tighter per-pane cap than a widget with just one
+   SVG, or the whole stack (and the play button beside it) runs off-screen. */
+.widget-visual svg:not(:only-of-type) {
+  max-height: 100px;
+}
 .widget-visual svg + .pane-label { margin-top: 4px; }
 .widget-visual .pane-label { margin: 0 0 2px; font-size: 11.5px; }
 /* Square (1:1) or portrait SVGs (vector diagrams, vertical drop tracks,
    top-down maps) need a taller box than the default line-graph cap, but
    still bounded so they never require scrolling to see the whole widget. */
 .widget-visual.compact svg {
-  max-width: 210px;
-  max-height: 210px;
+  max-width: 230px;
+  max-height: 230px;
   margin: 0 auto;
 }
 

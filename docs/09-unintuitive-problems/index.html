@@ -189,19 +189,20 @@
       <div class="widget">
         <div class="widget-visual">
           <svg viewBox="0 0 300 260" id="slinkySvg"></svg>
-        </div>
-        <div class="widget-side">
-          <div class="controls">
-            <button class="action" id="slinkyDropBtn">▶ Release</button>
-          </div>
           <p class="pane-label" id="slinkyStatus">—</p>
           <svg viewBox="0 0 500 100" id="slinkyPlotSvg">
             <line x1="40" y1="90" x2="480" y2="90" class="svg-axis"></line>
             <line x1="40" y1="10" x2="40" y2="90" class="svg-axis"></line>
             <path id="slinkyTopPlotPath" fill="none" stroke="#eb6834" stroke-width="2"></path>
             <path id="slinkyPlotPath" fill="none" stroke="#e34948" stroke-width="2.5"></path>
-            <text x="440" y="20" class="svg-label">top (orange), bottom (red) drop vs. time</text>
+            <text x="475" y="86" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">drop (top orange, bottom red)</text>
           </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <button class="action" id="slinkyDropBtn">▶ Release</button>
+          </div>
         </div>
       </div>
       <details class="math-details">
@@ -405,7 +406,8 @@
             <path id="racketPlot1" fill="none" stroke="#2a78d6" stroke-width="2"></path>
             <path id="racketPlot2" fill="none" stroke="#eb6834" stroke-width="2"></path>
             <path id="racketPlot3" fill="none" stroke="#1baf7a" stroke-width="2"></path>
-            <text x="440" y="20" class="svg-label">ω1 (blue), ω2 (orange), ω3 (green)</text>
+            <text x="475" y="86" text-anchor="end" class="svg-label">t (s)</text>
+            <text x="4" y="20" class="svg-label">ω1 (blue), ω2 (orange), ω3 (green)</text>
           </svg>
         </div>
         <div class="widget-side">
@@ -482,6 +484,8 @@
             <path id="hoopBifPath2" fill="none" stroke="#eb6834" stroke-width="2"></path>
             <circle id="hoopBifMarker" cx="260" cy="70" r="5" fill="var(--text-primary)"></circle>
             <text x="270" y="18" class="svg-label">equilibrium angle vs. Ω (bifurcation diagram)</text>
+            <text x="475" y="66" text-anchor="end" class="svg-label">Ω (rad/s)</text>
+            <text x="264" y="30" class="svg-label">angle</text>
           </svg>
         </div>
         <div class="widget-side">
