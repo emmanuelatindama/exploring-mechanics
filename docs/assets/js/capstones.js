@@ -34,7 +34,19 @@
       const tSkid = v0 / (3.5 * mu * G);
       const vRoll = (5 / 7) * v0;
       const dSkid = v0 * tSkid - 0.5 * mu * G * tSkid * tSkid;
-      return { v0, mu, tSkid, vRoll, dSkid };
+      // Speed when the ball actually reaches the pins (lane end). If the skid
+      // finishes before the lane runs out, that's just vRoll (friction no
+      // longer matters). But if the lane isn't long enough for the skid to
+      // finish, the ball is still slowing down under friction when it hits
+      // the pins, so its speed there is higher than vRoll and does depend on mu.
+      let vAtPins;
+      if (dSkid <= LANE_M) {
+        vAtPins = vRoll;
+      } else {
+        const t = (v0 - Math.sqrt(Math.max(0, v0 * v0 - 2 * mu * G * LANE_M))) / (mu * G);
+        vAtPins = v0 - mu * G * t;
+      }
+      return { v0, mu, tSkid, vRoll, dSkid, vAtPins };
     }
     function render() {
       v0Val.textContent = (+v0Slider.value).toFixed(1) + " m/s";
@@ -58,7 +70,7 @@
       ball.setAttribute("cx", X0 + Math.min(xPx, LANE_PX));
       if (xPx >= LANE_PX) {
         const mb = 7, mp = 1.6, e = 0.3;
-        pinSpeedVal.textContent = (((1 + e) * mb * c.vRoll) / (mb + mp)).toFixed(2) + " m/s";
+        pinSpeedVal.textContent = (((1 + e) * mb * c.vAtPins) / (mb + mp)).toFixed(2) + " m/s";
         pin.setAttribute("cx", X0 + LANE_PX + 12);
         running = false; return;
       }
@@ -468,7 +480,14 @@
     }
     q("[data-go]").addEventListener("click", () => {
       if (running) { running = false; if (rafId) cancelAnimationFrame(rafId); placeCart(0); sPos = 0; return; }
-      sPos = 0; running = true; last = performance.now(); rafId = requestAnimationFrame(frame);
+      // Sample 0 sits exactly at the crest of the first hill, where v = 0 by
+      // construction (drop = 0 there) -- starting sPos there would trip the
+      // v < 0.05 "stopped" check on the very first frame. Start just past the
+      // crest, at the first sample with meaningful speed, instead.
+      let startIdx = 0;
+      while (startIdx < samples.length - 1 && samples[startIdx].v < 0.05) startIdx++;
+      sPos = samples[startIdx].s;
+      running = true; last = performance.now(); rafId = requestAnimationFrame(frame);
     });
   }
 
