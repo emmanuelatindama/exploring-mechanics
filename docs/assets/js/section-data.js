@@ -367,6 +367,16 @@ window.SECTIONS = {
       applications: ["Hill-to-hill energy transfer", "Minimum height to complete a loop"],
       experiments: ["Energy skate-park model", "Roller-coaster loop animation"],
     },
+    {
+      id: "full-ride-and-energy",
+      title: "Full Ride and Energy Accounting",
+      concepts: [
+        "Continuous energy bookkeeping along an entire multi-hill track",
+        "Kinetic, potential, and thermal energy tracked together as the car moves",
+        "Where a real coaster can stall once friction is included",
+      ],
+      experiments: ["Full-ride energy simulation with adjustable friction"],
+    },
   ],
 },
 

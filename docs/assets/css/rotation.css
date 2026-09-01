@@ -1,2 +1,135 @@
 /* Section-specific additions for 07-rotation-and-rolling, layered on top of
    toolkit.css and kinematics.css's shared widget primitives. */
+
+/* --- Injected Run/Reset buttons (door, yo-yo, bowling, race, new widgets) --- */
+.rot-go {
+  font: inherit;
+  margin-top: 0.6rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid #2a78d6;
+  border-radius: 6px;
+  background: #2a78d6;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.rot-go:hover { background: #2266bd; }
+.rot-go:active { transform: translateY(1px); }
+
+/* --- Bowling lane mini-canvas injected under the bars --- */
+.rot-lane-svg {
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+  margin-top: 0.5rem;
+  background: #f4efe4;
+  border: 1px solid #e2e6ea;
+  border-radius: 8px;
+}
+
+/* --- Rolling markers / spin dots: JS drives them each frame --- */
+#raceSimSvg circle,
+#yoyoSvg circle { transition: none; }
+
+/* --- Shared styling for the JS-injected widgets
+       (#torqueSpinHost, #spoolParadoxHost). Neutral so they inherit
+       the site's look. --- */
+.rot-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.rot-svg {
+  width: 100%;
+  height: auto;
+  max-height: 220px;
+  background: #fbfbfd;
+  border: 1px solid #e2e6ea;
+  border-radius: 8px;
+}
+.rot-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+.rot-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+.rot-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.35rem 1rem;
+  font-size: 0.9rem;
+}
+.rot-readouts b { font-variant-numeric: tabular-nums; }
+.rot-verdict {
+  grid-column: 1 / -1;
+  font-style: italic;
+  color: #555;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-go { transition: none; }
+}
+
+
+/* --- Tennis-racket axis preset buttons --- */
+.rot-presets {
+  display: inline-flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.rot-presets button {
+  font: inherit;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid #c7ced6;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.rot-presets button:hover { background: #eef3f9; }
+.rot-presets button.active {
+  background: #2a78d6;
+  border-color: #2a78d6;
+  color: #fff;
+}
+
+/* --- Gyro injected vectors / tennis-racket paths driven by JS --- */
+#gyroSvg line, #tennisRacketHost .rot-svg path { transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rot-presets button { transition: none; }
+}
+
+
+/* 4. Enable the tennis‑racket widget (your index.html)
+The gyro upgrade needs no HTML change (it reuses #gyroSvg). For the tennis racket, add a host div in the Angular Momentum panel (or its own tab):
+
+<div class="widget">
+  <h3>Tennis-Racket Theorem (Intermediate-Axis / Dzhanibekov)</h3>
+  <div id="tennisRacketHost"></div>
+</div> */
+
+
+
+/* To enable the two new widgets (optional — your index.html edit)
+The JS no‑ops until you add a host <div>. Add these inside the relevant tab panels (or give them their own tab):
+
+<!-- In the Torque or Moment-of-Inertia panel -->
+<div class="widget">
+  <h3>Equal Torque, Different Spin-Up</h3>
+  <div id="torqueSpinHost"></div>
+</div>
+
+<!-- In the Rolling-Without-Slipping panel (guide §9 spool paradox) -->
+<div class="widget">
+  <h3>The Spool Paradox</h3>
+  <div id="spoolParadoxHost"></div>
+</div> */

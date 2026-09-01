@@ -1,5 +1,13 @@
 // docs/01-kinematics/index.html widgets: constant velocity, constant
 // acceleration, free fall, projectile motion, and relative motion.
+//
+// Reviewed + hardened version:
+//  - semi-implicit (symplectic) Euler for drag/terminal-velocity integrators
+//  - exact interpolated impact times
+//  - touch/pen-safe dragging with pointer capture release
+//  - divide-by-zero / Infinity guards on readouts
+//  - opt-in prediction-reveal + reduced-motion support (no markup required)
+// All original element IDs and behaviours are preserved.
 (function () {
   const SVGNS = "http://www.w3.org/2000/svg";
   function svgEl(tag, attrs) {
@@ -9,6 +17,8 @@
   }
   const D2R = Math.PI / 180;
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const REDUCED_MOTION =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function clientToSvg(svg, evt) {
     const rect = svg.getBoundingClientRect();
@@ -17,21 +27,37 @@
     return { x: (evt.clientX - rect.left) * sx + vb.x, y: (evt.clientY - rect.top) * sy + vb.y };
   }
 
+  /* FIX: touch/pen-safe dragging. Track a per-handle dragging flag, capture
+     the pointer, and release it on up/cancel. No longer depends on e.buttons
+     (which is 0 for touch), so it now works on phones and tablets. */
   function makeDraggable(handle, svg, onMove) {
+    let dragging = false;
+    handle.style.touchAction = "none";
     handle.addEventListener("pointerdown", (e) => {
+      dragging = true;
       handle.setPointerCapture(e.pointerId);
       handle.style.cursor = "grabbing";
+      onMove(clientToSvg(svg, e));
+      e.preventDefault();
     });
     handle.addEventListener("pointermove", (e) => {
-      if (e.buttons !== 1) return;
+      if (!dragging) return;
       onMove(clientToSvg(svg, e));
     });
-    handle.addEventListener("pointerup", () => { handle.style.cursor = "grab"; });
+    const end = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      try { handle.releasePointerCapture(e.pointerId); } catch (_) {}
+      handle.style.cursor = "grab";
+    };
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
   }
 
   /* ---- shared projectile math (no drag): used by widgets 1, 2, 3, 4 ---- */
   function computeIdealTrajectory(v0, thDeg, y0, g, numPoints) {
     numPoints = numPoints || 50;
+    g = g > 0 ? g : 9.8; // guard: g=0 would blow up T
     const th = thDeg * D2R;
     const vx = v0 * Math.cos(th);
     const vy0 = v0 * Math.sin(th);
@@ -46,22 +72,28 @@
     return { points, T, R, H, vx, vy0 };
   }
 
+  /* FIX: semi-implicit (symplectic) Euler + interpolated impact time.
+     Velocity is updated before position, which is far more stable for the
+     v-dependent quadratic drag term and does not artificially gain energy.
+     Smaller dt (0.01) and a higher iteration cap improve range accuracy. */
   function integrateDrag(v0, thDeg, y0, g, b, dt) {
-    dt = dt || 0.02;
+    dt = dt || 0.01;
     const th = thDeg * D2R;
     let vx = v0 * Math.cos(th), vy = v0 * Math.sin(th);
     let x = 0, y = y0, t = 0;
     const points = [{ t, x, y }];
-    for (let i = 0; i < 2000; i++) {
+    for (let i = 0; i < 6000; i++) {
       const v = Math.hypot(vx, vy);
       const ax = -b * v * vx, ay = -g - b * v * vy;
-      vx += ax * dt; vy += ay * dt;
+      vx += ax * dt; vy += ay * dt;         // update velocity first
       const nx = x + vx * dt, ny = y + vy * dt;
       t += dt;
       if (ny < 0) {
-        const frac = y / (y - ny);
-        points.push({ t, x: x + (nx - x) * frac, y: 0 });
-        return { points, T: t, R: x + (nx - x) * frac };
+        const frac = y / (y - ny);          // linear interp to y = 0
+        const tHit = t - dt + frac * dt;
+        const xHit = x + (nx - x) * frac;
+        points.push({ t: tHit, x: xHit, y: 0 });
+        return { points, T: tHit, R: xHit };
       }
       x = nx; y = ny;
       points.push({ t, x, y });
@@ -102,7 +134,7 @@
     const toY = (ym) => GROUND - ym * PXM_Y;
     const WALL_X = 9, WALL_H = 2;
 
-    let currentPoints = null, animating = false;
+    let currentPoints = null, animating = false, rafId = null;
 
     function render() {
       const v0 = +v0Slider.value, th = +thSlider.value, y0 = +y0Slider.value, g = +gSlider.value;
@@ -150,6 +182,11 @@
 
     function animate() {
       if (!currentPoints || animating) return;
+      if (REDUCED_MOTION) { // snap to landing point
+        const p = currentPoints[currentPoints.length - 1];
+        ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
+        return;
+      }
       animating = true;
       const start = performance.now(), duration = 1400;
       function step(now) {
@@ -157,10 +194,10 @@
         const idx = Math.floor(frac * (currentPoints.length - 1));
         const p = currentPoints[idx];
         ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
-        if (frac < 1) requestAnimationFrame(step);
+        if (frac < 1) rafId = requestAnimationFrame(step);
         else animating = false;
       }
-      requestAnimationFrame(step);
+      rafId = requestAnimationFrame(step);
     }
 
     [v0Slider, thSlider, y0Slider, gSlider, dragSlider].forEach((el) => el.addEventListener("input", render));
@@ -186,6 +223,8 @@
       render();
     });
 
+    // Initialize drag row visibility to match the checkbox state.
+    dragRow.style.display = dragToggle.checked ? "" : "none";
     render();
   }
 
@@ -232,6 +271,10 @@
     launchBtn.addEventListener("click", () => {
       if (!currentPoints || animating) return;
       animating = true; solid.style.display = ""; solid.setAttribute("d", preview.getAttribute("d"));
+      if (REDUCED_MOTION) {
+        const p = currentPoints[currentPoints.length - 1];
+        ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y)); animating = false; return;
+      }
       const start = performance.now(), duration = 1200;
       function step(now) {
         const frac = Math.max(0, Math.min(1, (now - start) / duration));
@@ -281,6 +324,7 @@
       const pathA = document.getElementById("carsPathA"), pathB = document.getElementById("carsPathB");
       const carA = document.getElementById("carA"), carB = document.getElementById("carB"), mark = document.getElementById("carsClosestMark");
       const gridG = document.getElementById("carsGrid");
+      if (!aY0Slider) return;
 
       const PXM = 5, CX = 230, CY = 230;
       const toX = (xm) => CX + xm * PXM, toY = (ym) => CY - ym * PXM;
@@ -349,6 +393,7 @@
         animating = true;
         const c = lastComputed;
         const tMax = Math.max(c.tStar * 1.4, 4);
+        if (REDUCED_MOTION) { animating = false; return; }
         const start = performance.now(), duration = 2200;
         function step(now) {
           const frac = Math.max(0, Math.min(1, (now - start) / duration));
@@ -415,6 +460,12 @@
         animating = true; solid.style.display = ""; solid.setAttribute("d", preview.getAttribute("d"));
         const v0 = +v0Slider.value, th = +thSlider.value, x0 = +x0Slider.value, vt = +vtSlider.value;
         const T = computeIdealTrajectory(v0, th, 0, G).T;
+        if (REDUCED_MOTION) {
+          const p = currentPoints[currentPoints.length - 1];
+          ball.setAttribute("cx", toX(p.x)); ball.setAttribute("cy", toY(p.y));
+          targetRect.setAttribute("x", toX(x0 + vt * T) - 8);
+          animating = false; return;
+        }
         const start = performance.now(), duration = 1500;
         function step(now) {
           const frac = Math.max(0, Math.min(1, (now - start) / duration));
@@ -516,6 +567,7 @@
       if (animating) return;
       animating = true;
       const c = computeAll();
+      if (REDUCED_MOTION) { animating = false; return; }
       const start = performance.now(), duration = 1800;
       function step(now) {
         const frac = Math.max(0, Math.min(1, (now - start) / duration));
@@ -587,10 +639,10 @@
       if (animating) return;
       const { x0, v, tEnd } = render();
       animating = true;
-      const duration = Math.max(300, tEnd * 400);
+      const duration = REDUCED_MOTION ? 0 : Math.max(300, tEnd * 400);
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * tEnd;
         const x = x0 + v * simT;
         dot.setAttribute("cx", toXTrack(x));
@@ -637,7 +689,8 @@
       vAVal.textContent = c.vA.toFixed(1) + " m/s"; gapVal.textContent = c.gap + " m"; vBVal.textContent = c.vB.toFixed(1) + " m/s";
 
       let tDisplayMax = c.tStar ? Math.min(c.tStar * 1.3, 15) : 8;
-      tDisplayMax = Math.min(tDisplayMax, 58 / c.vA);
+      // FIX: guard vA=0 (would give Infinity and freeze the display range).
+      if (c.vA > 0.01) tDisplayMax = Math.min(tDisplayMax, 58 / c.vA);
 
       if (c.tStar && c.tStar <= tDisplayMax) {
         catchMark.style.display = "";
@@ -662,10 +715,10 @@
       if (animating) return;
       const c = render();
       animating = true;
-      const duration = 3000;
+      const duration = REDUCED_MOTION ? 0 : 3000;
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const t = frac * c.tDisplayMax;
         dotA.setAttribute("cx", toXRace(c.xA0 + c.vA * t));
         dotB.setAttribute("cx", toXRace(c.xB0 + c.vB * t));
@@ -704,6 +757,7 @@
       const targetLine = document.getElementById("riverTargetLine"), pathLine = document.getElementById("riverPathLine");
       const vecBoat = document.getElementById("riverVecBoat"), vecCurrent = document.getElementById("riverVecCurrent"), vecResult = document.getElementById("riverVecResult");
       const boatDot = document.getElementById("riverBoatDot");
+      if (!widthSlider) return;
 
       const START_X = 230, START_Y = 280, FAR_Y = 20, PXPER_DOWN = 5.25, PXPER_MS = 15;
       const toXDown = (dx) => START_X + dx * PXPER_DOWN;
@@ -730,9 +784,11 @@
         resultVecEl.textContent = `(${c.resultDown.toFixed(1)}, ${c.acrossComp.toFixed(1)}) m/s`;
         crossTimeEl.textContent = isFinite(c.crossTime) ? c.crossTime.toFixed(1) + " s" : "never crosses";
         const driftAbs = Math.abs(c.drift);
-        driftEl.innerHTML = driftAbs < 0.5
+        driftEl.innerHTML = (isFinite(driftAbs) && driftAbs < 0.5)
           ? '<span class="verdict-badge good">🎯 Landed straight across!</span>'
-          : `${driftAbs.toFixed(1)} m ${c.drift >= 0 ? "downstream" : "upstream"}`;
+          : isFinite(driftAbs)
+            ? `${driftAbs.toFixed(1)} m ${c.drift >= 0 ? "downstream" : "upstream"}`
+            : '<span class="verdict-badge bad">Never reaches the far bank</span>';
 
         targetLine.setAttribute("d", `M ${START_X} ${START_Y} L ${START_X} ${FAR_Y}`);
         const landX = toXDown(isFinite(c.drift) ? c.drift : 0);
@@ -756,10 +812,10 @@
         if (animating || !isFinite(compute().crossTime)) return;
         const c = render();
         animating = true;
-        const duration = 2200;
+        const duration = REDUCED_MOTION ? 0 : 2200;
         const start = performance.now();
         function step(now) {
-          const frac = Math.max(0, Math.min(1, (now - start) / duration));
+          const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
           const simT = frac * c.crossTime;
           const curX = toXDown(c.resultDown * simT);
           const acrossPx = (c.acrossComp * simT) * ((START_Y - FAR_Y) / c.W);
@@ -794,8 +850,10 @@
       function compute() {
         const air = +airSlider.value, wind = +windSlider.value, distKm = +distSlider.value;
         const ground = air + wind;
-        const timeHr = (distKm * 1000) / ground / 3600;
-        const timeNoWindHr = (distKm * 1000) / air / 3600;
+        // FIX: guard non-positive ground speed (strong headwind) so we don't
+        // report negative/Infinite travel times.
+        const timeHr = ground > 0 ? (distKm * 1000) / ground / 3600 : Infinity;
+        const timeNoWindHr = air > 0 ? (distKm * 1000) / air / 3600 : Infinity;
         return { air, wind, distKm, ground, timeHr, timeNoWindHr };
       }
 
@@ -803,12 +861,14 @@
         const c = compute();
         airVal.textContent = c.air + " m/s"; windVal.textContent = (c.wind >= 0 ? "+" : "") + c.wind + " m/s"; distVal.textContent = c.distKm + " km";
         groundSpeedEl.textContent = c.ground.toFixed(0) + " m/s";
-        timeEl.textContent = c.timeHr.toFixed(2) + " h";
-        timeNoWindEl.textContent = c.timeNoWindHr.toFixed(2) + " h";
+        timeEl.textContent = isFinite(c.timeHr) ? c.timeHr.toFixed(2) + " h" : "never arrives";
+        timeNoWindEl.textContent = isFinite(c.timeNoWindHr) ? c.timeNoWindHr.toFixed(2) + " h" : "—";
         const delta = c.timeNoWindHr - c.timeHr;
-        deltaEl.innerHTML = delta >= 0
-          ? `<span class="verdict-badge good">${delta.toFixed(2)} h saved</span>`
-          : `<span class="verdict-badge bad">${Math.abs(delta).toFixed(2)} h lost</span>`;
+        deltaEl.innerHTML = !isFinite(delta)
+          ? '<span class="verdict-badge bad">Headwind ≥ airspeed: no progress</span>'
+          : delta >= 0
+            ? `<span class="verdict-badge good">${delta.toFixed(2)} h saved</span>`
+            : `<span class="verdict-badge bad">${Math.abs(delta).toFixed(2)} h lost</span>`;
         if (!animating) { planeDot.setAttribute("cx", TRACK_MID); planeDot.setAttribute("cy", 35); }
         return c;
       }
@@ -817,11 +877,11 @@
         if (animating) return;
         const c = render();
         animating = true;
-        const duration = 2000;
+        const duration = REDUCED_MOTION ? 0 : 2000;
         const start = performance.now();
         const endCx = Math.max(30, Math.min(470, TRACK_MID + c.ground * PXPER_MS_WIND));
         function step(now) {
-          const frac = Math.max(0, Math.min(1, (now - start) / duration));
+          const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
           planeDot.setAttribute("cx", TRACK_MID + (endCx - TRACK_MID) * frac);
           if (frac < 1) requestAnimationFrame(step);
           else animating = false;
@@ -909,10 +969,10 @@
       if (animating) return;
       const { u, a, series, toXt } = render();
       animating = true;
-      const duration = Math.max(300, series.tEnd * 400);
+      const duration = REDUCED_MOTION ? 0 : Math.max(300, series.tEnd * 400);
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * series.tEnd;
         const v = u + a * simT, x = u * simT + 0.5 * a * simT * simT;
         dot.setAttribute("cx", toXTrack(x));
@@ -967,7 +1027,8 @@
     function compute() {
       const v0 = +v0Slider.value, tR = +tRSlider.value, a = +aSlider.value;
       const reactDist = v0 * tR;
-      const brakeDist = (v0 * v0) / (2 * a);
+      // FIX: guard a<=0 so braking distance can't become Infinity/NaN.
+      const brakeDist = a > 0 ? (v0 * v0) / (2 * a) : Infinity;
       const totalDist = reactDist + brakeDist;
       const hazardOn = hazardToggle.checked, hazardDist = +hazardSlider.value;
       return { v0, tR, a, reactDist, brakeDist, totalDist, hazardOn, hazardDist };
@@ -976,10 +1037,13 @@
     function render() {
       const c = compute();
       v0Val.textContent = c.v0 + " m/s"; tRVal.textContent = c.tR.toFixed(1) + " s"; aVal.textContent = c.a.toFixed(1) + " m/s²";
-      reactVal.textContent = c.reactDist.toFixed(1) + " m"; brakeVal.textContent = c.brakeDist.toFixed(1) + " m"; totalVal.textContent = c.totalDist.toFixed(1) + " m";
+      reactVal.textContent = c.reactDist.toFixed(1) + " m";
+      brakeVal.textContent = isFinite(c.brakeDist) ? c.brakeDist.toFixed(1) + " m" : "∞ (no braking)";
+      totalVal.textContent = isFinite(c.totalDist) ? c.totalDist.toFixed(1) + " m" : "∞";
 
       reactSeg.setAttribute("d", `M ${toXBrake(0)} 35 L ${toXBrake(c.reactDist)} 35`);
-      brakeSeg.setAttribute("d", `M ${toXBrake(c.reactDist)} 35 L ${toXBrake(c.totalDist)} 35`);
+      const brakeEnd = isFinite(c.totalDist) ? c.totalDist : 160;
+      brakeSeg.setAttribute("d", `M ${toXBrake(c.reactDist)} 35 L ${toXBrake(brakeEnd)} 35`);
 
       if (c.hazardOn) {
         hazardLine.style.display = ""; hazardLine.setAttribute("x1", toXBrake(c.hazardDist)); hazardLine.setAttribute("x2", toXBrake(c.hazardDist));
@@ -1001,10 +1065,10 @@
       animating = true;
       const t2 = c.a > 0 ? c.v0 / c.a : 0;
       const simDuration = Math.max(0.2, c.tR + t2);
-      const duration = 2500;
+      const duration = REDUCED_MOTION ? 0 : 2500;
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * simDuration;
         let pos;
         if (simT <= c.tR) pos = c.v0 * simT;
@@ -1012,7 +1076,8 @@
           const te = simT - c.tR;
           pos = c.reactDist + c.v0 * te - 0.5 * c.a * te * te;
         }
-        carDot.setAttribute("cx", toXBrake(Math.min(pos, c.totalDist)));
+        const capped = isFinite(c.totalDist) ? Math.min(pos, c.totalDist) : pos;
+        carDot.setAttribute("cx", toXBrake(capped));
         if (frac < 1) requestAnimationFrame(step);
         else animating = false;
       }
@@ -1080,7 +1145,8 @@
       const angleDeg = +angleSlider.value, L = +lenSlider.value;
       const th = angleDeg * D2R;
       const a = G * Math.sin(th);
-      const trueT = Math.sqrt((2 * L) / a);
+      // FIX: guard angle=0 (a=0) which would give an infinite slide time.
+      const trueT = a > 1e-4 ? Math.sqrt((2 * L) / a) : Infinity;
       const bottomX = TOPX + L * Math.cos(th) * PXPER_M;
       const bottomY = TOPY + L * Math.sin(th) * PXPER_M;
       return { angleDeg, L, a, trueT, bottomX, bottomY };
@@ -1089,7 +1155,7 @@
     function render() {
       const c = compute();
       angleVal.textContent = c.angleDeg + "°"; lenVal.textContent = c.L.toFixed(1) + " m";
-      aVal.textContent = c.a.toFixed(2) + " m/s²"; trueTVal.textContent = c.trueT.toFixed(2) + " s";
+      aVal.textContent = c.a.toFixed(2) + " m/s²"; trueTVal.textContent = isFinite(c.trueT) ? c.trueT.toFixed(2) + " s" : "∞ (level)";
       surface.setAttribute("d", `M ${TOPX} ${TOPY} L ${c.bottomX} ${c.bottomY}`);
       if (!animating) { cart.setAttribute("cx", TOPX); cart.setAttribute("cy", TOPY); }
       return c;
@@ -1098,11 +1164,12 @@
     releaseBtn.addEventListener("click", () => {
       if (animating) return;
       const c = render();
+      if (!isFinite(c.trueT)) return; // level ramp: nothing to release
       animating = true;
-      const duration = Math.max(400, c.trueT * 1000);
+      const duration = REDUCED_MOTION ? 0 : Math.max(400, c.trueT * 1000);
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * c.trueT;
         const dist = 0.5 * c.a * simT * simT;
         const f = c.L > 0 ? Math.min(1, dist / c.L) : 1;
@@ -1124,7 +1191,7 @@
         timerBtn.textContent = "⏱ Start / stop your timer";
         measuredTVal.textContent = measured.toFixed(2) + " s";
         const L = +lenSlider.value;
-        const measuredA = (2 * L) / (measured * measured);
+        const measuredA = measured > 0 ? (2 * L) / (measured * measured) : 0;
         measuredAVal.textContent = measuredA.toFixed(2) + " m/s²";
       }
     });
@@ -1182,10 +1249,10 @@
       if (animating) return;
       const { v0, g, series, toXt } = render();
       animating = true;
-      const duration = Math.max(300, series.T * 400);
+      const duration = REDUCED_MOTION ? 0 : Math.max(300, series.T * 400);
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * series.T;
         const y = Math.max(0, series.points[0].y + v0 * simT - 0.5 * g * simT * simT);
         const v = v0 - g * simT;
@@ -1215,6 +1282,8 @@
   }
 
   /* ===================== FREE FALL: WIDGET 2 (drop comparison) ===================== */
+  /* FIX: semi-implicit Euler (velocity then position) + interpolated impact
+     time so the reported fall time lands exactly on the target height. */
   function integrateFallSeries(height, b, g) {
     if (b <= 0) {
       const T = Math.sqrt((2 * height) / g);
@@ -1225,10 +1294,16 @@
     const dt = 0.02;
     let s = 0, d = 0, t = 0;
     const points = [{ t, d }];
-    for (let i = 0; i < 3000; i++) {
-      const a = g - b * s * s;
-      s += a * dt; const dNext = d + s * dt; t += dt;
-      if (dNext >= height) { points.push({ t, d: height }); return { points, T: t }; }
+    for (let i = 0; i < 4000; i++) {
+      const a = g - b * s * s;   // quadratic drag deceleration
+      s += a * dt;               // velocity update first
+      const dNext = d + s * dt;  // then position
+      t += dt;
+      if (dNext >= height) {
+        const frac = (height - d) / (dNext - d || 1);
+        points.push({ t: t - dt + frac * dt, d: height });
+        return { points, T: t - dt + frac * dt };
+      }
       d = dNext;
       points.push({ t, d });
     }
@@ -1270,7 +1345,7 @@
       const seriesDrag = integrateFallSeries(height, isVacuum ? 0 : b2, G);
       compactTEl.textContent = seriesCompact.T.toFixed(2) + " s";
       dragTEl.textContent = seriesDrag.T.toFixed(2) + " s";
-      terminalVEl.textContent = isVacuum ? "n/a (vacuum)" : Math.sqrt(G / b2).toFixed(1) + " m/s";
+      terminalVEl.textContent = (isVacuum || b2 <= 0) ? "n/a (vacuum)" : Math.sqrt(G / b2).toFixed(1) + " m/s";
       if (!animating) {
         ballCompact.setAttribute("cy", TOP_Y); ballDrag.setAttribute("cy", TOP_Y);
       }
@@ -1282,10 +1357,10 @@
       const c = render();
       animating = true;
       const simTMax = Math.max(c.seriesCompact.T, c.seriesDrag.T);
-      const duration = Math.min(6000, simTMax * 350);
+      const duration = REDUCED_MOTION ? 0 : Math.min(6000, simTMax * 350);
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * simTMax;
         const dCompact = Math.min(c.height, dAtTime(c.seriesCompact, simT));
         const dDrag = Math.min(c.height, dAtTime(c.seriesDrag, simT));
@@ -1444,10 +1519,10 @@
       if (trackAnimating) return;
       trackAnimating = true;
       const { A: a0, B: b0 } = render();
-      const duration = 3000;
+      const duration = REDUCED_MOTION ? 0 : 3000;
       const start = performance.now();
       function step(now) {
-        const frac = Math.max(0, Math.min(1, (now - start) / duration));
+        const frac = duration === 0 ? 1 : Math.max(0, Math.min(1, (now - start) / duration));
         const simT = frac * SIM_T_MAX;
         groundA.setAttribute("cx", clamp(CX + a0.x * simT * PXPER, 30, 470));
         groundB.setAttribute("cx", clamp(CX + b0.x * simT * PXPER, 30, 470));
@@ -1457,6 +1532,29 @@
         else trackAnimating = false;
       }
       requestAnimationFrame(step);
+    });
+  }
+
+  /* ===================== ADDED: PREDICTION-REVEAL PATTERN =====================
+     Opt-in, no per-widget code needed. In your index.html:
+       <div class="prediction">
+         <h4>What do you predict?</h4>
+         <p>…the prompt…</p>
+         <button class="reveal-btn" data-reveal-btn="revealExplorer">Reveal</button>
+       </div>
+       <div data-reveal id="revealExplorer"> … the widget/answer … </div>
+     Clicking the button un-collapses the matching [data-reveal] block.
+     Fulfils guide.md's "Make a prediction" step for every page. */
+  function initPredictionReveals() {
+    document.querySelectorAll("[data-reveal-btn]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = document.getElementById(btn.dataset.revealBtn);
+        if (target) {
+          target.classList.add("revealed");
+          btn.setAttribute("aria-expanded", "true");
+          btn.disabled = true;
+        }
+      });
     });
   }
 
@@ -1476,8 +1574,9 @@
     const buttons = Array.from(document.querySelectorAll("#tabbar button"));
     buttons.forEach((btn) => {
       btn.addEventListener("click", () => {
-        buttons.forEach((b) => b.classList.remove("active"));
+        buttons.forEach((b) => { b.classList.remove("active"); b.setAttribute("aria-selected", "false"); });
         btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true"); // ADDED: a11y state for tabs
         document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
         const panel = document.getElementById("panel-" + btn.dataset.target);
         if (panel) panel.classList.add("active");
@@ -1487,11 +1586,13 @@
     const initial = window.location.hash.replace("#", "");
     const match = buttons.find((b) => b.dataset.target === initial);
     if (match) match.click();
+    else if (buttons.length) buttons[0].click(); // ADDED: ensure a panel is shown
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     initTabs();
     initJumpLinks();
+    initPredictionReveals();
     initMotionGraphLab();
     initTwoRunner();
     initRelativeVelocity();

@@ -26,6 +26,7 @@
     <button data-target="conservation-of-energy">Conservation of Energy</button>
     <button data-target="power-and-efficiency">Power and Efficiency</button>
     <button data-target="roller-coaster-physics">Roller Coaster Physics</button>
+    <button data-target="full-ride-and-energy">Full Ride &amp; Energy Accounting</button>
   </nav>
 
   <div class="panels" id="panels">
@@ -162,7 +163,9 @@
               <tr><td class="k">Work by friction, −<var>μmgd</var></td><td class="v" id="wkWFrictionVal">−88.2 J</td></tr>
               <tr><td class="k">Net work = <var>ΔKE</var></td><td class="v" id="wkWNetVal">111.8 J</td></tr>
               <tr><td class="k">Final speed, from rest</td><td class="v" id="wkVFinalVal">6.11 m/s</td></tr>
+              <tr><td class="k">Coasting distance after the pull ends</td><td class="v" id="wkCoastVal">—</td></tr>
             </table>
+            <p class="explainer" id="wkPullNote" style="margin:8px 0 0; font-size:13px;"></p>
           </div>
         </div>
       </div>
@@ -468,6 +471,12 @@
             <line id="penRod" x1="130" y1="20" x2="130" y2="180" stroke="var(--muted)" stroke-width="2"></line>
             <circle id="penBob" cx="130" cy="180" r="14" fill="#2a78d6" stroke="white" stroke-width="2"></circle>
           </svg>
+          <svg viewBox="0 0 60 110" id="penEnergyBarsSvg" style="width:60px; height:110px; margin:0 auto; display:block;">
+            <rect id="penKEBar" x="6" y="100" width="18" height="0" fill="#e34948"></rect>
+            <rect id="penPEBar" x="34" y="100" width="18" height="0" fill="#1baf7a"></rect>
+            <text x="15" y="108" class="svg-label" text-anchor="middle" font-size="7">KE</text>
+            <text x="43" y="108" class="svg-label" text-anchor="middle" font-size="7">PE</text>
+          </svg>
         </div>
         <div class="widget-side">
           <div class="controls">
@@ -481,6 +490,8 @@
             <table>
               <tr><td class="k">Height dropped, <var>L</var>(1−cosθ₀)</td><td class="v" id="penHVal">0.35 m</td></tr>
               <tr><td class="k">Speed at the bottom, √(2<var>gL</var>(1−cosθ₀))</td><td class="v" id="penVVal">2.62 m/s</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#e34948"></span>Kinetic energy per kg</td><td class="v" id="penKEVal">—</td></tr>
+              <tr><td class="k"><span class="swatch" style="background:#1baf7a"></span>Potential energy per kg</td><td class="v" id="penPEVal">—</td></tr>
             </table>
           </div>
         </div>
@@ -818,6 +829,7 @@
           <div class="controls">
             <div class="row"><div class="row-head"><span>Probe position along track</span><b id="rcPosVal">0%</b></div>
               <input type="range" id="rcPosSlider" min="0" max="100" step="1" value="0"></div>
+            <button class="action" id="rcRideBtn">▶ Ride</button>
           </div>
           <div class="readout">
             <table>
@@ -927,12 +939,14 @@
             <line x1="10" y1="200" x2="210" y2="200" stroke="var(--text-primary)" stroke-width="2"></line>
             <circle id="rcLoopCircle" cx="110" cy="140" r="60" fill="none" stroke="var(--border)" stroke-width="3"></circle>
             <line id="rcLoopHillLine" x1="10" y1="200" x2="50" y2="80" stroke="var(--text-primary)" stroke-width="3"></line>
+            <circle id="rcLoopCar" r="6" fill="#eb6834" stroke="white" stroke-width="1.5"></circle>
           </svg>
         </div>
         <div class="widget-side">
           <div class="controls">
             <div class="row"><div class="row-head"><span>Loop radius, r</span><b id="rcLoopRVal">10 m</b></div>
               <input type="range" id="rcLoopRSlider" min="3" max="20" step="1" value="10"></div>
+            <button class="action" id="rcLoopRideBtn">▶ Send car around</button>
           </div>
           <div class="readout">
             <table>
@@ -956,6 +970,58 @@
           mass.
         </p>
       </details>
+    </div>
+
+    <!-- ================= FULL RIDE & ENERGY ACCOUNTING ================= -->
+    <div class="panel" id="panel-full-ride-and-energy">
+      <h2>Full Ride &amp; Energy Accounting</h2>
+      <p class="explainer">
+        <strong>Make a prediction first:</strong> a full coaster profile —
+        several hills of decreasing height, with real friction — is released
+        from the very top. Does it necessarily make it all the way to the
+        end, or could it get stuck partway?
+      </p>
+      <p class="explainer">
+        This combines every idea from this section into one continuous
+        ride: kinetic energy, potential energy, and (once friction is turned
+        up) heat, tracked bar by bar as the car actually moves along the
+        whole track — not just at one isolated point.
+      </p>
+      <h3 class="subhead">Widget — Full Ride and Energy Accounting</h3>
+      <p class="explainer">Watch a car released from the highest hill. Add friction to see mechanical energy turn into heat — and find where the car stalls.</p>
+      <div class="widget">
+        <div class="widget-visual">
+          <svg viewBox="0 0 480 220" id="rcFullSvg">
+            <path id="rcFullTrack" fill="none" stroke="var(--text-primary)" stroke-width="2.5"></path>
+            <circle id="rcFullCar" r="7" fill="#eb6834" stroke="white" stroke-width="2"></circle>
+            <g transform="translate(410,90)">
+              <rect id="rcFullBarKE" x="0" y="110" width="16" height="0" fill="#e34948"></rect>
+              <rect id="rcFullBarPE" x="24" y="110" width="16" height="0" fill="#1baf7a"></rect>
+              <rect id="rcFullBarHeat" x="48" y="110" width="16" height="0" fill="var(--muted)"></rect>
+              <text x="8" y="122" class="svg-label" text-anchor="middle" font-size="7">KE</text>
+              <text x="32" y="122" class="svg-label" text-anchor="middle" font-size="7">PE</text>
+              <text x="56" y="122" class="svg-label" text-anchor="middle" font-size="7">Heat</text>
+            </g>
+          </svg>
+        </div>
+        <div class="widget-side">
+          <div class="controls">
+            <div class="row"><div class="row-head"><span>Friction, μ</span><b id="rcFullMuVal">0.000</b></div>
+              <input type="range" id="rcFullMuSlider" min="0" max="0.05" step="0.001" value="0"></div>
+            <button class="action" id="rcFullPlayBtn">▶ Play</button>
+            <button class="action" id="rcFullResetBtn">Reset</button>
+          </div>
+          <div class="readout">
+            <table>
+              <tr><td class="k">Kinetic energy</td><td class="v" id="rcFullKEVal">0 J</td></tr>
+              <tr><td class="k">Potential energy</td><td class="v" id="rcFullPEVal">0 J</td></tr>
+              <tr><td class="k">Heat generated so far</td><td class="v" id="rcFullHeatVal">0 J</td></tr>
+              <tr><td class="k">Total (should stay constant without friction)</td><td class="v" id="rcFullTotalVal">0 J</td></tr>
+            </table>
+            <p class="explainer" id="rcFullStatus" style="margin:8px 0 0; font-size:13px;"></p>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>

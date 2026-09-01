@@ -428,9 +428,23 @@
           segments equally. The two-hanging-masses version of a pulley
           system (no mechanical advantage, just redirected tension) was
           already built as the Atwood Machine in
-          <a href="../02-newtons-laws/index.html#tension-and-connected-objects">Newton's Laws → Tension and Connected Objects</a>.
+          <a href="../02-newtons-laws/index.html#tension-and-connected-objects">Newton's Laws → Tension and Connected Objects</a>
+          — the version below revisits it here with the pulley itself front
+          and center.
         </p>
       </details>
+
+      <h3 class="subhead">Widget 3 — Atwood's Machine</h3>
+      <p class="explainer">Two masses hang from opposite ends of a rope over a single fixed pulley — release them and watch the heavier side fall, dragging the lighter one up at exactly the same acceleration.</p>
+      <div class="widget">
+        <div id="atwoodHost"></div>
+      </div>
+
+      <h3 class="subhead">Widget 4 — Movable-Pulley Distance Puzzle</h3>
+      <p class="explainer">Pull the rope a full meter and the load only rises half a meter — trace input work against output work as you drag the slider and watch them stay exactly equal.</p>
+      <div class="widget">
+        <div id="pulleyDistanceHost"></div>
+      </div>
 
       <div class="try-at-home">
         <h4>Try it for real: shoelace pulley</h4>
@@ -652,6 +666,7 @@
           <svg viewBox="0 0 220 220" id="wheelAxleSvg">
             <circle id="wheelOuter" cx="110" cy="110" r="90" fill="none" stroke="var(--border)" stroke-width="4"></circle>
             <circle id="wheelAxle" cx="110" cy="110" r="20" fill="var(--chip)" stroke="var(--text-primary)" stroke-width="3"></circle>
+            <line id="wheelSpoke" x1="110" y1="110" x2="200" y2="110" stroke="var(--text-primary)" stroke-width="3"></line>
             <line id="wheelEffortArrow" stroke="#2a78d6" stroke-width="3" marker-end="url(#wheelHead)"></line>
             <defs><marker id="wheelHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#2a78d6"></path></marker></defs>
           </svg>

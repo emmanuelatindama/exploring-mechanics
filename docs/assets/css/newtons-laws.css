@@ -9,3 +9,45 @@
 #surfBox {
   transition: x 0.5s ease;
 }
+
+/* --- Injected animation controls (Release / Reset) -------------------
+   Added for widgets that previously had no play control, most notably
+   the incline-connected-to-a-hanging-mass simulation. */
+.nl-anim-row {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.6rem 0 0.2rem;
+  flex-wrap: wrap;
+}
+
+.nl-btn {
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
+}
+
+.nl-btn:hover { background: #1d4ed8; }
+.nl-btn:active { transform: translateY(1px); }
+.nl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.nl-btn-secondary {
+  background: #fff;
+  color: #2563eb;
+}
+.nl-btn-secondary:hover { background: #eff6ff; }
+
+/* --- Dynamically-added hanging mass for the incline-tension widget --- */
+#itHangMass {
+  transition: none;
+}
+#itHangLabel {
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,2 +1,82 @@
 /* Section-specific additions for 06-circular-motion, layered on top of
    toolkit.css and kinematics.css's shared widget primitives. */
+
+/* --- Bucket water fill / droplets --- */
+#bucketWater { transition: none; }
+#bucketDrops circle { transition: none; }
+
+/* --- Shared styling for the JS-injected widgets
+       (#bankTrackHost animated bank, #conicalHost conical pendulum).
+       Neutral so they inherit the site's look. --- */
+.cm-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.cm-svg {
+  width: 100%;
+  height: auto;
+  max-height: 240px;
+  background: #fbfbfd;
+  border: 1px solid #e2e6ea;
+  border-radius: 8px;
+}
+.cm-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+}
+.cm-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+.cm-readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.35rem 1rem;
+  font-size: 0.9rem;
+}
+.cm-readouts b { font-variant-numeric: tabular-nums; }
+.cm-verdict {
+  grid-column: 1 / -1;
+  font-style: italic;
+  color: #555;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-svg * { transition: none !important; }
+}
+
+
+/* To enable the two new widgets (optional — your index.html edit)
+In the Banked Curves panel (the interactive visual you were missing):
+<div class="widget">
+  <h3>Banked Track: Watch the Car Hold or Skid</h3>
+  <div id="bankTrackHost"></div>
+</div>
+
+In the Uniform Circular Motion panel (gap‑filler):
+
+<div class="widget">
+  <h3>Conical Pendulum</h3>
+  <div id="conicalHost"></div>
+</div> 
+
+The existing .cm-widget / .cm-svg / .cm-controls / .cm-readouts / .cm-verdict rules already style it. Only add a checkbox alignment tweak:
+
+ Rotating-frame split-screen: inline checkbox control 
+.cm-controls label input[type="checkbox"] {
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+Enable it (your index.html)
+Drop this into the Uniform Circular Motion panel:
+
+<div class="widget">
+  <h3>Two Observers: Centripetal vs. Centrifugal</h3>
+  <div id="rotFrameHost"></div>
+</div>
+*/

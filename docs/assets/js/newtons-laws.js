@@ -2,9 +2,18 @@
 // Reuses toolkit.js for initTabs(); each widget below is self-contained.
 (function () {
   const G = 9.8;
+  const SVGNS = "http://www.w3.org/2000/svg";
 
   function clamp(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v));
+  }
+
+  // Create an SVG element with attributes (used to inject missing pieces
+  // like the hanging mass, so no HTML edits are required).
+  function svgEl(name, attrs) {
+    const el = document.createElementNS(SVGNS, name);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
   }
 
   function clientToSvg(svg, evt) {
@@ -69,6 +78,7 @@
       card.setAttribute("opacity", 1);
       coin.setAttribute("cx", COIN_CX0);
       coin.setAttribute("cy", COIN_CY0);
+      coin.setAttribute("opacity", 1);
       status.textContent = "";
     }
     reset();
@@ -108,9 +118,7 @@
           coin.setAttribute("cx", coinX);
           if (cardX < -160) {
             card.setAttribute("opacity", 0);
-            coin.setAttribute("opacity", 0);
             status.textContent = "🙈 The coin got dragged away with the card — flick harder, or use a smoother card.";
-            coin.setAttribute("opacity", 1);
             animating = false;
             flickBtn.disabled = false;
             return;
@@ -168,7 +176,7 @@
     if (!svg) return;
     const pax = document.getElementById("lurchPax");
     const windshield = document.getElementById("lurchWindshield");
-    const road = document.getElementById("lurchSvg").querySelector("line[stroke-dasharray]");
+    const road = svg.querySelector("line[stroke-dasharray]");
     const v0Slider = document.getElementById("lurchV0Slider");
     const v0Val = document.getElementById("lurchV0Val");
     const aSlider = document.getElementById("lurchASlider");
@@ -465,6 +473,8 @@
 
   // ---------------------------------------------------------------
   // Widget 2 (Second Law) -- Sled Simulator
+  // FIXED: the sled now speeds up while pulled, then friction
+  // decelerates it to a stop once the pull is released.
   // ---------------------------------------------------------------
   function initSled() {
     const svg = document.getElementById("sledSvg");
@@ -483,50 +493,75 @@
     const aVal = document.getElementById("sledAVal");
     const verdictVal = document.getElementById("sledVerdictVal");
 
-    const BODY_X0 = 30, ANIM_SECONDS = 3;
+    const BODY_X0 = 30, TRACK_PX = 380, PUSH_TIME = 1.2, SLOWMO = 1.6;
     let animating = false, rafId = null;
 
     function current() {
       const F = parseFloat(fSlider.value);
       const m = parseFloat(mSlider.value);
       const mu = parseFloat(muSlider.value);
-      const friction = mu * m * G;
-      const net = F - friction;
-      const a = net > 0 ? net / m : 0;
-      return { F, m, mu, friction, net, a };
+      const fk = mu * m * G;          // limiting / kinetic friction
+      const net = F - fk;
+      const a = net > 0 ? net / m : 0; // acceleration while the pull is applied
+      return { F, m, mu, fk, net, a };
     }
 
     function redraw() {
-      const { F, m, mu, friction, net, a } = current();
+      const { F, m, mu, fk, net, a } = current();
       fVal.textContent = F + " N";
       mVal.textContent = m + " kg";
       muVal.textContent = mu.toFixed(2);
-      frictionVal.textContent = friction.toFixed(1) + " N";
+      frictionVal.textContent = fk.toFixed(1) + " N";
       netVal.textContent = net.toFixed(1) + " N";
       aVal.textContent = a.toFixed(2) + " m/s²";
-      verdictVal.textContent = a > 0 ? "Accelerates forward" : "Doesn't move — friction holds it";
+      verdictVal.textContent = a > 0
+        ? "Accelerates while pulled → friction brakes it to a stop"
+        : "Doesn't move — static friction holds it";
       pullArrow.setAttribute("x2", 5 + clamp(F * 0.35, 5, 60));
     }
-    fSlider.addEventListener("input", redraw);
-    mSlider.addEventListener("input", redraw);
-    muSlider.addEventListener("input", redraw);
+    fSlider.addEventListener("input", () => { if (!animating) redraw(); });
+    mSlider.addEventListener("input", () => { if (!animating) redraw(); });
+    muSlider.addEventListener("input", () => { if (!animating) redraw(); });
     redraw();
 
     goBtn.addEventListener("click", () => {
       if (animating) return;
+      if (rafId) cancelAnimationFrame(rafId);
       body.setAttribute("x", BODY_X0);
-      const { a } = current();
-      if (a <= 0) { redraw(); return; }
+      const { m, fk, a: a1 } = current();
+      if (a1 <= 0) { redraw(); return; }   // never overcomes friction
+
+      // Phase 1 (pulling): accelerate at a1 = (F - fk)/m for PUSH_TIME.
+      // Phase 2 (released): decelerate at aDecel = fk/m until it stops.
+      const aDecel = fk / m;
+      const vEnd = a1 * PUSH_TIME;
+      const d1 = 0.5 * a1 * PUSH_TIME * PUSH_TIME;
+      const tCoast = aDecel > 0 ? vEnd / aDecel : 0;
+      const d2 = aDecel > 0 ? (vEnd * vEnd) / (2 * aDecel) : 0;
+      const totalDist = d1 + d2;
+      const pxpm = TRACK_PX / Math.max(totalDist, 0.01);
+      const tEnd = PUSH_TIME + tCoast;
 
       animating = true;
       goBtn.disabled = true;
-      const distM = 0.5 * a * ANIM_SECONDS * ANIM_SECONDS;
-      const pxpm = 380 / Math.max(distM, 0.01);
       const start = performance.now();
       function frame(now) {
-        const t = Math.min(ANIM_SECONDS, Math.max(0, (now - start) / 1000));
-        body.setAttribute("x", BODY_X0 + 0.5 * a * t * t * pxpm);
-        if (t >= ANIM_SECONDS) {
+        const t = Math.max(0, (now - start) / 1000) / SLOWMO;
+        let x, phase;
+        if (t <= PUSH_TIME) {
+          x = 0.5 * a1 * t * t;
+          phase = "Pulling — speeding up (a = " + a1.toFixed(2) + " m/s²)";
+        } else if (t <= tEnd) {
+          const tc = t - PUSH_TIME;
+          x = d1 + vEnd * tc - 0.5 * aDecel * tc * tc;
+          phase = "Released — friction slowing it (a = −" + aDecel.toFixed(2) + " m/s²)";
+        } else {
+          x = totalDist;
+          phase = "Stopped by friction";
+        }
+        body.setAttribute("x", BODY_X0 + x * pxpm);
+        verdictVal.textContent = phase;
+        if (t >= tEnd) {
           animating = false;
           goBtn.disabled = false;
           return;
@@ -1254,6 +1289,9 @@
 
   // ---------------------------------------------------------------
   // Widget 3 (Tension) -- Incline Connected to a Hanging Mass
+  // FIXED: was static (sliders updated numbers only, no m2 drawn).
+  // Now draws a hanging mass + rope (created in JS) and animates the
+  // block sliding along the ramp with Release / Reset controls.
   // ---------------------------------------------------------------
   function initInclineTension() {
     const svg = document.getElementById("itSvg");
@@ -1274,53 +1312,169 @@
     const verdictVal = document.getElementById("itVerdictVal");
 
     const PULLEY = { x: 240, y: 20 };
+    const BASE = { x: 20, y: 200 };
+    const RAMP_PX = 190, RAMP_M = 3, PXPM = RAMP_PX / RAMP_M;
+    const F_REST = 0.42, F_MIN = 0.12, F_MAX = 0.82;
+    const HANG_Y0 = 78, HANG_MIN = 40, HANG_MAX = 178;
 
-    function redraw() {
+    // --- inject hanging mass + rope (no HTML edit required) ---
+    let hangRope = document.getElementById("itHangRope");
+    if (!hangRope) {
+      hangRope = svgEl("line", { id: "itHangRope", stroke: "#6b7280", "stroke-width": 2 });
+      svg.appendChild(hangRope);
+    }
+    let hangMass = document.getElementById("itHangMass");
+    if (!hangMass) {
+      hangMass = svgEl("rect", {
+        id: "itHangMass", width: 22, height: 18, rx: 2,
+        fill: "#c0392b", stroke: "#7b241c", "stroke-width": 1.5
+      });
+      svg.appendChild(hangMass);
+    }
+    let hangLabel = document.getElementById("itHangLabel");
+    if (!hangLabel) {
+      hangLabel = svgEl("text", {
+        id: "itHangLabel", "text-anchor": "middle", "font-size": 10, fill: "#fff"
+      });
+      hangLabel.textContent = "m\u2082";
+      svg.appendChild(hangLabel);
+    }
+
+    // --- inject Release / Reset controls ---
+    const widget = svg.closest(".widget") || svg.parentElement;
+    let btnRow = widget ? widget.querySelector(".nl-anim-row[data-for='it']") : null;
+    let goBtn, resetBtn;
+    if (!btnRow) {
+      btnRow = document.createElement("div");
+      btnRow.className = "nl-anim-row";
+      btnRow.setAttribute("data-for", "it");
+      goBtn = document.createElement("button");
+      goBtn.type = "button";
+      goBtn.className = "nl-btn";
+      goBtn.textContent = "\u25B6 Release";
+      resetBtn = document.createElement("button");
+      resetBtn.type = "button";
+      resetBtn.className = "nl-btn nl-btn-secondary";
+      resetBtn.textContent = "\u21BA Reset";
+      btnRow.appendChild(goBtn);
+      btnRow.appendChild(resetBtn);
+      svg.insertAdjacentElement("afterend", btnRow);
+    } else {
+      goBtn = btnRow.querySelector(".nl-btn:not(.nl-btn-secondary)");
+      resetBtn = btnRow.querySelector(".nl-btn-secondary");
+    }
+
+    let animating = false, rafId = null;
+
+    function state() {
       const thetaDeg = parseFloat(thetaSlider.value);
       const theta = (thetaDeg * Math.PI) / 180;
       const m1 = parseFloat(m1Slider.value);
       const m2 = parseFloat(m2Slider.value);
       const mu = parseFloat(muSlider.value);
-
       const netDriving = m2 * G - m1 * G * Math.sin(theta);
       const frictionMag = mu * m1 * G * Math.cos(theta);
-      let a, T, verdict;
+      let a = 0, T, dir = 0, verdict;
       if (Math.abs(netDriving) <= frictionMag) {
-        a = 0; T = m2 * G; verdict = "Static equilibrium — friction holds it";
+        a = 0; T = m2 * G; dir = 0;
+        verdict = "Static equilibrium — friction holds it";
       } else if (netDriving > frictionMag) {
         a = (netDriving - frictionMag) / (m1 + m2);
-        T = m2 * (G - a);
+        T = m2 * (G - a); dir = 1;
         verdict = "Hanging mass wins — block slides up the ramp";
       } else {
         a = (-netDriving - frictionMag) / (m1 + m2);
-        T = m2 * (G + a);
-        verdict = "Block wins — slides down the ramp, hanging mass rises";
+        T = m2 * (G + a); dir = -1;
+        verdict = "Block wins — slides down, hanging mass rises";
       }
+      return { thetaDeg, theta, m1, m2, mu, a, T, dir, verdict };
+    }
 
-      thetaVal.textContent = thetaDeg + "°";
-      m1Val.textContent = m1 + " kg";
-      m2Val.textContent = m2 + " kg";
-      muVal.textContent = mu.toFixed(2);
-      aVal.textContent = a.toFixed(2) + " m/s²";
-      tVal.textContent = T.toFixed(1) + " N";
-      verdictVal.textContent = verdict;
-
-      const run = 190 * Math.cos(theta), rise = 190 * Math.sin(theta);
-      const base = { x: 20, y: 200 };
-      const top = { x: base.x + run, y: base.y - rise };
-      rampFill.setAttribute("d", "M" + base.x + "," + base.y + " L" + top.x + "," + top.y + " L" + (base.x + run) + "," + base.y + " Z");
-
-      const f = 0.5;
-      const bx = base.x + f * run, by = base.y - f * rise;
+    function placeBlock(f) {
+      const { theta, thetaDeg } = state();
+      const run = RAMP_PX * Math.cos(theta), rise = RAMP_PX * Math.sin(theta);
+      const bx = BASE.x + f * run, by = BASE.y - f * rise;
       const uPerpOut = { x: -Math.sin(theta), y: -Math.cos(theta) };
       const blockCx = bx + uPerpOut.x * 14, blockCy = by + uPerpOut.y * 14;
-      block.setAttribute("transform", "translate(" + blockCx + "," + blockCy + ") rotate(" + -thetaDeg + ") translate(-13,-9)");
+      block.setAttribute("transform",
+        "translate(" + blockCx + "," + blockCy + ") rotate(" + -thetaDeg + ") translate(-13,-9)");
       ropeUp.setAttribute("x1", blockCx);
       ropeUp.setAttribute("y1", blockCy);
       ropeUp.setAttribute("x2", PULLEY.x);
       ropeUp.setAttribute("y2", PULLEY.y + 14);
     }
-    [thetaSlider, m1Slider, m2Slider, muSlider].forEach((s) => s.addEventListener("input", redraw));
+
+    function placeHang(y) {
+      hangRope.setAttribute("x1", PULLEY.x);
+      hangRope.setAttribute("y1", PULLEY.y + 14);
+      hangRope.setAttribute("x2", PULLEY.x);
+      hangRope.setAttribute("y2", y);
+      hangMass.setAttribute("x", PULLEY.x - 11);
+      hangMass.setAttribute("y", y);
+      hangLabel.setAttribute("x", PULLEY.x);
+      hangLabel.setAttribute("y", y + 13);
+    }
+
+    function drawRamp() {
+      const { theta } = state();
+      const run = RAMP_PX * Math.cos(theta), rise = RAMP_PX * Math.sin(theta);
+      const top = { x: BASE.x + run, y: BASE.y - rise };
+      rampFill.setAttribute("d",
+        "M" + BASE.x + "," + BASE.y + " L" + top.x + "," + top.y +
+        " L" + (BASE.x + run) + "," + BASE.y + " Z");
+    }
+
+    function redraw() {
+      if (rafId) cancelAnimationFrame(rafId);
+      animating = false;
+      if (goBtn) goBtn.disabled = false;
+      const s = state();
+      thetaVal.textContent = s.thetaDeg + "°";
+      m1Val.textContent = s.m1 + " kg";
+      m2Val.textContent = s.m2 + " kg";
+      muVal.textContent = s.mu.toFixed(2);
+      aVal.textContent = s.a.toFixed(2) + " m/s²";
+      tVal.textContent = s.T.toFixed(1) + " N";
+      verdictVal.textContent = s.verdict;
+      drawRamp();
+      placeBlock(F_REST);
+      placeHang(HANG_Y0);
+    }
+
+    [thetaSlider, m1Slider, m2Slider, muSlider].forEach((sl) =>
+      sl.addEventListener("input", redraw));
+
+    goBtn.addEventListener("click", () => {
+      if (animating) return;
+      const s = state();
+      if (s.dir === 0 || s.a <= 0) { redraw(); return; }
+
+      animating = true;
+      goBtn.disabled = true;
+      const SLOWMO = 1.4;
+      const start = performance.now();
+      function frame(now) {
+        const t = Math.max(0, (now - start) / 1000) / SLOWMO;
+        const dist = 0.5 * s.a * t * t;                 // metres along the rope
+        const f = F_REST + s.dir * (dist / RAMP_M);      // fraction along ramp
+        const hangY = HANG_Y0 + s.dir * dist * PXPM;     // mass drops as block climbs
+        const cf = clamp(f, F_MIN, F_MAX);
+        const cy = clamp(hangY, HANG_MIN, HANG_MAX);
+        placeBlock(cf);
+        placeHang(cy);
+        const hitLimit = f !== cf || hangY !== cy;
+        if (hitLimit || t > 4) {
+          animating = false;
+          goBtn.disabled = false;
+          return;
+        }
+        rafId = requestAnimationFrame(frame);
+      }
+      rafId = requestAnimationFrame(frame);
+    });
+
+    resetBtn.addEventListener("click", redraw);
+
     redraw();
   }
 

@@ -18,9 +18,70 @@
 }
 .surprise-box p { margin: 0; color: var(--text-secondary); font-size: 14px; }
 
-.race-track {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
+.race-track { display: flex; gap: 8px; align-items: flex-end; margin-top: 8px; }
+
+/* --- Ensure curve SVGs are never clipped by their container --- */
+#brachSvg, #tautoSvg, #racketSvg { width: 100%; height: auto; overflow: visible; }
+
+/* --- Verdict badges (used by cone / spool / etc.) --- */
+.verdict-badge {
+  display: inline-block;
   margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--surface-1, #f2f4f7);
+  border: 1px solid #d7dee6;
 }
+.verdict-badge.good { background: #e8f6ee; border-color: #9dd8ba; color: #1b6b43; }
+.verdict-badge.bad { background: #fdeaea; border-color: #efb3b3; color: #a12626; }
+
+/* --- Result tables + swatches (brachistochrone / race) --- */
+#brachResults table, #raceResults table { border-collapse: collapse; width: 100%; margin-top: 6px; }
+#brachResults td, #raceResults td { padding: 3px 8px; font-size: 13.5px; }
+#brachResults td.v, #raceResults td.v { text-align: right; font-variant-numeric: tabular-nums; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+/* --- Injected control rows (friction / speed sliders) --- */
+.uni-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem;
+  margin: 0.5rem 0; font-size: 0.9rem;
+}
+.uni-controls label { display: inline-flex; align-items: center; gap: 0.4rem; }
+.uni-hint { color: var(--text-secondary, #777); font-style: italic; font-size: 0.85rem; }
+
+/* --- Self-building new widgets (#brachExplorerHost, #tautoClockHost) --- */
+.uni-widget { display: flex; flex-direction: column; gap: 0.6rem; }
+.uni-svg {
+  width: 100%; height: auto; max-height: 220px;
+  background: #fbfbfd; border: 1px solid #e2e6ea; border-radius: 8px; overflow: visible;
+}
+.uni-go {
+  font: inherit; padding: 0.35rem 0.8rem; border: 1px solid #2a78d6;
+  border-radius: 6px; background: #2a78d6; color: #fff; font-weight: 600; cursor: pointer;
+  transition: background 0.15s ease;
+}
+.uni-go:hover { background: #2266bd; }
+.uni-readouts {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.35rem 1rem; font-size: 0.9rem;
+}
+.uni-readouts b { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) { .uni-go { transition: none; } }
+
+
+/* To enable the two new widgets (your index.html edit)
+Everything else (arc fix, tautochrone fit, tennis rebuild, friction & speed sliders) needs no HTML change — the sliders are injected after the existing Go buttons, and the curve widgets fit their existing SVG viewBoxes. Only the two new widgets need a host div:
+
+<!-- Brachistochrone tab -->
+<div class="widget">
+  <h3>Brachistochrone Explorer — drag to beat the cycloid</h3>
+  <div id="brachExplorerHost"></div>
+</div>
+
+<!-- Tautochrone tab -->
+<div class="widget">
+  <h3>Tautochrone Clock</h3>
+  <div id="tautoClockHost"></div>
+</div> */
