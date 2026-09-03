@@ -463,6 +463,7 @@
     function reset() {
       if (rafId) cancelAnimationFrame(rafId);
       animating = false;
+      kVal.textContent = activeK();
       outVal.textContent = activeK();
       draw(-1, 0); // preview: left group lifted, ready to release
     }
